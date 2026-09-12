@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="window.__noXLSX=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__noSupabase=1"></script>
 <style>
 :root{
   --bg:#EDF0EE; --surface:#FFFFFF; --surface-2:#F6F8F6; --paper:#FBF8F1;
@@ -472,16 +473,43 @@ function pwScore(p){ let s=0; if(p.length>=8)s++; if(p.length>=12)s++; if(/[a-z]
    1) الخزنة والحالة
 ================================================================== */
 const VKEY='admin_suite_vault_v3', OLD2='crm_pages_v2', OLD1='crm_registry_v1';
+const SB_URL='https://uwwuchwivroukskddkhq.supabase.co';
+const SB_KEY='sb_publishable_nq98s8SPKegEmVrYcD9ewA_jEuYA7yh';
+const SB=(window.supabase&&!window.__noSupabase)?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const CACHE_KEY=VKEY+'_cloud_cache', PENDING_KEY=VKEY+'_pending';
 let VAULT=null, DEK=null, ME=null, DB=null, MYREV=0;
 let cur=null, ui={}, saveTimer=null, idleTimer=null;
 const IDLE_MIN=15;
 
-const NOSTORE=!(window.storage&&window.storage.get);
-let MEMV=null;
-async function vaultRead(){ if(NOSTORE) return MEMV;
-  try{ const r=await window.storage.get(VKEY,true); return r&&r.value?JSON.parse(r.value):MEMV; }catch(e){ return MEMV; } }
-async function vaultWrite(v){ MEMV=v; if(NOSTORE) return; await window.storage.set(VKEY,JSON.stringify(v),true); }
-async function readOld(k){ try{ const r=await window.storage.get(k); return r&&r.value?JSON.parse(r.value):null; }catch(e){ return null; } }
+const NOSTORE=false;
+let MEMV=null, SB_SESSION=null;
+function localGet(k){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function localSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+async function cloudSession(){
+  if(!SB) return null;
+  const {data,error}=await SB.auth.getSession();
+  if(error) throw error;
+  SB_SESSION=data.session||null; return SB_SESSION;
+}
+async function vaultRead(){
+  if(!SB_SESSION) await cloudSession();
+  if(!SB_SESSION) return null;
+  const {data,error}=await SB.from('user_vaults').select('vault,revision').eq('user_id',SB_SESSION.user.id).maybeSingle();
+  if(error) throw error;
+  if(!data||!data.vault) return null;
+  MEMV=data.vault; localSet(CACHE_KEY,MEMV); return MEMV;
+}
+async function vaultWrite(v){
+  if(!SB_SESSION) await cloudSession();
+  if(!SB_SESSION) throw new Error('انتهت جلسة الدخول');
+  const {error}=await SB.from('user_vaults').upsert({user_id:SB_SESSION.user.id,vault:v,revision:v.rev||1,updated_at:nowTs()},{onConflict:'user_id'});
+  if(error) throw error;
+  MEMV=v; localSet(CACHE_KEY,v);
+}
+async function readOld(k){
+  try{ if(window.storage&&window.storage.get){ const r=await window.storage.get(k); if(r&&r.value) return JSON.parse(r.value); } }catch(e){}
+  return localGet(k);
+}
 
 /* ==================================================================
    2) البيانات الافتراضية
@@ -658,14 +686,23 @@ function secNote(){ $('#gateSec').textContent = SUB?'البيانات مشفّر
 async function boot(){
   secNote();
   if(!SUB){ gate(`<div class="gerr">هذا المتصفح لا يوفّر واجهة التشفير (Web Crypto). افتح النظام عبر رابط https أو استخدم متصفحاً حديثاً.</div>`); return; }
-  if(NOSTORE) setTimeout(()=>toast('تنبيه: التخزين الدائم غير متاح هنا — البيانات لهذه الجلسة فقط. افتح النظام من الرابط المنشور.','err'),700);
-  VAULT=await vaultRead();
-  if(!VAULT||!VAULT.users||!VAULT.users.length) return screenSetup();
-  screenLogin();
+  if(!SB){ gate(`<div class="gerr">تعذّر تحميل خدمة المزامنة. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.</div>`); return; }
+  try{
+    const session=await cloudSession();
+    if(!session) return screenLogin();
+    VAULT=await vaultRead();
+    if(!VAULT||!VAULT.users||!VAULT.users.length){
+      const pending=localGet(PENDING_KEY);
+      if(pending&&pending.email===String(session.user.email||'').toLowerCase()){
+        VAULT=pending.vault; await vaultWrite(VAULT); localStorage.removeItem(PENDING_KEY);
+      } else return screenSetup('لم تُنشأ خزنة لهذا الحساب بعد. أكمل إنشاء حساب المدير.');
+    }
+    screenLogin({email:session.user.email||''},'الجلسة السحابية متصلة. أدخل كلمة المرور لفك تشفير بياناتك.');
+  }catch(e){ screenLogin(null,'تعذّر الاتصال بالسحابة مؤقتاً. تحقق من الإنترنت ثم حاول الدخول.'); }
 }
-function screenSetup(){
+function screenSetup(note){
   gate(`
-    <div class="gnote">🔐 هذه أول مرة. أنشئ حساب المدير — كلمة المرور هي المفتاح الذي تُشفَّر به كل البيانات، ولا يمكن استرجاعها إن نُسيت.</div>
+    <div class="gnote">🔐 ${esc(note||'هذه أول مرة. أنشئ حساب المدير — سيُستخدم الحساب نفسه للمزامنة بين الجوال والكمبيوتر، وكلمة المرور هي مفتاح تشفير البيانات.')}</div>
     <div class="fld" style="margin-bottom:11px"><label>الاسم</label><input id="s_name" value="أحمد السعيدي"></div>
     <div class="fld" style="margin-bottom:11px"><label>البريد الإلكتروني <i>*</i></label><input id="s_mail" type="email" placeholder="name@example.com" autocomplete="username"></div>
     <div class="fld" style="margin-bottom:11px"><label>كلمة المرور <i>*</i></label><input id="s_pw" type="password" autocomplete="new-password">
@@ -687,6 +724,9 @@ async function doSetup(){
   if(pw!==pw2) return gErr('كلمتا المرور غير متطابقتين.');
   const btn=$('#s_go'); btn.innerHTML='<span class="spin"></span> جارٍ التشفير…'; btn.disabled=true;
   try{
+    const auth=await SB.auth.signUp({email:mail,password:pw});
+    if(auth.error) throw auth.error;
+    SB_SESSION=auth.data.session||null;
     const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt), dek=await newDEK(), wr=await wrapDEK(kek,dek);
     let data;
     const old2=await readOld(OLD2);
@@ -698,35 +738,51 @@ async function doSetup(){
     VAULT={v:3,rev:1,createdAt:nowTs(),updatedAt:nowTs(),iters:ITERS,
       users:[{id:meId,email:mail,salt,...wr,active:true,fails:0,lockUntil:0}],
       data:await encObj(dek,data)};
-    await vaultWrite(VAULT);
+    if(!SB_SESSION){
+      localSet(PENDING_KEY,{email:mail,vault:VAULT});
+      screenLogin({email:mail},'أرسلنا رسالة تأكيد إلى بريدك. أكّد البريد، ثم ارجع هنا وسجّل الدخول ليتم رفع الخزنة المشفّرة.');
+      return;
+    }
+    await vaultWrite(VAULT); localStorage.removeItem(PENDING_KEY);
     DEK=dek; DB=data; ME=data.users[0]; MYREV=VAULT.rev;
-    enterApp(); toast('أُنشئ الحساب — احفظ كلمة المرور في مكان آمن');
+    enterApp(); toast('أُنشئ الحساب وربطت المزامنة السحابية');
   }catch(e){ btn.disabled=false; btn.textContent='إنشاء الحساب وتشفير البيانات'; gErr('تعذّر الإنشاء: '+e.message); }
 }
-function screenLogin(lockedUser){
+function screenLogin(lockedUser,note){
   const em=lockedUser?lockedUser.email:'';
   gate(`
-    ${lockedUser?`<div class="gnote">🔒 قُفلت الجلسة لعدم النشاط. أدخل كلمة المرور للمتابعة.</div>`:''}
+    ${note?`<div class="gnote">${esc(note)}</div>`:(lockedUser?`<div class="gnote">🔒 أدخل كلمة المرور لفك تشفير الخزنة والمتابعة.</div>`:'')}
     <div class="fld" style="margin-bottom:11px"><label>البريد الإلكتروني</label>
       <input id="l_mail" type="email" value="${esc(em)}" ${lockedUser?'readonly':''} autocomplete="username"></div>
     <div class="fld" style="margin-bottom:16px"><label>كلمة المرور</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <button class="btn primary gbig" id="l_go">دخول</button>
+    ${!lockedUser?`<button class="btn ghost gbig" id="l_new" style="margin-top:9px">إنشاء حساب المدير لأول مرة</button>`:''}
     <p style="text-align:center;font-size:11.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.8">
-      لا توجد استعادة لكلمة المرور — البيانات مشفّرة بها.<br>راجع مدير النظام لإنشاء حساب.</p>`);
+      نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#l_go').onclick=doLogin;
+  if($('#l_new')) $('#l_new').onclick=()=>screenSetup();
   $('#l_pw').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   setTimeout(()=>{const f=lockedUser?$('#l_pw'):$('#l_mail'); if(f) f.focus();},60);
 }
 async function doLogin(){
   const mail=$('#l_mail').value.trim().toLowerCase(), pw=$('#l_pw').value;
-  VAULT=await vaultRead(); if(!VAULT) return gErr('لا توجد بيانات — أعد تحميل الصفحة.');
-  const u=VAULT.users.find(x=>x.email.toLowerCase()===mail);
-  if(!u) return gErr('البريد أو كلمة المرور غير صحيحة.');
-  if(u.active===false) return gErr('هذا الحساب موقوف. راجع مدير النظام.');
-  if(u.lockUntil&&Date.now()<u.lockUntil){
-    const m=Math.ceil((u.lockUntil-Date.now())/60000); return gErr(`الحساب مقفل مؤقتاً بعد محاولات خاطئة. أعد المحاولة بعد ${m} دقيقة.`); }
   const btn=$('#l_go'); btn.innerHTML='<span class="spin"></span> جارٍ فك التشفير…'; btn.disabled=true;
+  let u=null;
   try{
+    const auth=await SB.auth.signInWithPassword({email:mail,password:pw});
+    if(auth.error) throw auth.error;
+    SB_SESSION=auth.data.session;
+    VAULT=await vaultRead();
+    if(!VAULT){
+      const pending=localGet(PENDING_KEY);
+      if(pending&&pending.email===mail){ VAULT=pending.vault; await vaultWrite(VAULT); localStorage.removeItem(PENDING_KEY); }
+      else throw new Error('لا توجد خزنة مرتبطة بهذا الحساب. أنشئ حساب المدير أولاً.');
+    }
+    u=VAULT.users.find(x=>x.email.toLowerCase()===mail);
+    if(!u) throw new Error('هذا البريد غير مسجل داخل الخزنة.');
+    if(u.active===false) throw new Error('هذا الحساب موقوف. راجع مدير النظام.');
+    if(u.lockUntil&&Date.now()<u.lockUntil){
+      const m=Math.ceil((u.lockUntil-Date.now())/60000); throw new Error(`الحساب مقفل مؤقتاً. أعد المحاولة بعد ${m} دقيقة.`); }
     const kek=await deriveKEK(pw,u.salt,VAULT.iters||ITERS);
     const dek=await unwrapDEK(kek,u);
     const data=await decObj(dek,VAULT.data);
@@ -738,16 +794,17 @@ async function doLogin(){
     await persist();
     enterApp();
   }catch(e){
-    u.fails=(u.fails||0)+1;
-    if(u.fails>=5){ u.lockUntil=Date.now()+5*60000; u.fails=0; }
-    try{ await vaultWrite(VAULT); }catch(_){}
+    if(u){ u.fails=(u.fails||0)+1;
+      if(u.fails>=5){ u.lockUntil=Date.now()+5*60000; u.fails=0; }
+      try{ await vaultWrite(VAULT); }catch(_){} }
     btn.disabled=false; btn.textContent='دخول';
-    gErr(u.lockUntil>Date.now()?'محاولات خاطئة متكررة — قُفل الحساب 5 دقائق.':'البريد أو كلمة المرور غير صحيحة.');
+    gErr(u&&u.lockUntil>Date.now()?'محاولات خاطئة متكررة — قُفل الحساب 5 دقائق.':(e.message||'البريد أو كلمة المرور غير صحيحة.'));
   }
 }
 function lockSession(){ if(!ME) return; const u=VAULT.users.find(x=>x.id===ME.id);
   DEK=null; DB=null; const keep=ME; ME=null; ui={}; cur=null; clearTimeout(idleTimer); screenLogin(u||{email:''}); }
-function logout(){ DEK=null; DB=null; ME=null; ui={}; cur=null; clearTimeout(idleTimer); screenLogin(); }
+async function logout(){ DEK=null; DB=null; ME=null; VAULT=null; SB_SESSION=null; ui={}; cur=null; clearTimeout(idleTimer);
+  try{ if(SB) await SB.auth.signOut(); }catch(e){} screenLogin(); }
 function resetIdle(){ clearTimeout(idleTimer); if(ME) idleTimer=setTimeout(lockSession,IDLE_MIN*60000); }
 ['click','keydown','mousemove','touchstart'].forEach(e=>document.addEventListener(e,()=>{ if(ME) resetIdle(); },{passive:true}));
 
