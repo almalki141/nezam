@@ -375,24 +375,38 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .brand{padding:13px 14px 11px}.brand .crest{width:36px;height:36px}.unit-name{margin-top:9px}
   .who{padding:9px 14px}.nav{min-height:0;padding:9px 10px}.nav-item{padding:8px 10px}
   .side-foot{padding:8px 10px;gap:5px}.sbtn{padding:7px 4px}.credit{display:none}
+  .app,.main,.topbar,.page{width:100%;max-width:100%;min-width:0}
   .topbar{padding:10px;gap:9px;align-items:flex-start}
   .topbar>div:nth-child(2){min-width:0;flex:1}.topbar h2{font-size:17px}.topbar .sub{font-size:11.5px}
   .pgtools{order:3;width:100%}.pgtools .btn{flex:1;justify-content:center}
   .stripe{order:4;margin:0;width:100%;overflow-x:auto}.stripe .cell{min-width:92px;padding:6px 10px}
   .page{padding:12px 10px 80px;min-width:0}
-  .tools{gap:7px}.search{max-width:none;min-width:100%;width:100%}
-  select.filter{flex:1;max-width:none;min-width:135px}
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
+  .search{grid-column:1/-1;max-width:none;min-width:0;width:100%}
+  .search input,.fld input,.fld select,.fld textarea,select.filter{font-size:16px}
+  .search input{height:48px;padding-inline-start:14px;border-radius:12px}
+  select.filter{width:100%;max-width:none;min-width:0;height:46px;border-radius:11px}
   .tools .spacer{display:none}.tools>.btn{flex:1;justify-content:center;min-width:calc(50% - 4px);padding:9px 8px;font-size:12.5px}
+  .tools>.btn,.tools>.seg{min-width:0;width:100%;margin:0}
   .seg{width:100%}.seg button{flex:1}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
-  .register{border-radius:10px}.reg-head{padding:10px 12px}
-  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.tablewrap table{min-width:760px}
-  thead th,tbody td{padding:9px 10px}
+  .register{background:transparent;border:0;box-shadow:none;overflow:visible}.reg-head{padding:10px 12px;border-radius:11px;margin-bottom:9px;position:sticky;top:0;z-index:5}
+  .tablewrap{overflow:visible}.tablewrap table{min-width:0}.tablewrap thead{display:none}
+  .tablewrap tbody{display:grid;gap:9px}
+  .tablewrap tbody tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 8px;box-shadow:var(--shadow-sm);overflow:hidden}
+  .tablewrap tbody tr:hover{background:var(--surface)}
+  .tablewrap tbody td{display:grid;grid-template-columns:minmax(88px,34%) 1fr;gap:10px;align-items:start;padding:7px 2px;border-bottom:1px solid var(--line-2);font-size:14px;min-width:0;text-align:start}
+  .tablewrap tbody td::before{content:attr(data-label);color:var(--ink-3);font-size:12px;font-weight:700;line-height:1.7}
+  .tablewrap tbody td.num{display:block;position:absolute;left:10px;top:9px;width:auto;padding:2px 8px;border:0;border-radius:20px;background:var(--surface-2);box-shadow:none!important}
+  .tablewrap tbody td.num::before{display:none}
+  .tablewrap tbody td.acts{display:flex;width:auto;justify-content:flex-end;gap:5px;padding:9px 0 0;border:0;text-align:start}
+  .tablewrap tbody td.acts::before{content:'إجراءات';margin-inline-end:auto;align-self:center}
+  .tablewrap .person{min-width:0}.tablewrap .person b,.tablewrap .person span,.tablewrap .trunc{white-space:normal;overflow-wrap:anywhere}
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
   .desk-bar>*{flex:1}.desk-bar .lbl{flex-basis:100%}.desk-bar select{min-width:100%}
   .sheetwrap{padding:8px;max-height:none}.sheet{padding:22px 18px;font-size:15px;line-height:1.9}
   .overlay{padding:0;align-items:flex-end}.modal,.modal.sm,.modal.lg{max-width:none;border-radius:16px 16px 0 0;max-height:94dvh}
-  .m-head{padding:13px 15px}.m-body{padding:15px;max-height:72dvh}.m-foot{padding:11px 15px}
+  .m-head{padding:13px 15px}.m-body{padding:15px;max-height:calc(100dvh - 132px)}.m-foot{padding:11px 15px;padding-bottom:max(11px,env(safe-area-inset-bottom))}
   .m-foot .btn{flex:1;justify-content:center}.utable{min-width:620px}.m-body:has(.utable){overflow-x:auto}
   .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
   .toasts{left:10px;right:10px;bottom:12px}.toast{max-width:none;width:100%}
@@ -512,7 +526,7 @@ const CACHE_KEY=VKEY+'_cloud_cache', PENDING_KEY=VKEY+'_pending', PENDING_INVITE
 let INVITE_TOKEN=new URLSearchParams(location.search).get('invite')||'';
 let VAULT=null, DEK=null, ME=null, DB=null, MYREV=0;
 let WORKSPACE_ID=null;
-let cur=null, ui={}, saveTimer=null, idleTimer=null;
+let cur=null, ui={}, saveTimer=null, idleTimer=null, searchTimer=null;
 const IDLE_MIN=15;
 
 const NOSTORE=false;
@@ -1235,7 +1249,9 @@ function toolsHTML(p,extra){
   </div>`;
 }
 function bindTools(p){
-  const u=U(), qi=$('#q'); if(qi) qi.oninput=e=>{u.q=e.target.value;refreshBody();};
+  const u=U(), qi=$('#q'); if(qi) qi.oninput=e=>{
+    u.q=e.target.value; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,120);
+  };
   document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;refreshBody();});
   const a=$('#bAdd'); if(a) a.onclick=()=>openRow();
   const x=$('#bXls'); if(x) x.onclick=()=>exportCSV(p);
@@ -1268,10 +1284,10 @@ function renderTable(p){
     : !rows.length ? empty('لا نتائج مطابقة','غيّر كلمة البحث أو أعد ضبط عوامل التصفية.')
     : `<div class="tablewrap"><table><thead><tr><th class="num">م</th>${th}<th class="acts"></th></tr></thead><tbody>
       ${rows.map((r,i)=>`<tr>
-        <td class="num" ${ch?`style="box-shadow:inset 3px 0 0 ${CVAR[((ch.options||[]).find(o=>o.label===r.v[ch.id])||{}).color]||'transparent'}"`:''}>${i+1}</td>
-        ${cols.map(c=>`<td>${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
-        ${p.showUpdated?`<td class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
-        <td class="acts">
+        <td class="num" data-label="الرقم" ${ch?`style="box-shadow:inset 3px 0 0 ${CVAR[((ch.options||[]).find(o=>o.label===r.v[ch.id])||{}).color]||'transparent'}"`:''}>${i+1}</td>
+        ${cols.map(c=>`<td data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
+        ${p.showUpdated?`<td data-label="آخر تحديث" class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
+        <td class="acts" data-label="إجراءات">
           <button class="iconbtn" title="السجل" data-log="${r.id}">${ic('clock')}</button>
           ${can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit')}</button>`:''}
           ${can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
