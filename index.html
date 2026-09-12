@@ -371,7 +371,10 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .gate{padding:0;align-items:stretch}
   .gcard{max-width:none;min-height:100dvh;border-radius:0;display:flex;flex-direction:column;justify-content:center}
   .ghead{padding:22px 18px 17px}.gbody{padding:18px}.gfoot{padding:12px 18px}
-  .side{width:min(88vw,330px);right:min(-90vw,-340px)}
+  .side{width:min(86vw,330px);right:min(-90vw,-340px);height:100dvh}
+  .brand{padding:13px 14px 11px}.brand .crest{width:36px;height:36px}.unit-name{margin-top:9px}
+  .who{padding:9px 14px}.nav{min-height:0;padding:9px 10px}.nav-item{padding:8px 10px}
+  .side-foot{padding:8px 10px;gap:5px}.sbtn{padding:7px 4px}.credit{display:none}
   .topbar{padding:10px;gap:9px;align-items:flex-start}
   .topbar>div:nth-child(2){min-width:0;flex:1}.topbar h2{font-size:17px}.topbar .sub{font-size:11.5px}
   .pgtools{order:3;width:100%}.pgtools .btn{flex:1;justify-content:center}
@@ -958,6 +961,21 @@ async function syncNow(){
     ME=(DB.users||[]).find(x=>x.id===ME.id)||ME; render(); toast('تمت المزامنة'); }
   catch(e){ toast('تعذّرت المزامنة','err'); }
 }
+async function syncQuietly(){
+  if(!ME||!DEK||persisting||pendingAgain||document.hidden) return;
+  try{
+    const remote=await vaultRead();
+    if(!remote||remote.rev<=MYREV) return;
+    VAULT=remote; DB=await decObj(DEK,VAULT.data); MYREV=VAULT.rev;
+    ME=(DB.users||[]).find(x=>x.id===ME.id)||ME;
+    const stillVisible=cur&&visiblePages().some(p=>p.id===cur);
+    if(!stillVisible) cur=(visiblePages()[0]||{}).id||null;
+    render(); setSave('تمت المزامنة تلقائياً');
+  }catch(e){ /* تبقى المزامنة اليدوية متاحة عند انقطاع الشبكة */ }
+}
+window.addEventListener('focus',syncQuietly);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) syncQuietly(); });
+setInterval(syncQuietly,30000);
 
 /* ==================================================================
    6) الأيقونات والأنواع
@@ -1799,9 +1817,10 @@ function openAddUser(){
     if(pw.length<8) return toast('كلمة المرور 8 أحرف على الأقل','err');
     if(VAULT.users.some(x=>x.email.toLowerCase()===mail)) return toast('هذا البريد مستخدم مسبقاً','err');
     const btn=$('#uSave'); btn.innerHTML='<span class="spin"></span> جارٍ الإنشاء…'; btn.disabled=true;
+    let createdId=null;
     try{
       const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
-      const id=uid(), perms={};
+      const id=uid(), perms={}; createdId=id;
       document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value);
       DB.users.push({id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,createdAt:nowTs()});
       VAULT.users.push({id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0});
@@ -1815,7 +1834,15 @@ function openAddUser(){
         <div class="fld"><label>كلمة المرور المؤقتة</label><input id="invitePw" readonly value="${esc(pw)}" style="direction:ltr"></div>`,
         `<button class="btn primary" id="copyInvite">نسخ الرابط وكلمة المرور</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
       $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText('رابط الدعوة: '+link+'\nكلمة المرور المؤقتة: '+pw); toast('نُسخت بيانات الدعوة'); };
-    }catch(e){ btn.disabled=false; btn.textContent='إنشاء الحساب'; toast('تعذّر الإنشاء','err'); }
+    }catch(e){
+      if(createdId){
+        DB.users=DB.users.filter(x=>x.id!==createdId);
+        VAULT.users=VAULT.users.filter(x=>x.id!==createdId);
+        try{ await persist(); }catch(_){}
+      }
+      btn.disabled=false; btn.textContent='إنشاء الحساب';
+      toast('تعذّر إنشاء الدعوة: '+(e.message||'خطأ غير معروف'),'err');
+    }
   };
 }
 function openPerms(id){
