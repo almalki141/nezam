@@ -167,6 +167,11 @@ select.filter{padding:10px 12px;border:1px solid var(--line);background:var(--su
 .pager .pginfo{font-size:12.5px;color:var(--ink-3);font-weight:700;min-width:95px;text-align:center}
 .date-summary{display:flex;align-items:center;gap:10px;padding:7px 11px;border:1px solid var(--line);background:var(--surface);border-radius:10px;box-shadow:var(--shadow-sm)}
 .date-summary b{font-size:12px}.date-summary span{display:block;font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.smart-summary{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:end;background:linear-gradient(135deg,var(--pine),var(--pine-2));color:#fff;border-radius:13px;padding:13px 15px;margin-bottom:12px;box-shadow:var(--shadow)}
+.smart-summary .result{min-width:115px}.smart-summary .result b{display:block;font-size:28px;line-height:1}.smart-summary .result span{font-size:11px;color:#AFC7C1}
+.smart-summary label{display:block;font-size:10.5px;color:#BFD2CD;font-weight:700;margin-bottom:4px}
+.smart-summary .pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.smart-summary select{width:100%;min-width:0;padding:8px;border:1px solid rgba(255,255,255,.15);border-radius:8px;background:#fff;color:#18322F;font-size:12px}
 
 .register{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 .reg-head{display:flex;align-items:center;gap:10px;padding:12px 16px;
@@ -414,6 +419,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .register.view-compact tbody td:not(.num):not(.acts):nth-of-type(n+5){display:none}
   .register.view-compact tbody td{padding-block:5px}
   .date-summary{order:2;margin-inline-start:auto;padding:5px 8px}.date-summary b{font-size:11.5px}.date-summary span{font-size:9.5px}
+  .smart-summary{grid-template-columns:1fr 1fr;padding:12px;gap:9px}.smart-summary .result{grid-column:1/-1;display:flex;align-items:baseline;gap:8px}.smart-summary .result b{font-size:25px}.smart-summary .pair{grid-template-columns:1fr}
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
   .desk-bar>*{flex:1}.desk-bar .lbl{flex-basis:100%}.desk-bar select{min-width:100%}
   .sheetwrap{padding:8px;max-height:none}.sheet{padding:22px 18px;font-size:15px;line-height:1.9}
@@ -1015,7 +1021,7 @@ setInterval(syncQuietly,30000);
 ================================================================== */
 const COLORS=[['slate','رمادي'],['green','أخضر'],['red','أحمر'],['blue','أزرق'],['amber','برتقالي'],['plum','بنفسجي'],['gold','ذهبي']];
 const CVAR={slate:'var(--slate)',green:'var(--green)',red:'var(--red)',blue:'var(--blue)',amber:'var(--amber)',plum:'var(--plum)',gold:'var(--brass)',teal:'var(--pine-2)'};
-const TYPES=[['text','نص'],['longtext','نص طويل'],['code','رقم / كود'],['number','عدد'],['phone','رقم جوال'],['date','تاريخ'],
+const TYPES=[['text','نص'],['longtext','نص طويل'],['code','رقم / كود'],['number','عدد'],['phone','رقم جوال'],['date','تاريخ ميلادي'],['hijri','تاريخ هجري'],
              ['select','قائمة خيارات ملوّنة'],['link','ربط بسجل من صفحة أخرى'],['list','قائمة بنود نصية'],
              ['image','صورة واحدة'],['gallery','صور متعددة'],['files','ملفات (PDF وصور)']];
 const ICONS={
@@ -1105,7 +1111,7 @@ const primary=p=>vis(p).find(c=>!['image','gallery','files'].includes(c.type))||
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:'',page:1,pageSize:25,display:'detail'}; return ui[cur]; }
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:'',page:1,pageSize:25,display:'detail',summary:[{c:'',v:''},{c:'',v:''}]}; return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1120,7 +1126,8 @@ function cellText(p,c,r){ const v=r.v[c.id];
   if(c.type==='files') return (Array.isArray(v)?v:[]).map(f=>f.n).join(' · ');
   if(c.type==='list') return (Array.isArray(v)?v:[]).join(' · ');
   if(c.type==='link'){ const t=linkPage(c),o=t&&t.rows.find(x=>x.id===v); return o?rowTitle(t,o):''; }
-  if(c.type==='date') return v?fmtDate(v):'';
+  if(c.type==='date') return v?fmtG(v):'';
+  if(c.type==='hijri') return v?String(v).replace(/\s*هـ\s*$/,'')+' هـ':'';
   return v==null?'':String(v); }
 function cellHTML(p,c,r,isP){
   const v=r.v[c.id], txt=cellText(p,c,r);
@@ -1140,7 +1147,7 @@ function cellHTML(p,c,r,isP){
     return esc(txt); }
   if(c.type==='list'){ const a=Array.isArray(v)?v:[]; return a.length?`<span class="badge b-slate" title="${esc(a.join(' • '))}">${a.length} بنود</span>`:'<span class="dim">—</span>'; }
   if(!txt) return '<span class="dim">—</span>';
-  if(c.type==='date') return `<span class="mono" title="${esc(fmtG(v))}">${esc(txt)}</span>`;
+  if(c.type==='date'||c.type==='hijri') return `<span class="mono">${esc(txt)}</span>`;
   if(['code','phone','number'].includes(c.type)) return `<span class="mono">${esc(txt)}</span>`;
   if(c.type==='longtext') return `<span class="trunc" title="${esc(txt)}">${esc(txt)}</span>`;
   if(isP&&(p.avatars||photoCol(p))) return `<div class="person">${avaHTML(p,r,txt)}<div><b>${esc(txt)}</b><span>${esc(subLine(p,r))}</span></div></div>`;
@@ -1257,6 +1264,16 @@ function rowsOf(p){
       return A.localeCompare(B,'ar')*u.sort.d; }); }
   return r;
 }
+function summaryHTML(p){
+  const u=U(); u.summary=u.summary||[{c:'',v:''},{c:'',v:''}];
+  const cols=vis(p).filter(c=>!['image','gallery','files','longtext','list'].includes(c.type));
+  const preferred=cols.filter(c=>c.filterable||c.type==='select');
+  u.summary.forEach((s,i)=>{ if(s.c&&!cols.some(c=>c.id===s.c)){s.c='';s.v='';} if(!s.c&&preferred[i]) s.c=preferred[i].id; });
+  const matches=p.rows.filter(r=>u.summary.every(s=>!s.v||cellText(p,p.cols.find(c=>c.id===s.c),r)===s.v)).length;
+  const block=(s,i)=>{ const c=p.cols.find(x=>x.id===s.c), vals=c?uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')):[];
+    return `<div><label>الشرط ${i+1}</label><div class="pair"><select data-sc="${i}"><option value="">اختر العمود</option>${cols.map(x=>`<option value="${x.id}" ${s.c===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><select data-sv="${i}" ${c?'':'disabled'}><option value="">كل القيم</option>${vals.map(v=>`<option ${s.v===v?'selected':''}>${esc(v)}</option>`).join('')}</select></div></div>`; };
+  return `<div class="smart-summary"><div class="result"><b>${matches}</b><span>سجل مطابق من ${p.rows.length}</span></div>${u.summary.map(block).join('')}</div>`;
+}
 function toolsHTML(p,extra){
   const u=U(), ch=chipsCol(p), fl=vis(p).filter(c=>c.filterable&&(!ch||c.id!==ch.id));
   return `<div class="tools">
@@ -1277,6 +1294,8 @@ function bindTools(p){
   };
   document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;u.page=1;refreshBody();});
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{u.display=b.dataset.view;refreshBody();});
+  document.querySelectorAll('[data-sc]').forEach(s=>s.onchange=()=>{const x=u.summary[+s.dataset.sc];x.c=s.value;x.v='';refreshBody();});
+  document.querySelectorAll('[data-sv]').forEach(s=>s.onchange=()=>{u.summary[+s.dataset.sv].v=s.value;refreshBody();});
   const a=$('#bAdd'); if(a) a.onclick=()=>openRow();
   const x=$('#bXls'); if(x) x.onclick=()=>exportCSV(p);
   const pr=$('#bPrn'); if(pr) pr.onclick=()=>printTable(p);
@@ -1320,7 +1339,7 @@ function renderTable(p){
           ${can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
-  $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
+  $('#pageBody').innerHTML=summaryHTML(p)+toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
     <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3><span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${pager}</div>`;
   bindTools(p); bindCells();
   const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
@@ -1470,7 +1489,9 @@ function fieldHTML(p,c,v){
     return `<div class="fld">${L}<select id="${id}"><option value="">— غير محدد —</option>
       ${t.rows.map(r=>`<option value="${r.id}" ${v===r.id?'selected':''}>${esc(rowTitle(t,r))}</option>`).join('')}</select></div>`; }
   if(c.type==='date') return `<div class="fld">${L}<input id="${id}" type="date" value="${esc(v||'')}" oninput="document.getElementById('hj_${c.id}').textContent=this.value?('يوافق '+window.fmtDate(this.value)):''">
-    <span class="hint" id="hj_${c.id}">${v?'يوافق '+fmtDate(v):'التاريخ الميلادي للإدخال، ويُعرض هجرياً في الجداول.'}</span></div>`;
+    <span class="hint" id="hj_${c.id}">${v?'يوافق '+fmtDate(v):'اختر التاريخ الميلادي، وسيظهر مقابله الهجري هنا.'}</span></div>`;
+  if(c.type==='hijri') return `<div class="fld">${L}<input id="${id}" type="text" inputmode="numeric" value="${esc(v||'')}" placeholder="مثال: 1448/04/02" pattern="[0-9٠-٩]{4}[/.-][0-9٠-٩]{1,2}[/.-][0-9٠-٩]{1,2}">
+    <span class="hint">أدخل التاريخ الهجري بصيغة السنة/الشهر/اليوم.</span></div>`;
   const dl='dl_'+c.id, vals=uniq(p.rows.map(r=>r.v[c.id])).slice(0,60);
   const type=c.type==='number'?'number':'text';
   return `<div class="fld">${L}<input id="${id}" type="${type}" value="${esc(v??'')}" ${c.type==='phone'?'inputmode="tel"':''} list="${dl}">
@@ -1554,6 +1575,7 @@ function readField(c){
   if(c.type==='files') return FILB[c.id]||[];
   const e=document.getElementById('f_'+c.id); if(!e) return undefined;
   if(c.type==='list') return e.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(c.type==='hijri') return e.value.trim().replace(/[٠-٩]/g,d=>'0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]).replace(/[.-]/g,'/');
   return e.value.trim();
 }
 function normUnique(v){
@@ -1566,6 +1588,8 @@ function saveRow(rid){
   if(!String(V[pc.id]||'').trim()){ const el=document.getElementById('f_'+pc.id); if(el){el.classList.add('bad');el.focus();}
     return toast(`«${pc.name}» مطلوب`,'err'); }
   for(const c of p.cols){ if(c.required){ const x=V[c.id]; if(!(Array.isArray(x)?x.length:String(x||'').length)) return toast(`«${c.name}» مطلوب`,'err'); } }
+  for(const c of p.cols.filter(x=>x.type==='hijri')){ const v=V[c.id];
+    if(v&&!/^1[34]\d{2}\/(0?[1-9]|1[0-2])\/(0?[1-9]|[12]\d|30)$/.test(v)) return toast(`صيغة «${c.name}» غير صحيحة؛ استخدم 1448/04/02`,'err'); }
   for(const c of p.cols.filter(x=>x.unique)){
     const val=normUnique(V[c.id]); if(!val) continue;
     if(p.rows.some(row=>row.id!==rid&&normUnique(row.v[c.id])===val)){
