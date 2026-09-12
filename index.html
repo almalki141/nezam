@@ -162,6 +162,11 @@ select.filter{padding:10px 12px;border:1px solid var(--line);background:var(--su
 .chip.on{color:#fff;border-color:transparent}
 .dist{display:flex;height:8px;border-radius:20px;overflow:hidden;background:var(--line-2);margin-bottom:12px}
 .dist i{display:block;height:100%}
+.view-switch{display:none}
+.pager{display:flex;align-items:center;justify-content:center;gap:9px;padding:13px 8px 2px}
+.pager .pginfo{font-size:12.5px;color:var(--ink-3);font-weight:700;min-width:95px;text-align:center}
+.date-summary{display:flex;align-items:center;gap:10px;padding:7px 11px;border:1px solid var(--line);background:var(--surface);border-radius:10px;box-shadow:var(--shadow-sm)}
+.date-summary b{font-size:12px}.date-summary span{display:block;font-size:10.5px;color:var(--ink-3);white-space:nowrap}
 
 .register{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 .reg-head{display:flex;align-items:center;gap:10px;padding:12px 16px;
@@ -388,6 +393,9 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   select.filter{width:100%;max-width:none;min-width:0;height:46px;border-radius:11px}
   .tools .spacer{display:none}.tools>.btn{flex:1;justify-content:center;min-width:calc(50% - 4px);padding:9px 8px;font-size:12.5px}
   .tools>.btn,.tools>.seg{min-width:0;width:100%;margin:0}
+  .view-switch{display:flex;grid-column:1/-1;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:3px;gap:3px}
+  .view-switch button{flex:1;padding:7px 5px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink-3)}
+  .view-switch button.on{background:var(--pine);color:#fff}
   .seg{width:100%}.seg button{flex:1}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
   .register{background:transparent;border:0;box-shadow:none;overflow:visible}.reg-head{padding:10px 12px;border-radius:11px;margin-bottom:9px;position:sticky;top:0;z-index:5}
@@ -402,6 +410,10 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .tablewrap tbody td.acts{display:flex;width:auto;justify-content:flex-end;gap:5px;padding:9px 0 0;border:0;text-align:start}
   .tablewrap tbody td.acts::before{content:'إجراءات';margin-inline-end:auto;align-self:center}
   .tablewrap .person{min-width:0}.tablewrap .person b,.tablewrap .person span,.tablewrap .trunc{white-space:normal;overflow-wrap:anywhere}
+  .register.view-compact tbody tr{padding-block:10px}
+  .register.view-compact tbody td:not(.num):not(.acts):nth-of-type(n+5){display:none}
+  .register.view-compact tbody td{padding-block:5px}
+  .date-summary{order:2;margin-inline-start:auto;padding:5px 8px}.date-summary b{font-size:11.5px}.date-summary span{font-size:9.5px}
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
   .desk-bar>*{flex:1}.desk-bar .lbl{flex-basis:100%}.desk-bar select{min-width:100%}
   .sheetwrap{padding:8px;max-height:none}.sheet{padding:22px 18px;font-size:15px;line-height:1.9}
@@ -442,6 +454,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
     <div class="who" id="who"></div>
     <nav class="nav"><div class="nav-label">الصفحات</div><div id="navList"></div>
       <button class="nav-add" id="navAdd" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة صفحة</button>
+      <button class="nav-add" id="navSort" hidden>ترتيب الصفحات</button>
     </nav>
     <div class="side-foot">
       <div class="savepill"><span class="dot" id="saveDot"></span><span id="saveTxt">جاهز</span><span class="sz" id="sizeTxt"></span></div>
@@ -907,6 +920,12 @@ function resetIdle(){ clearTimeout(idleTimer); if(ME) idleTimer=setTimeout(lockS
 
 function enterApp(){
   DB.users=DB.users||[]; DB.audit=DB.audit||[]; DB.pages=DB.pages||[];
+  if(!DB.uniqueRulesV1){
+    DB.pages.forEach(p=>(p.cols||[]).forEach(c=>{
+      if(/^(الاسم|اسم الفرد|رقم الهوية|الرقم العام|الرقم العسكري|رقم المعاملة)$/.test(String(c.name||'').trim())) c.unique=true;
+    }));
+    DB.uniqueRulesV1=true; save();
+  }
   $('#gate').hidden=true; $('#app').hidden=false;
   $('#unitName').value=DB.unit||''; $('#unitName').disabled=!isAdmin();
   const vp=visiblePages(); cur=vp.length?vp[0].id:null;
@@ -1086,7 +1105,7 @@ const primary=p=>vis(p).find(c=>!['image','gallery','files'].includes(c.type))||
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:''}; return ui[cur]; }
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:'',page:1,pageSize:25,display:'detail'}; return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1179,6 +1198,8 @@ function renderSideBtns(){
   if(isAdmin()){ $('#btnUsers').onclick=openUsers; $('#btnAudit').onclick=openAudit;
     $('#btnBackup').onclick=openBackup; $('#btnRestore').onclick=openRestore; }
   $('#navAdd').hidden=!isAdmin();
+  $('#navSort').hidden=!isAdmin();
+  if(isAdmin()) $('#navSort').onclick=openPageOrder;
 }
 function renderNav(){
   const list=visiblePages();
@@ -1192,6 +1213,7 @@ function renderTop(){
   $('#topbar').innerHTML=`
     <button class="burger" id="burger"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <div><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p></div>
+    <div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>
     ${isAdmin()?`<div class="pgtools">
       <button class="btn ghost sm" id="btnCols">${ic('cols')} الأعمدة</button>
       <button class="btn ghost sm" id="btnPageSet">${ic('gear')} إعدادات الصفحة</button></div>`:''}
@@ -1241,6 +1263,7 @@ function toolsHTML(p,extra){
     <div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" placeholder="ابحث في ${esc(p.name)}…"></div>
     ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>
       ${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
+    <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
     <div class="spacer"></div>${extra||''}
     ${canImport(p)?`<button class="btn ghost" id="bImp">${ic('up')} استيراد Excel</button>`:''}
     ${canExport()?`<button class="btn ghost" id="bXls">${ic('xls')} تصدير Excel</button>
@@ -1250,9 +1273,10 @@ function toolsHTML(p,extra){
 }
 function bindTools(p){
   const u=U(), qi=$('#q'); if(qi) qi.oninput=e=>{
-    u.q=e.target.value; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,120);
+    u.q=e.target.value; u.page=1; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,120);
   };
-  document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;refreshBody();});
+  document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;u.page=1;refreshBody();});
+  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{u.display=b.dataset.view;refreshBody();});
   const a=$('#bAdd'); if(a) a.onclick=()=>openRow();
   const x=$('#bXls'); if(x) x.onclick=()=>exportCSV(p);
   const pr=$('#bPrn'); if(pr) pr.onclick=()=>printTable(p);
@@ -1268,7 +1292,10 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function renderTable(p){
-  const u=U(), ch=chipsCol(p), rows=rowsOf(p), cols=vis(p), pcol=primary(p);
+  const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
+  const pageSize=Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
+  u.page=Math.min(Math.max(1,Number(u.page)||1),pages);
+  const first=(u.page-1)*pageSize, rows=allRows.slice(first,first+pageSize);
   const seg=p.view==='letters'?`<div class="seg"><button class="on">جدول</button><button id="toLetter">خطاب</button></div>`:'';
   let chips='';
   if(ch){
@@ -1284,7 +1311,7 @@ function renderTable(p){
     : !rows.length ? empty('لا نتائج مطابقة','غيّر كلمة البحث أو أعد ضبط عوامل التصفية.')
     : `<div class="tablewrap"><table><thead><tr><th class="num">م</th>${th}<th class="acts"></th></tr></thead><tbody>
       ${rows.map((r,i)=>`<tr>
-        <td class="num" data-label="الرقم" ${ch?`style="box-shadow:inset 3px 0 0 ${CVAR[((ch.options||[]).find(o=>o.label===r.v[ch.id])||{}).color]||'transparent'}"`:''}>${i+1}</td>
+        <td class="num" data-label="الرقم" ${ch?`style="box-shadow:inset 3px 0 0 ${CVAR[((ch.options||[]).find(o=>o.label===r.v[ch.id])||{}).color]||'transparent'}"`:''}>${first+i+1}</td>
         ${cols.map(c=>`<td data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
         ${p.showUpdated?`<td data-label="آخر تحديث" class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
         <td class="acts" data-label="إجراءات">
@@ -1292,16 +1319,19 @@ function renderTable(p){
           ${can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit')}</button>`:''}
           ${can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
-  $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register">
-    <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3><span class="meta">عرض ${rows.length} من ${p.rows.length}</span></div>${body}</div>`;
+  const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
+  $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
+    <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3><span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${pager}</div>`;
   bindTools(p); bindCells();
   const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
   const a2=$('#bAdd2'); if(a2) a2.onclick=()=>openRow();
-  document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{u.chip=b.dataset.ch;refreshBody();});
-  document.querySelectorAll('[data-s]').forEach(h=>h.onclick=()=>{const k=h.dataset.s;u.sort=u.sort.k===k?{k,d:-u.sort.d}:{k,d:1};refreshBody();});
+  document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{u.chip=b.dataset.ch;u.page=1;refreshBody();});
+  document.querySelectorAll('[data-s]').forEach(h=>h.onclick=()=>{const k=h.dataset.s;u.sort=u.sort.k===k?{k,d:-u.sort.d}:{k,d:1};u.page=1;refreshBody();});
   document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>openRow(b.dataset.ed));
   document.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>delRow(b.dataset.dl));
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
+  if($('#pgPrev')) $('#pgPrev').onclick=()=>{u.page--;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
+  if($('#pgNext')) $('#pgNext').onclick=()=>{u.page++;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
 }
 function renderLetters(p){
   const u=U(), rows=rowsOf(p);
@@ -1526,6 +1556,9 @@ function readField(c){
   if(c.type==='list') return e.value.split('\n').map(s=>s.trim()).filter(Boolean);
   return e.value.trim();
 }
+function normUnique(v){
+  return String(v??'').trim().toLowerCase().replace(/[٠-٩]/g,d=>'0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]).replace(/\s+/g,' ');
+}
 function saveRow(rid){
   const p=pg(), V={};
   for(const c of p.cols){ const v=readField(c); if(v!==undefined) V[c.id]=v; }
@@ -1533,6 +1566,13 @@ function saveRow(rid){
   if(!String(V[pc.id]||'').trim()){ const el=document.getElementById('f_'+pc.id); if(el){el.classList.add('bad');el.focus();}
     return toast(`«${pc.name}» مطلوب`,'err'); }
   for(const c of p.cols){ if(c.required){ const x=V[c.id]; if(!(Array.isArray(x)?x.length:String(x||'').length)) return toast(`«${c.name}» مطلوب`,'err'); } }
+  for(const c of p.cols.filter(x=>x.unique)){
+    const val=normUnique(V[c.id]); if(!val) continue;
+    if(p.rows.some(row=>row.id!==rid&&normUnique(row.v[c.id])===val)){
+      const el=document.getElementById('f_'+c.id); if(el){el.classList.add('bad');el.focus();}
+      return toast(`القيمة في «${c.name}» مسجلة مسبقاً في هذه الصفحة`,'err');
+    }
+  }
   if(rid){ const r=p.rows.find(x=>x.id===rid);
     if(p.logCol&&V[p.logCol]&&V[p.logCol]!==r.v[p.logCol]){ r.log=r.log||[]; r.log.unshift({at:nowTs(),tx:V[p.logCol],by:ME.name}); }
     r.v=V; r.updated=todayISO(); audit('تعديل سجل',p.name+' · '+rowTitle(p,r)); toast('حُفظت التعديلات');
@@ -1591,7 +1631,7 @@ function openCols(){
 function cmSync(){ CD.forEach((c,i)=>{ const g=k=>document.getElementById('cm_'+k+'_'+i);
   if(g('n')) c.name=g('n').value; if(g('t')) c.type=g('t').value;
   if(g('h')) c.hidden=g('h').checked; if(g('f')) c.filterable=g('f').checked;
-  if(g('q')) c.required=g('q').checked; if(g('l')) c.link=g('l').value;
+  if(g('q')) c.required=g('q').checked; if(g('u')) c.unique=g('u').checked; if(g('l')) c.link=g('l').value;
   (c.options||[]).forEach((o,j)=>{ const ol=document.getElementById(`cm_ol_${i}_${j}`); if(ol) o.label=ol.value;
     const oc=document.getElementById(`cm_oc_${i}_${j}`); if(oc) o.color=oc.value; }); }); }
 function drawCM(){
@@ -1614,6 +1654,7 @@ function drawCM(){
       <label><input type="checkbox" id="cm_f_${i}" ${c.filterable?'checked':''}> إتاحة التصفية</label>
       <label><input type="checkbox" id="cm_h_${i}" ${c.hidden?'checked':''}> إخفاء من الجدول</label>
       <label><input type="checkbox" id="cm_q_${i}" ${c.required?'checked':''}> حقل إلزامي</label>
+      <label><input type="checkbox" id="cm_u_${i}" ${c.unique?'checked':''}> منع تكرار القيمة</label>
     </div></div>`).join('')||`<p style="color:var(--ink-3);font-size:13.5px">لا توجد أعمدة.</p>`;
   const R=f=>{cmSync();f();drawCM();}, B=(s,fn)=>$('#cmBox').querySelectorAll(s).forEach(fn);
   B('[data-up]',b=>b.onclick=()=>R(()=>{const i=+b.dataset.up;[CD[i-1],CD[i]]=[CD[i],CD[i-1]];}));
@@ -1625,6 +1666,20 @@ function drawCM(){
     if(c.type==='select'&&!(c.options||[]).length) c.options=statusOpts();
     if(c.type==='link'&&!c.link){const o=DB.pages.find(x=>x.id!==cur);c.link=o?o.id:'';} }));
   $('#cmAdd').onclick=()=>R(()=>CD.push(col('عمود جديد','text')));
+}
+function openPageOrder(){
+  if(!isAdmin()) return;
+  modal('ترتيب الصفحات','<div id="pageOrder"></div>',
+    '<button class="btn primary" id="poDone">تم</button>','sm');
+  const draw=()=>{
+    $('#pageOrder').innerHTML=DB.pages.map((p,i)=>`<div class="frow">
+      <div class="fi">${icon(p.icon,16)}</div><b style="flex:1">${esc(p.name)}</b>
+      <div class="fx"><button class="iconbtn" data-pu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-pd="${i}" ${i===DB.pages.length-1?'disabled':''}>▼</button></div></div>`).join('');
+    document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.pu;[DB.pages[i-1],DB.pages[i]]=[DB.pages[i],DB.pages[i-1]];draw();});
+    document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{const i=+b.dataset.pd;[DB.pages[i+1],DB.pages[i]]=[DB.pages[i],DB.pages[i+1]];draw();});
+  };
+  draw();
+  $('#poDone').onclick=()=>{audit('ترتيب الصفحات','تحديث ترتيب القائمة');save();closeModal();render();toast('حُفظ ترتيب الصفحات');};
 }
 function openPageSet(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
@@ -2010,11 +2065,15 @@ function showImport(){
         else V[cid]=val;
       });
       if(!String(V[pc.id]||'').trim()){ skipped++; return; }
+      const duplicate=p.cols.filter(c=>c.unique).some(c=>{
+        const val=normUnique(V[c.id]); return val&&p.rows.some(x=>normUnique(x.v[c.id])===val);
+      });
+      if(duplicate){ skipped++; return; }
       p.rows.push({id:uid(),v:V,log:[],created:todayISO(),updated:todayISO()}); n++;
     });
     audit('استيراد Excel',p.name+' · '+n+' سجل');
     save(); closeModal(); render();
-    toast(skipped?`استُورد ${n} سجل · تُخطّي ${skipped} (بدون «${pc.name}»)`:`استُورد ${n} سجل بنجاح`);
+    toast(skipped?`استُورد ${n} سجل · تُخطّي ${skipped} (ناقص أو مكرر)`:`استُورد ${n} سجل بنجاح`);
   };
 }
 
