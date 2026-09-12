@@ -366,6 +366,35 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .grid2,.permgrid{grid-template-columns:1fr}
   .cmtop{grid-template-columns:auto 1fr;grid-auto-rows:auto}
 }
+@media (max-width:600px){
+  body{font-size:14px;overflow-x:hidden}
+  .gate{padding:0;align-items:stretch}
+  .gcard{max-width:none;min-height:100dvh;border-radius:0;display:flex;flex-direction:column;justify-content:center}
+  .ghead{padding:22px 18px 17px}.gbody{padding:18px}.gfoot{padding:12px 18px}
+  .side{width:min(88vw,330px);right:min(-90vw,-340px)}
+  .topbar{padding:10px;gap:9px;align-items:flex-start}
+  .topbar>div:nth-child(2){min-width:0;flex:1}.topbar h2{font-size:17px}.topbar .sub{font-size:11.5px}
+  .pgtools{order:3;width:100%}.pgtools .btn{flex:1;justify-content:center}
+  .stripe{order:4;margin:0;width:100%;overflow-x:auto}.stripe .cell{min-width:92px;padding:6px 10px}
+  .page{padding:12px 10px 80px;min-width:0}
+  .tools{gap:7px}.search{max-width:none;min-width:100%;width:100%}
+  select.filter{flex:1;max-width:none;min-width:135px}
+  .tools .spacer{display:none}.tools>.btn{flex:1;justify-content:center;min-width:calc(50% - 4px);padding:9px 8px;font-size:12.5px}
+  .seg{width:100%}.seg button{flex:1}
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
+  .register{border-radius:10px}.reg-head{padding:10px 12px}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.tablewrap table{min-width:760px}
+  thead th,tbody td{padding:9px 10px}
+  .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
+  .desk-bar>*{flex:1}.desk-bar .lbl{flex-basis:100%}.desk-bar select{min-width:100%}
+  .sheetwrap{padding:8px;max-height:none}.sheet{padding:22px 18px;font-size:15px;line-height:1.9}
+  .overlay{padding:0;align-items:flex-end}.modal,.modal.sm,.modal.lg{max-width:none;border-radius:16px 16px 0 0;max-height:94dvh}
+  .m-head{padding:13px 15px}.m-body{padding:15px;max-height:72dvh}.m-foot{padding:11px 15px}
+  .m-foot .btn{flex:1;justify-content:center}.utable{min-width:620px}.m-body:has(.utable){overflow-x:auto}
+  .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
+  .toasts{left:10px;right:10px;bottom:12px}.toast{max-width:none;width:100%}
+  .empty{padding:36px 15px}
+}
 </style>
 </head>
 <body>
@@ -476,8 +505,10 @@ const VKEY='admin_suite_vault_v3', OLD2='crm_pages_v2', OLD1='crm_registry_v1';
 const SB_URL='https://uwwuchwivroukskddkhq.supabase.co';
 const SB_KEY='sb_publishable_nq98s8SPKegEmVrYcD9ewA_jEuYA7yh';
 const SB=(window.supabase&&!window.__noSupabase)?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
-const CACHE_KEY=VKEY+'_cloud_cache', PENDING_KEY=VKEY+'_pending';
+const CACHE_KEY=VKEY+'_cloud_cache', PENDING_KEY=VKEY+'_pending', PENDING_INVITE=VKEY+'_invite';
+let INVITE_TOKEN=new URLSearchParams(location.search).get('invite')||'';
 let VAULT=null, DEK=null, ME=null, DB=null, MYREV=0;
+let WORKSPACE_ID=null;
 let cur=null, ui={}, saveTimer=null, idleTimer=null;
 const IDLE_MIN=15;
 
@@ -491,10 +522,28 @@ async function cloudSession(){
   if(error) throw error;
   SB_SESSION=data.session||null; return SB_SESSION;
 }
+async function workspaceId(){
+  if(WORKSPACE_ID) return WORKSPACE_ID;
+  const {data,error}=await SB.from('workspace_members').select('workspace_id').eq('user_id',SB_SESSION.user.id).maybeSingle();
+  if(error) throw error;
+  WORKSPACE_ID=data&&data.workspace_id||null; return WORKSPACE_ID;
+}
+async function createWorkspace(vault){
+  const {data,error}=await SB.rpc('create_workspace',{p_vault:vault});
+  if(error) throw error;
+  WORKSPACE_ID=data; return data;
+}
+async function claimInvite(token){
+  const {data,error}=await SB.rpc('claim_workspace_invite',{p_token:token});
+  if(error) throw error;
+  WORKSPACE_ID=data; return data;
+}
 async function vaultRead(){
   if(!SB_SESSION) await cloudSession();
   if(!SB_SESSION) return null;
-  const {data,error}=await SB.from('user_vaults').select('vault,revision').eq('user_id',SB_SESSION.user.id).maybeSingle();
+  const wid=await workspaceId();
+  if(!wid) return null;
+  const {data,error}=await SB.from('workspaces').select('vault,revision').eq('id',wid).maybeSingle();
   if(error) throw error;
   if(!data||!data.vault) return null;
   MEMV=data.vault; localSet(CACHE_KEY,MEMV); return MEMV;
@@ -502,7 +551,9 @@ async function vaultRead(){
 async function vaultWrite(v){
   if(!SB_SESSION) await cloudSession();
   if(!SB_SESSION) throw new Error('انتهت جلسة الدخول');
-  const {error}=await SB.from('user_vaults').upsert({user_id:SB_SESSION.user.id,vault:v,revision:v.rev||1,updated_at:nowTs()},{onConflict:'user_id'});
+  const wid=await workspaceId();
+  if(!wid) throw new Error('الحساب غير مرتبط بمنشأة');
+  const {error}=await SB.from('workspaces').update({vault:v,revision:v.rev||1,updated_at:nowTs()}).eq('id',wid);
   if(error) throw error;
   MEMV=v; localSet(CACHE_KEY,v);
 }
@@ -690,15 +741,42 @@ async function boot(){
   try{
     const session=await cloudSession();
     if(!session) return screenLogin();
+    const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'';
+    if(token){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
     VAULT=await vaultRead();
     if(!VAULT||!VAULT.users||!VAULT.users.length){
       const pending=localGet(PENDING_KEY);
       if(pending&&pending.email===String(session.user.email||'').toLowerCase()){
-        VAULT=pending.vault; await vaultWrite(VAULT); localStorage.removeItem(PENDING_KEY);
-      } else return screenSetup('لم تُنشأ خزنة لهذا الحساب بعد. أكمل إنشاء حساب المدير.');
+        VAULT=pending.vault; await createWorkspace(VAULT); localStorage.removeItem(PENDING_KEY);
+      } else return screenLogin(null,'هذا الحساب غير مرتبط بالمنشأة. اطلب دعوة من مالك النظام.');
     }
     screenLogin({email:session.user.email||''},'الجلسة السحابية متصلة. أدخل كلمة المرور لفك تشفير بياناتك.');
   }catch(e){ screenLogin(null,'تعذّر الاتصال بالسحابة مؤقتاً. تحقق من الإنترنت ثم حاول الدخول.'); }
+}
+function screenInvite(){
+  const pi=localGet(PENDING_INVITE)||{}, token=INVITE_TOKEN||pi.token||'';
+  if(!token) return screenLogin(null,'رابط الدعوة غير موجود أو غير صالح.');
+  gate(`<div class="gnote">دعوة للانضمام إلى منظومة الشؤون الإدارية. استخدم البريد وكلمة المرور المؤقتة اللذين أرسلهما لك المدير.</div>
+    <div class="fld" style="margin-bottom:11px"><label>الاسم</label><input id="i_name" value="${esc(pi.name||'')}"></div>
+    <div class="fld" style="margin-bottom:11px"><label>البريد الإلكتروني</label><input id="i_mail" type="email" value="${esc(pi.email||'')}"></div>
+    <div class="fld" style="margin-bottom:16px"><label>كلمة المرور المؤقتة</label><input id="i_pw" type="password"></div>
+    <button class="btn primary gbig" id="i_go">تفعيل الدعوة</button>
+    <button class="btn ghost gbig" id="i_back" style="margin-top:9px">العودة للدخول</button>`);
+  $('#i_go').onclick=doInviteSignup; $('#i_back').onclick=()=>screenLogin();
+}
+async function doInviteSignup(){
+  const name=$('#i_name').value.trim(), mail=$('#i_mail').value.trim().toLowerCase(), pw=$('#i_pw').value;
+  const token=INVITE_TOKEN||(localGet(PENDING_INVITE)||{}).token||'';
+  if(!name||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)||pw.length<8) return gErr('أكمل الاسم والبريد وكلمة المرور المؤقتة.');
+  const btn=$('#i_go'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> جارٍ التفعيل…';
+  try{
+    localSet(PENDING_INVITE,{token,email:mail,name});
+    const auth=await SB.auth.signUp({email:mail,password:pw}); if(auth.error) throw auth.error;
+    SB_SESSION=auth.data.session||null; WORKSPACE_ID=null;
+    if(!SB_SESSION){ screenLogin({email:mail},'أرسلنا رسالة تأكيد إلى بريدك. بعد التأكيد ارجع وسجّل الدخول لإكمال الدعوة.'); return; }
+    await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname);
+    screenLogin({email:mail},'تم تفعيل الدعوة. أدخل كلمة المرور المؤقتة لفتح الخزنة.');
+  }catch(e){ btn.disabled=false; btn.textContent='تفعيل الدعوة'; gErr(e.message||'تعذّر تفعيل الدعوة.'); }
 }
 function screenSetup(note){
   gate(`
@@ -743,7 +821,7 @@ async function doSetup(){
       screenLogin({email:mail},'أرسلنا رسالة تأكيد إلى بريدك. أكّد البريد، ثم ارجع هنا وسجّل الدخول ليتم رفع الخزنة المشفّرة.');
       return;
     }
-    await vaultWrite(VAULT); localStorage.removeItem(PENDING_KEY);
+    await createWorkspace(VAULT); localStorage.removeItem(PENDING_KEY);
     DEK=dek; DB=data; ME=data.users[0]; MYREV=VAULT.rev;
     enterApp(); toast('أُنشئ الحساب وربطت المزامنة السحابية');
   }catch(e){ btn.disabled=false; btn.textContent='إنشاء الحساب وتشفير البيانات'; gErr('تعذّر الإنشاء: '+e.message); }
@@ -756,11 +834,11 @@ function screenLogin(lockedUser,note){
       <input id="l_mail" type="email" value="${esc(em)}" ${lockedUser?'readonly':''} autocomplete="username"></div>
     <div class="fld" style="margin-bottom:16px"><label>كلمة المرور</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <button class="btn primary gbig" id="l_go">دخول</button>
-    ${!lockedUser?`<button class="btn ghost gbig" id="l_new" style="margin-top:9px">إنشاء حساب المدير لأول مرة</button>`:''}
+    ${!lockedUser&&(INVITE_TOKEN||localGet(PENDING_INVITE))?`<button class="btn ghost gbig" id="l_inv" style="margin-top:9px">تفعيل دعوة موظف</button>`:''}
     <p style="text-align:center;font-size:11.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.8">
       نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#l_go').onclick=doLogin;
-  if($('#l_new')) $('#l_new').onclick=()=>screenSetup();
+  if($('#l_inv')) $('#l_inv').onclick=screenInvite;
   $('#l_pw').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   setTimeout(()=>{const f=lockedUser?$('#l_pw'):$('#l_mail'); if(f) f.focus();},60);
 }
@@ -771,12 +849,14 @@ async function doLogin(){
   try{
     const auth=await SB.auth.signInWithPassword({email:mail,password:pw});
     if(auth.error) throw auth.error;
-    SB_SESSION=auth.data.session;
+    SB_SESSION=auth.data.session; WORKSPACE_ID=null;
+    const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'';
+    if(token){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
     VAULT=await vaultRead();
     if(!VAULT){
       const pending=localGet(PENDING_KEY);
-      if(pending&&pending.email===mail){ VAULT=pending.vault; await vaultWrite(VAULT); localStorage.removeItem(PENDING_KEY); }
-      else throw new Error('لا توجد خزنة مرتبطة بهذا الحساب. أنشئ حساب المدير أولاً.');
+      if(pending&&pending.email===mail){ VAULT=pending.vault; await createWorkspace(VAULT); localStorage.removeItem(PENDING_KEY); }
+      else throw new Error('هذا الحساب غير مدعو إلى المنشأة. راجع مالك النظام.');
     }
     u=VAULT.users.find(x=>x.email.toLowerCase()===mail);
     if(!u) throw new Error('هذا البريد غير مسجل داخل الخزنة.');
@@ -804,7 +884,7 @@ async function doLogin(){
 function lockSession(){ if(!ME) return; const u=VAULT.users.find(x=>x.id===ME.id);
   DEK=null; DB=null; const keep=ME; ME=null; ui={}; cur=null; clearTimeout(idleTimer); screenLogin(u||{email:''}); }
 async function logout(){ DEK=null; DB=null; ME=null; VAULT=null; SB_SESSION=null; ui={}; cur=null; clearTimeout(idleTimer);
-  try{ if(SB) await SB.auth.signOut(); }catch(e){} screenLogin(); }
+  WORKSPACE_ID=null; try{ if(SB) await SB.auth.signOut(); }catch(e){} screenLogin(); }
 function resetIdle(){ clearTimeout(idleTimer); if(ME) idleTimer=setTimeout(lockSession,IDLE_MIN*60000); }
 ['click','keydown','mousemove','touchstart'].forEach(e=>document.addEventListener(e,()=>{ if(ME) resetIdle(); },{passive:true}));
 
@@ -1675,7 +1755,6 @@ function openUsers(){
       <td>${vu.active===false?'<span class="badge b-red">موقوف</span>':'<span class="badge b-green">نشط</span>'}</td>
       <td class="acts">
         <button class="iconbtn" data-eu="${u.id}" title="الصلاحيات">${ic('gear',14)}</button>
-        <button class="iconbtn" data-ru="${u.id}" title="تغيير كلمة المرور">${ic('lock',14)}</button>
         ${u.id!==ME.id?`<button class="iconbtn del" data-du="${u.id}" title="حذف">${ic('trash',14)}</button>`:''}
       </td></tr>`;}).join('');
   modal('المستخدمون والصلاحيات',
@@ -1686,12 +1765,14 @@ function openUsers(){
     `<button class="btn primary" id="uAdd">${ic('plus')} إضافة موظف</button><button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
   $('#uAdd').onclick=openAddUser;
   document.querySelectorAll('[data-eu]').forEach(b=>b.onclick=()=>openPerms(b.dataset.eu));
-  document.querySelectorAll('[data-ru]').forEach(b=>b.onclick=()=>openResetPw(b.dataset.ru));
   document.querySelectorAll('[data-du]').forEach(b=>b.onclick=()=>{
     const u=DB.users.find(x=>x.id===b.dataset.du);
     ask(`حذف حساب <b>${esc(u.name)}</b> نهائياً؟`,async()=>{
+      const vu=VAULT.users.find(x=>x.id===u.id)||{};
       DB.users=DB.users.filter(x=>x.id!==u.id); VAULT.users=VAULT.users.filter(x=>x.id!==u.id);
-      audit('حذف مستخدم',u.name); await persist(); openUsers(); toast('حُذف الحساب'); }); });
+      audit('حذف مستخدم',u.name); await persist();
+      if(vu.email){ const rr=await SB.rpc('revoke_workspace_member',{p_email:vu.email}); if(rr.error) toast('حُذف من النظام وتعذّر إلغاء عضويته السحابية','err'); }
+      openUsers(); toast('حُذف الحساب وأُلغيت عضويته'); }); });
 }
 function permGrid(perms){
   return `<div class="permgrid">${DB.pages.map(p=>`<div class="permrow"><span>${esc(p.name)}</span>
@@ -1725,7 +1806,15 @@ function openAddUser(){
       DB.users.push({id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,createdAt:nowTs()});
       VAULT.users.push({id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0});
       audit('إضافة مستخدم',name+' — '+mail);
-      await persist(); openUsers(); toast('أُنشئ الحساب — سلّم كلمة المرور للموظف');
+      await persist();
+      const inv=await SB.rpc('create_workspace_invite',{p_email:mail,p_role:$('#u_role').value});
+      if(inv.error) throw inv.error;
+      const link=location.origin+location.pathname+'?invite='+inv.data;
+      modal('تم إنشاء الدعوة',`<div class="gnote">أرسل للموظف رابط الدعوة وكلمة المرور المؤقتة عبر قناة آمنة. الرابط ينتهي خلال 7 أيام.</div>
+        <div class="fld" style="margin-bottom:10px"><label>رابط الدعوة</label><textarea id="inviteLink" readonly style="min-height:72px;direction:ltr">${esc(link)}</textarea></div>
+        <div class="fld"><label>كلمة المرور المؤقتة</label><input id="invitePw" readonly value="${esc(pw)}" style="direction:ltr"></div>`,
+        `<button class="btn primary" id="copyInvite">نسخ الرابط وكلمة المرور</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
+      $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText('رابط الدعوة: '+link+'\nكلمة المرور المؤقتة: '+pw); toast('نُسخت بيانات الدعوة'); };
     }catch(e){ btn.disabled=false; btn.textContent='إنشاء الحساب'; toast('تعذّر الإنشاء','err'); }
   };
 }
@@ -1752,7 +1841,9 @@ function openPerms(id){
     const perms={}; document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value); u.perms=perms;
     if($('#pu_act')) vu.active=$('#pu_act').checked;
     audit('تعديل صلاحيات',u.name);
-    await persist(); if(u.id===ME.id){ ME=u; renderWho(); renderSideBtns(); }
+    await persist();
+    if(vu.email&&u.id!==ME.id){ const rr=await SB.rpc('set_workspace_member_role',{p_email:vu.email,p_role:u.role}); if(rr.error) toast('حُفظت الصلاحيات الداخلية وتعذّر تحديث الدور السحابي','err'); }
+    if(u.id===ME.id){ ME=u; renderWho(); renderSideBtns(); }
     openUsers(); render(); toast('حُفظت الصلاحيات'); };
 }
 function openResetPw(id){
@@ -1786,6 +1877,7 @@ function openChangePw(){
     try{ const kekOld=await deriveKEK(o,vu.salt,VAULT.iters||ITERS); await unwrapDEK(kekOld,vu); }
     catch(e){ btn.disabled=false; btn.textContent='تغيير'; return toast('كلمة المرور الحالية غير صحيحة','err'); }
     try{ const salt=ab2b64(rnd(16)), kek=await deriveKEK(n,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
+      const auth=await SB.auth.updateUser({password:n}); if(auth.error) throw auth.error;
       vu.salt=salt; vu.wrapIv=wr.wrapIv; vu.wrapped=wr.wrapped;
       audit('تغيير كلمة المرور','الحساب الشخصي'); await persist(); closeModal(); toast('تم تغيير كلمة المرور'); }
     catch(e){ btn.disabled=false; btn.textContent='تغيير'; toast('تعذّر التغيير','err'); }
