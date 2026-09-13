@@ -421,7 +421,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .stripe{order:4;margin:0;width:100%;overflow-x:auto}.stripe .cell{min-width:92px;padding:6px 10px}
   .page{padding:12px 10px 80px;min-width:0}
   .welcome{padding:4px 0}.welcome-hero{padding:25px 20px;border-radius:18px;grid-template-columns:1fr auto;min-height:165px;gap:12px}.welcome-logo{width:66px;height:66px;border-radius:18px}.welcome-logo svg{width:31px;height:31px}.welcome-hero h2{font-size:20px}.welcome-hero p{font-size:12px}.welcome-date{margin-top:12px}.welcome-date span{padding:5px 8px;font-size:10.5px}.welcome-stats{margin:-13px 9px 0;gap:5px}.welcome-stat{padding:11px 8px;text-align:center}.welcome-stat b{font-size:19px}.welcome-stat span{font-size:9.5px}.welcome-section-title{margin-top:22px}.welcome-pages{grid-template-columns:1fr;gap:8px}.welcome-card{padding:12px}.welcome-card .wi{width:42px;height:42px}
-  .home-banner{aspect-ratio:4/3;min-height:300px;padding:24px;background-position:center}.home-banner-content{max-width:92%}.home-banner b{font-size:20px}.welcome-pages{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.welcome-card,.home-group-head{min-height:120px;padding:13px 5px}.welcome-card .wi,.home-group-head .wi{width:45px;height:45px}.welcome-card b,.home-group-head b{font-size:11px}.welcome-card span span,.home-group-head small{font-size:9px}.home-group-menu{position:absolute;z-index:8;right:0;left:0;min-width:185px}.home-group-menu button{font-size:11px}.date-converter-grid{grid-template-columns:1fr}.date-swap{margin:auto;transform:rotate(90deg)}
+  .home-banners{background:#0b403c}.home-banner{aspect-ratio:3/4;min-height:390px;padding:24px;background-size:contain;background-repeat:no-repeat;background-position:center}.home-banner:before{background:linear-gradient(0deg,rgba(3,32,30,.82),transparent 58%)}.home-banner-content{max-width:92%}.home-banner b{font-size:20px}.welcome-pages{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.welcome-card,.home-group-head{min-height:120px;padding:13px 5px}.welcome-card .wi,.home-group-head .wi{width:45px;height:45px}.welcome-card b,.home-group-head b{font-size:11px}.welcome-card span span,.home-group-head small{font-size:9px}.home-group-menu{position:absolute;z-index:8;right:0;left:0;min-width:185px}.home-group-menu button{font-size:11px}.date-converter-grid{grid-template-columns:1fr}.date-swap{margin:auto;transform:rotate(90deg)}
   .tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
   .search{grid-column:1/-1;max-width:none;min-width:0;width:100%}
   .search input,.fld input,.fld select,.fld textarea,select.filter{font-size:16px}
@@ -1398,7 +1398,7 @@ function go(id){
   if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
   window.scrollTo({top:0,behavior:'smooth'});
 }
-const render=()=>go();
+const render=()=>cur?go():showHome();
 
 function rowsOf(p){
   const u=U(), q=(u.q||'').trim().toLowerCase(), ch=chipsCol(p);
