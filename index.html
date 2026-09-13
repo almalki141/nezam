@@ -329,6 +329,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 .cmopts{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
 .cmopt{display:grid;grid-template-columns:1fr 130px auto;gap:6px;margin-bottom:5px;align-items:center}
 .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.preview-field{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface-2);min-width:0}.preview-field>span{display:block;color:var(--ink-3);font-size:11.5px;font-weight:700;margin-bottom:4px}.preview-field>div{overflow-wrap:anywhere}
+.pdf-viewer{display:block;width:100%;height:min(72vh,820px);border:1px solid var(--line);border-radius:10px;background:#fff}
 .cmprim{font-size:11px;font-weight:700;color:var(--brass);background:var(--gold-bg);border:1px solid var(--gold-br);padding:1px 7px;border-radius:5px;margin-inline-start:6px}
 .swatches{display:flex;gap:6px;flex-wrap:wrap}
 .sw{width:30px;height:30px;border-radius:8px;border:2px solid transparent}
@@ -1084,7 +1085,7 @@ const ic=(k,s)=>`<svg width="${s||15}" height="${s||15}" viewBox="0 0 24 24" fil
 /* ==================================================================
    7) صور وملفات
 ================================================================== */
-const MAXDIM=620, QUALITY=.72, MAXFILE=10*1024*1024;
+const MAXDIM=620, QUALITY=.72, MAXFILE=200*1024*1024, FILE_BUCKET='workspace-files';
 function compressImage(file){
   return new Promise((res,rej)=>{
     const fr=new FileReader(); fr.onerror=()=>rej(new Error('read'));
@@ -1103,10 +1104,19 @@ function dataUrlToBlob(d){ const [h,b]=d.split(','); const m=(h.match(/:(.*?);/)
   const bin=atob(b), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return new Blob([u],{type:m}); }
 function saveBlob(name,blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;a.target='_blank';
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},10000); }
-function previewFile(f){
-  const blob=dataUrlToBlob(f.d), url=URL.createObjectURL(blob);
-  if(/pdf/i.test(f.t||f.n)){ const w=window.open(url,'_blank'); if(!w) toast('اسمح بفتح النوافذ لعرض PDF','err'); setTimeout(()=>URL.revokeObjectURL(url),60000); }
-  else lightbox([f.d],0,f.n);
+async function fileUrl(f,downloadName){
+  if(f.path){ const {data,error}=await SB.storage.from(FILE_BUCKET).createSignedUrl(f.path,600,downloadName?{download:downloadName}:undefined); if(error) throw error; return data.signedUrl; }
+  return f.d;
+}
+async function previewFile(f){
+  try{ const url=await fileUrl(f);
+    if(/pdf/i.test(f.t||f.n)) modal('معاينة PDF — '+esc(f.n),`<iframe class="pdf-viewer" src="${esc(url)}#toolbar=0&navpanes=0" title="${esc(f.n)}"></iframe>`,`<button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
+    else lightbox([url],0,f.n);
+  }catch(e){ toast('تعذّرت معاينة الملف','err'); }
+}
+async function downloadFile(f){
+  try{ if(f.path){ const url=await fileUrl(f,f.n); const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.click(); } else saveBlob(f.n,dataUrlToBlob(f.d)); }
+  catch(e){ toast('تعذّر تنزيل الملف','err'); }
 }
 function download(n,c,t){ saveBlob(n,new Blob([c],{type:t||'text/plain;charset=utf-8'})); }
 
@@ -1189,11 +1199,11 @@ function openFiles(p,r,c){
   modal(esc(c.name)+' — '+esc(rowTitle(p,r)),
     a.length?a.map((f,i)=>`<div class="frow"><div class="fi ${/image/.test(f.t)?'img':''}">${/image/.test(f.t)?icon('image',16):icon('file',16)}</div>
       <div style="min-width:0"><b>${esc(f.n)}</b><span>${fmtSize(f.s||0)}</span></div>
-      <div class="fx"><button class="btn ghost sm" data-dlf="${i}">تنزيل</button>
+      <div class="fx">${c.allowDownload!==false?`<button class="btn ghost sm" data-dlf="${i}">تنزيل</button>`:''}
       ${/image|pdf/.test(f.t)?`<button class="btn ghost sm" data-vwf="${i}">معاينة</button>`:''}</div></div>`).join('')
       :`<p style="margin:0;color:var(--ink-3);font-size:13.5px">لا توجد ملفات.</p>`,
     `<button class="btn ghost" onclick="closeModal()">إغلاق</button>`);
-  document.querySelectorAll('[data-dlf]').forEach(b=>b.onclick=()=>{const f=a[+b.dataset.dlf]; saveBlob(f.n,dataUrlToBlob(f.d));});
+  document.querySelectorAll('[data-dlf]').forEach(b=>b.onclick=()=>downloadFile(a[+b.dataset.dlf]));
   document.querySelectorAll('[data-vwf]').forEach(b=>b.onclick=()=>previewFile(a[+b.dataset.vwf]));
 }
 
@@ -1236,7 +1246,7 @@ function renderNav(){
   const item=p=>`<button class="nav-item ${p.id===cur?'on':''}" data-pg="${p.id}" style="--acc:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon)}<span class="nm">${esc(p.name)}</span><span class="count">${p.rows.length}</span></button>`;
   const groups=[],seen=new Set(); list.forEach(p=>{const g=String(p.group||'').trim();if(g&&!seen.has(g)){seen.add(g);groups.push(g);}});
   const grouped=new Set(groups),plain=list.filter(p=>!String(p.group||'').trim()).map(item).join('');
-  $('#navList').innerHTML=plain+groups.map(g=>{const ps=list.filter(p=>String(p.group||'').trim()===g);return `<div class="nav-group"><button class="nav-group-head" data-ng="${esc(g)}"><span class="arr">⌄</span>${esc(g)}<span class="count">${ps.length}</span></button><div class="nav-group-pages">${ps.map(item).join('')}</div></div>`;}).join('');
+  $('#navList').innerHTML=plain+groups.map(g=>{const ps=list.filter(p=>String(p.group||'').trim()===g);return `<div class="nav-group closed"><button class="nav-group-head" data-ng="${esc(g)}"><span class="arr">⌄</span>${esc(g)}<span class="count">${ps.length}</span></button><div class="nav-group-pages">${ps.map(item).join('')}</div></div>`;}).join('');
   $('#navList').querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>go(b.dataset.pg));
   $('#navList').querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>b.closest('.nav-group').classList.toggle('closed'));
 }
@@ -1564,8 +1574,11 @@ async function handleFiles(cid,files,kind){
       const ok = f.type==='application/pdf'||f.type.startsWith('image/');
       if(!ok){ skipped++; continue; }
       if(f.size>MAXFILE){ skipped++; continue; }
-      const d = f.type.startsWith('image/')?await compressImage(f):await readAsDataURL(f);
-      FILB[cid].push({n:f.name,t:f.type,s:f.size,d});
+      if(!SB_SESSION) await cloudSession(); const wid=await workspaceId();
+      const clean=f.name.replace(/[^\p{L}\p{N}._-]+/gu,'_'),path=`${wid}/${Date.now()}-${uid()}-${clean}`;
+      const {error}=await SB.storage.from(FILE_BUCKET).upload(path,f,{contentType:f.type||'application/octet-stream',upsert:false});
+      if(error) throw error;
+      FILB[cid].push({n:f.name,t:f.type,s:f.size,path});
     }
     drawFil(cid);
     toast(skipped?`أُضيفت الملفات · تُخطّي ${skipped} (نوع غير مدعوم أو حجم كبير)`:'أُضيفت الملفات');
@@ -1694,6 +1707,7 @@ function cmSync(){ CD.forEach((c,i)=>{ const g=k=>document.getElementById('cm_'+
   if(g('n')) c.name=g('n').value; if(g('t')) c.type=g('t').value;
   if(g('h')) c.hidden=g('h').checked; if(g('f')) c.filterable=g('f').checked;
   if(g('q')) c.required=g('q').checked; if(g('u')) c.unique=g('u').checked; if(g('l')) c.link=g('l').value;
+  if(g('d')) c.allowDownload=g('d').checked;
   (c.options||[]).forEach((o,j)=>{ const ol=document.getElementById(`cm_ol_${i}_${j}`); if(ol) o.label=ol.value;
     const oc=document.getElementById(`cm_oc_${i}_${j}`); if(oc) o.color=oc.value; }); }); }
 function drawCM(){
@@ -1717,6 +1731,7 @@ function drawCM(){
       <label><input type="checkbox" id="cm_h_${i}" ${c.hidden?'checked':''}> إخفاء من الجدول</label>
       <label><input type="checkbox" id="cm_q_${i}" ${c.required?'checked':''}> حقل إلزامي</label>
       <label><input type="checkbox" id="cm_u_${i}" ${c.unique?'checked':''}> منع تكرار القيمة</label>
+      ${c.type==='files'?`<label><input type="checkbox" id="cm_d_${i}" ${c.allowDownload!==false?'checked':''}> السماح بتنزيل الملفات</label>`:''}
     </div></div>`).join('')||`<p style="color:var(--ink-3);font-size:13.5px">لا توجد أعمدة.</p>`;
   const R=f=>{cmSync();f();drawCM();}, B=(s,fn)=>$('#cmBox').querySelectorAll(s).forEach(fn);
   B('[data-up]',b=>b.onclick=()=>R(()=>{const i=+b.dataset.up;[CD[i-1],CD[i]]=[CD[i],CD[i-1]];}));
