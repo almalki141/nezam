@@ -1117,7 +1117,7 @@ async function uploadStoredFile(path,file){
 }
 async function previewFile(f){
   try{ const url=await fileUrl(f);
-    if(/pdf/i.test(f.t||f.n)) modal('معاينة PDF — '+esc(f.n),`<iframe class="pdf-viewer" src="${esc(url)}#toolbar=0&navpanes=0" title="${esc(f.n)}"></iframe>`,`<button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
+    if(/pdf/i.test((f.t||'')+' '+(f.n||''))) modal('معاينة PDF — '+esc(f.n),`<iframe class="pdf-viewer" src="${esc(url)}#toolbar=0&navpanes=0" title="${esc(f.n)}"></iframe>`,`<button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
     else lightbox([url],0,f.n);
   }catch(e){ toast('تعذّرت معاينة الملف','err'); }
 }
@@ -1207,7 +1207,7 @@ function openFiles(p,r,c){
     a.length?a.map((f,i)=>`<div class="frow"><div class="fi ${/image/.test(f.t)?'img':''}">${/image/.test(f.t)?icon('image',16):icon('file',16)}</div>
       <div style="min-width:0"><b>${esc(f.n)}</b><span>${fmtSize(f.s||0)}</span></div>
       <div class="fx">${c.allowDownload!==false?`<button class="btn ghost sm" data-dlf="${i}">تنزيل</button>`:''}
-      ${/image|pdf/.test(f.t)?`<button class="btn ghost sm" data-vwf="${i}">معاينة</button>`:''}</div></div>`).join('')
+      ${/image|pdf/i.test((f.t||'')+' '+(f.n||''))?`<button class="btn ghost sm" data-vwf="${i}">معاينة</button>`:''}</div></div>`).join('')
       :`<p style="margin:0;color:var(--ink-3);font-size:13.5px">لا توجد ملفات.</p>`,
     `<button class="btn ghost" onclick="closeModal()">إغلاق</button>`);
   document.querySelectorAll('[data-dlf]').forEach(b=>b.onclick=()=>downloadFile(a[+b.dataset.dlf]));
@@ -1228,6 +1228,7 @@ function renderSideBtns(){
   b.push(`<button class="sbtn" id="btnSync">${ic('sync',13)} مزامنة</button>`);
   b.push(`<button class="sbtn" id="btnPw">${ic('lock',13)} كلمة المرور</button>`);
   if(isAdmin()){
+    b.push(`<button class="sbtn" id="btnTicker">${ic('edit',13)} الشريط المتحرك</button>`);
     b.push(`<button class="sbtn" id="btnUsers">${ic('shieldk',13)} المستخدمون</button>`);
     b.push(`<button class="sbtn" id="btnAudit">${ic('clock',13)} سجل التدقيق</button>`);
     b.push(`<button class="sbtn" id="btnBackup">${ic('dn',13)} نسخة احتياطية</button>`);
@@ -1242,7 +1243,7 @@ function renderSideBtns(){
   $('#btnTheme').onclick=()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
     document.documentElement.setAttribute('data-theme',d?'light':'dark');};
   $('#sideToolsToggle').onclick=()=>{$('#side').querySelector('.side-foot').classList.toggle('tools-open');};
-  if(isAdmin()){ $('#btnUsers').onclick=openUsers; $('#btnAudit').onclick=openAudit;
+  if(isAdmin()){ $('#btnTicker').onclick=openTickerSettings; $('#btnUsers').onclick=openUsers; $('#btnAudit').onclick=openAudit;
     $('#btnBackup').onclick=openBackup; $('#btnRestore').onclick=openRestore; }
   $('#navAdd').hidden=!isAdmin();
   $('#navSort').hidden=!isAdmin();
@@ -1267,7 +1268,7 @@ function renderTop(){
     ${isAdmin()?`<div class="pgtools">
       <button class="btn ghost sm" id="btnCols">${ic('cols')} الأعمدة</button>
       <button class="btn ghost sm" id="btnPageSet">${ic('gear')} إعدادات الصفحة</button></div>`:''}
-    <div class="stripe" id="stripe">${stripeHTML(p)}</div>${p.ticker?`<div class="ticker"><span>${esc(p.ticker)}</span></div>`:''}`;
+    <div class="stripe" id="stripe">${stripeHTML(p)}</div>${DB.tickerEnabled!==false&&DB.ticker?`<div class="ticker"><span style="animation-duration:${Math.max(8,Math.min(60,+(DB.tickerSpeed||22)))}s">${esc(DB.ticker)}</span></div>`:''}`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
   if(isAdmin()){ $('#btnCols').onclick=openCols; $('#btnPageSet').onclick=openPageSet; }
 }
@@ -1578,11 +1579,13 @@ async function handleFiles(cid,files,kind){
     FILB[cid]=FILB[cid]||[];
     let skipped=0;
     for(const f of files.slice(0,10)){
-      const ok = f.type==='application/pdf'||f.type.startsWith('image/');
+      const ext=(f.name.split('.').pop()||'').toLowerCase();
+      const ok = f.type==='application/pdf'||f.type==='application/x-pdf'||f.type==='application/octet-stream'||ext==='pdf'||f.type.startsWith('image/');
       if(!ok){ skipped++; continue; }
       if(f.size>MAXFILE){ skipped++; continue; }
       if(!SB_SESSION) await cloudSession(); const wid=await workspaceId();
-      const clean=f.name.replace(/[^\p{L}\p{N}._-]+/gu,'_'),path=`${wid}/${Date.now()}-${uid()}-${clean}`;
+      const safeExt=/^[a-z0-9]{1,8}$/.test(ext)?ext:(f.type.startsWith('image/')?'jpg':'pdf');
+      const path=`${wid}/${Date.now()}-${uid()}.${safeExt}`;
       await uploadStoredFile(path,f);
       FILB[cid].push({n:f.name,t:f.type,s:f.size,path});
     }
@@ -1766,6 +1769,14 @@ function openPageOrder(){
   draw();
   $('#poDone').onclick=()=>{sync();audit('ترتيب وتجميع الصفحات','تحديث القائمة');save();closeModal();render();toast('حُفظ ترتيب وتجميع الصفحات');};
 }
+function openTickerSettings(){
+  modal('إعدادات الشريط المتحرك',`<div class="grid2">
+    <div class="fld full"><label>النص المعروض</label><textarea id="tkText" rows="4" placeholder="اكتب الإعلان أو التنبيه الذي تريد عرضه…">${esc(DB.ticker||'')}</textarea></div>
+    <div class="fld"><label>سرعة الحركة</label><select id="tkSpeed"><option value="35" ${+(DB.tickerSpeed||22)===35?'selected':''}>بطيئة</option><option value="22" ${+(DB.tickerSpeed||22)===22?'selected':''}>متوسطة</option><option value="12" ${+(DB.tickerSpeed||22)===12?'selected':''}>سريعة</option></select></div>
+    <div class="fld"><label>حالة الشريط</label><select id="tkEnabled"><option value="1" ${DB.tickerEnabled!==false?'selected':''}>ظاهر في جميع الصفحات</option><option value="0" ${DB.tickerEnabled===false?'selected':''}>مخفي</option></select></div>
+  </div>`,`<button class="btn ghost" onclick="closeModal()">إلغاء</button><button class="btn primary" id="tkSave">حفظ</button>`);
+  $('#tkSave').onclick=()=>{DB.ticker=$('#tkText').value.trim();DB.tickerSpeed=+$('#tkSpeed').value;DB.tickerEnabled=$('#tkEnabled').value==='1';save();closeModal();renderTop();toast('حُفظ إعداد الشريط المتحرك');};
+}
 function openPageSet(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
   const p=pg(), i=DB.pages.indexOf(p);
@@ -1774,7 +1785,6 @@ function openPageSet(){
     <div class="grid2">
       <div class="fld"><label>اسم الصفحة <i>*</i></label><input id="ps_name" value="${esc(p.name)}"></div>
       <div class="fld"><label>الوصف</label><input id="ps_sub" value="${esc(p.sub||'')}"></div>
-      <div class="fld full"><label>نص الشريط المتحرك</label><input id="ps_ticker" value="${esc(p.ticker||'')}" placeholder="اتركه فارغًا لإخفاء الشريط"></div>
       <div class="fld"><label>مجموعة الصفحة</label><input id="ps_group" value="${esc(p.group||'')}" list="pageGroups" placeholder="مثال: شؤون الأفراد"><datalist id="pageGroups">${uniq(DB.pages.map(x=>x.group)).map(g=>`<option value="${esc(g)}">`).join('')}</datalist><span class="hint">الصفحات التي تحمل اسم المجموعة نفسه تظهر تحت زر واحد قابل للفتح والإغلاق.</span></div>
       <div class="fld full"><label>الأيقونة</label><div class="iconpick" id="psIcons">
         ${Object.keys(ICONS).map(k=>`<button type="button" class="ip ${p.icon===k?'on':''}" data-ico="${k}">${icon(k,17)}</button>`).join('')}</div></div>
@@ -1822,7 +1832,7 @@ function openPageSet(){
     cur=DB.pages[0].id; save(); render(); toast('حُذفت الصفحة'); });
   $('#psSave').onclick=()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
-    p.name=n; p.sub=$('#ps_sub').value.trim(); p.ticker=$('#ps_ticker').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
+    p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
     p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
