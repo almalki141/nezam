@@ -1306,9 +1306,23 @@ function showWelcomePopup(){
   sessionStorage.setItem('welcome_seen','1');
   modal(DB.welcomePopupTitle||'مرحباً بك',`${DB.welcomeImage?`<img class="welcome-popup-img" src="${esc(DB.welcomeImage)}" alt="صورة ترحيبية">`:''}${DB.welcomeMessage?`<div class="welcome-popup-text">${esc(DB.welcomeMessage)}</div>`:''}`,`<button class="btn primary" onclick="closeModal()">متابعة إلى المنظومة</button>`,'sm');
 }
+function prepareWelcomeImage(file){
+  return new Promise((resolve,reject)=>{
+    if(!file||!file.type.startsWith('image/')) return reject(new Error('اختر ملف صورة صالحاً'));
+    if(file.size>30*1024*1024) return reject(new Error('حجم الصورة الأصلية أكبر من 30 م.ب'));
+    const rd=new FileReader();
+    rd.onerror=()=>reject(new Error('تعذرت قراءة الصورة'));
+    rd.onload=()=>{const im=new Image();im.onerror=()=>reject(new Error('تعذرت معالجة الصورة'));im.onload=()=>{
+      const max=1800,scale=Math.min(1,max/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*scale)),h=Math.max(1,Math.round(im.height*scale));
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,w,h);cx.drawImage(im,0,0,w,h);
+      let quality=.88,out=cv.toDataURL('image/jpeg',quality);while(out.length>1450000&&quality>.45){quality-=.08;out=cv.toDataURL('image/jpeg',quality)}
+      resolve(out);
+    };im.src=rd.result};rd.readAsDataURL(file);
+  });
+}
 function openWelcomeSettings(){
   modal('إعدادات شاشة الترحيب',`<div class="grid2"><div class="fld"><label>عنوان الشاشة الأولى</label><input id="wt" value="${esc(DB.welcomeTitle||'')}"></div><div class="fld"><label>العنوان الفرعي</label><input id="ws" value="${esc(DB.welcomeSubtitle||'')}"></div></div><div class="fld"><label>عنوان النافذة المنبثقة</label><input id="wpt" value="${esc(DB.welcomePopupTitle||'')}"></div><div class="fld"><label>رسالة النافذة</label><textarea id="wpm">${esc(DB.welcomeMessage||'')}</textarea></div><div class="fld"><label>رابط الصورة أو اختر صورة من جهازك</label><input id="wimg" value="${esc(DB.welcomeImage||'')}" placeholder="https://..."><input id="wfile" type="file" accept="image/*" style="margin-top:7px"></div><label class="ck"><input type="checkbox" id="wpe" ${DB.welcomePopupEnabled!==false?'checked':''}> إظهار الصورة/الرسالة مرة واحدة بعد كل دخول</label>`,`<button class="btn primary" id="wsave">حفظ</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
-  $('#wfile').onchange=()=>{const f=$('#wfile').files[0];if(!f)return;if(f.size>1600000){$('#wfile').value='';return toast('حجم صورة الترحيب يجب ألا يتجاوز 1.5 م.ب','err')}const rd=new FileReader();rd.onload=()=>$('#wimg').value=rd.result;rd.readAsDataURL(f)};
+  $('#wfile').onchange=async()=>{const f=$('#wfile').files[0];if(!f)return;toast('جارٍ تجهيز الصورة…');try{$('#wimg').value=await prepareWelcomeImage(f);toast('تم ضغط الصورة وتجهيزها للحفظ')}catch(e){$('#wfile').value='';toast(e.message||'تعذرت معالجة الصورة','err')}};
   $('#wsave').onclick=()=>{DB.welcomeTitle=$('#wt').value.trim();DB.welcomeSubtitle=$('#ws').value.trim();DB.welcomePopupTitle=$('#wpt').value.trim();DB.welcomeMessage=$('#wpm').value.trim();DB.welcomeImage=$('#wimg').value.trim();DB.welcomePopupEnabled=$('#wpe').checked;sessionStorage.removeItem('welcome_seen');audit('تعديل','إعدادات شاشة الترحيب');save();closeModal();showHome();toast('حُفظت شاشة الترحيب')};
 }
 function renderTop(){
