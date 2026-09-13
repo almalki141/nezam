@@ -788,6 +788,14 @@ function gate(html){ $('#gateBody').innerHTML=html; $('#gate').hidden=false; $('
 function gErr(m){ const e=document.createElement('div'); e.className='gerr'; e.textContent=m;
   const b=$('#gateBody'); const old=b.querySelector('.gerr'); if(old) old.remove(); b.prepend(e); }
 function secNote(){ $('#gateSec').textContent = SUB?'البيانات مشفّرة AES‑256‑GCM · اشتقاق المفتاح PBKDF2 ('+ITERS.toLocaleString('en')+' دورة)':'⚠ التشفير غير متاح في هذا المتصفح'; }
+function confirmUrl(token){ return location.origin+location.pathname+(token?'?invite='+encodeURIComponent(token):''); }
+function authMessage(m){ const s=String(m||'');
+  if(/Email not confirmed/i.test(s)) return 'البريد الإلكتروني لم يُؤكَّد بعد.';
+  if(/Invalid login credentials/i.test(s)) return 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+  if(/User already registered/i.test(s)) return 'يوجد حساب مسجل بهذا البريد مسبقًا.';
+  if(/rate limit/i.test(s)) return 'تم إرسال رسائل كثيرة. انتظر قليلًا ثم أعد المحاولة.';
+  return s||'تعذّر إكمال العملية.';
+}
 
 async function boot(){
   secNote();
@@ -819,6 +827,17 @@ function screenInvite(){
     <button class="btn ghost gbig" id="i_back" style="margin-top:9px">العودة للدخول</button>`);
   $('#i_go').onclick=doInviteSignup; $('#i_back').onclick=()=>screenLogin();
 }
+function screenAwaitConfirm(mail,token){
+  gate(`<div class="gnote" style="text-align:center;line-height:2"><b>بقيت خطوة واحدة</b><br>أرسلنا رسالة تفعيل إلى<br><span class="mono">${esc(mail)}</span><br>افتح الرسالة واضغط «تأكيد البريد»، وستعود إلى المنظومة لإكمال الدعوة.</div>
+    <button class="btn primary gbig" id="c_done">أكدت البريد — متابعة الدخول</button>
+    <button class="btn ghost gbig" id="c_resend" style="margin-top:9px">إعادة إرسال رسالة التفعيل</button>
+    <button class="btn ghost gbig" id="c_change" style="margin-top:9px">تصحيح البريد أو العودة</button>`);
+  $('#c_done').onclick=()=>screenLogin({email:mail},'بعد تأكيد البريد أدخل كلمة المرور المؤقتة لإكمال التفعيل.');
+  $('#c_change').onclick=screenInvite;
+  $('#c_resend').onclick=async()=>{const b=$('#c_resend');b.disabled=true;b.innerHTML='<span class="spin"></span> جارٍ الإرسال…';
+    const r=await SB.auth.resend({type:'signup',email:mail,options:{emailRedirectTo:confirmUrl(token)}});
+    b.disabled=false;b.textContent='إعادة إرسال رسالة التفعيل';r.error?gErr(authMessage(r.error.message)):toast('أُعيد إرسال رسالة التفعيل');};
+}
 async function doInviteSignup(){
   const name=$('#i_name').value.trim(), mail=$('#i_mail').value.trim().toLowerCase(), pw=$('#i_pw').value;
   const token=INVITE_TOKEN||(localGet(PENDING_INVITE)||{}).token||'';
@@ -826,12 +845,12 @@ async function doInviteSignup(){
   const btn=$('#i_go'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> جارٍ التفعيل…';
   try{
     localSet(PENDING_INVITE,{token,email:mail,name});
-    const auth=await SB.auth.signUp({email:mail,password:pw}); if(auth.error) throw auth.error;
+    const auth=await SB.auth.signUp({email:mail,password:pw,options:{emailRedirectTo:confirmUrl(token)}}); if(auth.error) throw auth.error;
     SB_SESSION=auth.data.session||null; WORKSPACE_ID=null;
-    if(!SB_SESSION){ screenLogin({email:mail},'أرسلنا رسالة تأكيد إلى بريدك. بعد التأكيد ارجع وسجّل الدخول لإكمال الدعوة.'); return; }
+    if(!SB_SESSION){ screenAwaitConfirm(mail,token); return; }
     await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname);
     screenLogin({email:mail},'تم تفعيل الدعوة. أدخل كلمة المرور المؤقتة لفتح الخزنة.');
-  }catch(e){ btn.disabled=false; btn.textContent='تفعيل الدعوة'; gErr(e.message||'تعذّر تفعيل الدعوة.'); }
+  }catch(e){ btn.disabled=false; btn.textContent='تفعيل الدعوة'; gErr(authMessage(e.message)); }
 }
 function screenSetup(note){
   gate(`
@@ -857,7 +876,7 @@ async function doSetup(){
   if(pw!==pw2) return gErr('كلمتا المرور غير متطابقتين.');
   const btn=$('#s_go'); btn.innerHTML='<span class="spin"></span> جارٍ التشفير…'; btn.disabled=true;
   try{
-    const auth=await SB.auth.signUp({email:mail,password:pw});
+    const auth=await SB.auth.signUp({email:mail,password:pw,options:{emailRedirectTo:confirmUrl('')}});
     if(auth.error) throw auth.error;
     SB_SESSION=auth.data.session||null;
     const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt), dek=await newDEK(), wr=await wrapDEK(kek,dek);
@@ -921,7 +940,7 @@ async function doLogin(){
     const kek=await deriveKEK(pw,u.salt,VAULT.iters||ITERS);
     const dek=await unwrapDEK(kek,u);
     const data=await decObj(dek,VAULT.data);
-    u.fails=0; u.lockUntil=0;
+    u.fails=0; u.lockUntil=0; u.activatedAt=u.activatedAt||nowTs();
     DEK=dek; DB=data; MYREV=VAULT.rev||1;
     ME=(DB.users||[]).find(x=>x.id===u.id);
     if(!ME){ ME={id:u.id,name:u.email,role:'admin',perms:{},canExport:true,canImport:true}; DB.users=DB.users||[]; DB.users.push(ME); }
@@ -933,7 +952,8 @@ async function doLogin(){
       if(u.fails>=5){ u.lockUntil=Date.now()+5*60000; u.fails=0; }
       try{ await vaultWrite(VAULT); }catch(_){} }
     btn.disabled=false; btn.textContent='دخول';
-    gErr(u&&u.lockUntil>Date.now()?'محاولات خاطئة متكررة — قُفل الحساب 5 دقائق.':(e.message||'البريد أو كلمة المرور غير صحيحة.'));
+    if(/Email not confirmed/i.test(String(e.message||''))){ const pi=localGet(PENDING_INVITE)||{}; return screenAwaitConfirm(mail,INVITE_TOKEN||pi.token||''); }
+    gErr(u&&u.lockUntil>Date.now()?'محاولات خاطئة متكررة — قُفل الحساب 5 دقائق.':authMessage(e.message));
   }
 }
 function lockSession(){ if(!ME) return; const u=VAULT.users.find(x=>x.id===ME.id);
@@ -1942,7 +1962,7 @@ function openUsers(){
     return `<tr><td><b>${esc(u.name)}</b><br><span class="dim" style="font-size:11.5px">${esc(vu.email||'')}</span></td>
       <td><span class="badge ${u.role==='admin'?'b-gold':'b-blue'}">${u.role==='admin'?'مدير':'موظف'}</span></td>
       <td>${esc(np)}</td>
-      <td>${vu.active===false?'<span class="badge b-red">موقوف</span>':'<span class="badge b-green">نشط</span>'}</td>
+      <td>${vu.active===false?'<span class="badge b-red">موقوف</span>':(!vu.activatedAt&&u.id!==ME.id?'<span class="badge b-amber">بانتظار التفعيل</span>':'<span class="badge b-green">نشط</span>')}</td>
       <td class="acts">
         <button class="iconbtn" data-eu="${u.id}" title="الصلاحيات">${ic('gear',14)}</button>
         ${u.id!==ME.id?`<button class="iconbtn del" data-du="${u.id}" title="حذف">${ic('trash',14)}</button>`:''}
@@ -2000,6 +2020,7 @@ function openAddUser(){
       await persist();
       const inv=await SB.rpc('create_workspace_invite',{p_email:mail,p_role:$('#u_role').value});
       if(inv.error) throw inv.error;
+      const pendingUser=VAULT.users.find(x=>x.id===id); if(pendingUser){pendingUser.inviteToken=inv.data;await persist();}
       const link=location.origin+location.pathname+'?invite='+inv.data;
       modal('تم إنشاء الدعوة',`<div class="gnote">أرسل للموظف رابط الدعوة وكلمة المرور المؤقتة عبر قناة آمنة. الرابط ينتهي خلال 7 أيام.</div>
         <div class="fld" style="margin-bottom:10px"><label>رابط الدعوة</label><textarea id="inviteLink" readonly style="min-height:72px;direction:ltr">${esc(link)}</textarea></div>
