@@ -802,11 +802,12 @@ function authMessage(m){ const s=String(m||'');
 
 async function boot(){
   secNote();
+  if(!INVITE_TOKEN) localStorage.removeItem(PENDING_INVITE);
   if(!SUB){ gate(`<div class="gerr">هذا المتصفح لا يوفّر واجهة التشفير (Web Crypto). افتح النظام عبر رابط https أو استخدم متصفحاً حديثاً.</div>`); return; }
   if(!SB){ gate(`<div class="gerr">تعذّر تحميل خدمة المزامنة. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.</div>`); return; }
   try{
     const session=await cloudSession();
-    if(!session) return (INVITE_TOKEN||localGet(PENDING_INVITE))?screenInvite():screenLogin();
+    if(!session) return INVITE_TOKEN?screenInvite():screenLogin();
     const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'', sessionMail=String(session.user.email||'').toLowerCase();
     if(INVITE_TOKEN&&(!pi||pi.email!==sessionMail)){ await SB.auth.signOut(); SB_SESSION=null; WORKSPACE_ID=null; return screenInvite(); }
     if(token&&pi&&pi.email===sessionMail){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
@@ -912,11 +913,9 @@ function screenLogin(lockedUser,note){
       <input id="l_mail" type="email" value="${esc(em)}" ${lockedUser?'readonly':''} autocomplete="username"></div>
     <div class="fld" style="margin-bottom:16px"><label>كلمة المرور</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <button class="btn primary gbig" id="l_go">دخول</button>
-    ${!lockedUser&&(INVITE_TOKEN||localGet(PENDING_INVITE))?`<button class="btn ghost gbig" id="l_inv" style="margin-top:9px">تفعيل دعوة موظف</button>`:''}
     <p style="text-align:center;font-size:11.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.8">
       نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#l_go').onclick=doLogin;
-  if($('#l_inv')) $('#l_inv').onclick=screenInvite;
   $('#l_pw').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   setTimeout(()=>{const f=lockedUser?$('#l_pw'):$('#l_mail'); if(f) f.focus();},60);
 }
@@ -1971,6 +1970,7 @@ function openUsers(){
       <td>${vu.active===false?'<span class="badge b-red">موقوف</span>':(!vu.activatedAt&&u.id!==ME.id?'<span class="badge b-amber">بانتظار التفعيل</span>':'<span class="badge b-green">نشط</span>')}</td>
       <td class="acts">
         <button class="iconbtn" data-eu="${u.id}" title="الصلاحيات">${ic('gear',14)}</button>
+        ${u.id!==ME.id?`<button class="iconbtn" data-rp="${u.id}" title="إصدار كلمة مؤقتة جديدة">${ic('lock',14)}</button>`:''}
         ${u.id!==ME.id?`<button class="iconbtn del" data-du="${u.id}" title="حذف">${ic('trash',14)}</button>`:''}
       </td></tr>`;}).join('');
   modal('المستخدمون والصلاحيات',
@@ -1981,14 +1981,15 @@ function openUsers(){
     `<button class="btn primary" id="uAdd">${ic('plus')} إضافة موظف</button><button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
   $('#uAdd').onclick=openAddUser;
   document.querySelectorAll('[data-eu]').forEach(b=>b.onclick=()=>openPerms(b.dataset.eu));
+  document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>openResetPw(b.dataset.rp));
   document.querySelectorAll('[data-du]').forEach(b=>b.onclick=()=>{
     const u=DB.users.find(x=>x.id===b.dataset.du);
     ask(`حذف حساب <b>${esc(u.name)}</b> نهائياً؟`,async()=>{
       const vu=VAULT.users.find(x=>x.id===u.id)||{};
+      if(vu.email){const cloud=await SB.functions.invoke('manage-users',{body:{action:'delete',email:vu.email}});if(cloud.error||(cloud.data&&cloud.data.error))return toast('تعذّر حذف حساب الدخول: '+authMessage(cloud.error?.message||cloud.data.error),'err');}
       DB.users=DB.users.filter(x=>x.id!==u.id); VAULT.users=VAULT.users.filter(x=>x.id!==u.id);
       audit('حذف مستخدم',u.name); await persist();
-      if(vu.email){ const rr=await SB.rpc('revoke_workspace_member',{p_email:vu.email}); if(rr.error) toast('حُذف من النظام وتعذّر إلغاء عضويته السحابية','err'); }
-      openUsers(); toast('حُذف الحساب وأُلغيت عضويته'); }); });
+      openUsers(); toast('حُذف الحساب نهائيًا'); }); });
 }
 function permGrid(perms){
   let last=''; return `<div class="perm-toolbar"><b>تطبيق صلاحية واحدة على جميع الصفحات</b>${LEVELS.map(l=>`<button type="button" class="btn ghost sm" data-perm-all="${l}">${LEVEL_AR[l]}</button>`).join('')}</div>
@@ -1997,19 +1998,20 @@ function permGrid(perms){
 }
 function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات');});}
 function openAddUser(){
-  modal('إضافة موظف',`
+  modal('إنشاء حساب مستخدم',`
+    <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد؛ سيدخل بالبريد والكلمة المؤقتة ثم يختار كلمة مرور خاصة به.</div>
     <div class="grid2">
       <div class="fld"><label>الاسم <i>*</i></label><input id="u_name"></div>
       <div class="fld"><label>البريد الإلكتروني <i>*</i></label><input id="u_mail" type="email" placeholder="name@example.com"></div>
       <div class="fld"><label>كلمة المرور المبدئية <i>*</i></label><input id="u_pw" type="text" value="${Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)}">
-        <span class="hint">سلّمها للموظف ليغيّرها بعد أول دخول.</span></div>
+        <span class="hint">صالحة للدخول الأول فقط، ثم يفرض النظام تغييرها.</span></div>
       <div class="fld"><label>الدور</label><select id="u_role"><option value="staff">موظف</option><option value="admin">مدير (صلاحية كاملة)</option></select></div>
       <div class="fld full"><label>خيارات</label>
         <label style="font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="u_exp" checked style="width:auto"> السماح بالتصدير والطباعة</label>
         <label style="font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="u_imp" style="width:auto"> السماح باستيراد Excel</label></div>
       <div class="fld full"><label>صلاحيات الصفحات</label>${permGrid({})}</div>
     </div>`,
-    `<button class="btn primary" id="uSave">إنشاء الحساب</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
+    `<button class="btn primary" id="uSave">إنشاء الحساب مباشرة</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
   bindPermPresets();
   $('#uSave').onclick=async()=>{
     const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw=$('#u_pw').value;
@@ -2025,17 +2027,14 @@ function openAddUser(){
       document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value);
       DB.users.push({id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,mustChangePassword:true,createdAt:nowTs()});
       VAULT.users.push({id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0});
-      audit('إضافة مستخدم',name+' — '+mail);
-      await persist();
-      const inv=await SB.rpc('create_workspace_invite',{p_email:mail,p_role:$('#u_role').value});
-      if(inv.error) throw inv.error;
-      const pendingUser=VAULT.users.find(x=>x.id===id); if(pendingUser){pendingUser.inviteToken=inv.data;await persist();}
-      const link=location.origin+location.pathname+'?invite='+inv.data;
-      const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\n1. افتح رابط التفعيل:\n${link}\n\n2. استخدم كلمة المرور المؤقتة:\n${pw}\n\n3. بعد أول دخول سيطلب منك النظام إنشاء كلمة مرور خاصة بك.\n\nتنتهي صلاحية رابط الدعوة خلال 7 أيام، ويُرجى عدم مشاركة بيانات الدخول.`;
-      modal('دعوة المستخدم جاهزة',`<div class="gnote"><b>تم إنشاء حساب ${esc(name)}</b><br>انسخ الرسالة التالية وأرسلها للموظف عبر قناة آمنة.</div>
+      const cloud=await SB.functions.invoke('manage-users',{body:{action:'create',email:mail,password:pw,name,role:$('#u_role').value}});
+      if(cloud.error) throw cloud.error; if(cloud.data&&cloud.data.error) throw new Error(cloud.data.error);
+      audit('إنشاء حساب مباشر',name+' — '+mail); await persist();
+      const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\nرابط النظام:\n${location.origin+location.pathname}\n\nالبريد الإلكتروني:\n${mail}\n\nكلمة المرور المؤقتة:\n${pw}\n\nبعد أول دخول سيطلب منك النظام إنشاء كلمة مرور خاصة بك.\nيُرجى عدم مشاركة بيانات الدخول مع أي شخص.`;
+      modal('تم إنشاء الحساب بنجاح',`<div class="gnote"><b>حساب ${esc(name)} جاهز للدخول فورًا</b><br>لا توجد رسالة تأكيد أو رابط تفعيل. انسخ البيانات التالية وأرسلها عبر قناة آمنة.</div>
         <div class="fld"><label>رسالة الدعوة الجاهزة</label><textarea id="inviteMsg" readonly style="min-height:245px;direction:rtl;line-height:1.9">${esc(msg)}</textarea></div>`,
-        `<button class="btn primary" id="copyInvite">نسخ رسالة الدعوة</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
-      $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText(msg); toast('نُسخت رسالة الدعوة كاملة'); };
+        `<button class="btn primary" id="copyInvite">نسخ بيانات الدخول</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
+      $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText(msg); toast('نُسخت بيانات الدخول كاملة'); };
     }catch(e){
       if(createdId){
         DB.users=DB.users.filter(x=>x.id!==createdId);
@@ -2043,7 +2042,7 @@ function openAddUser(){
         try{ await persist(); }catch(_){}
       }
       btn.disabled=false; btn.textContent='إنشاء الحساب';
-      toast('تعذّر إنشاء الدعوة: '+(e.message||'خطأ غير معروف'),'err');
+      toast('تعذّر إنشاء الحساب: '+authMessage(e.message),'err');
     }
   };
 }
@@ -2077,19 +2076,22 @@ function openPerms(id){
     openUsers(); render(); toast('حُفظت الصلاحيات'); };
 }
 function openResetPw(id){
-  const u=DB.users.find(x=>x.id===id);
-  modal('تغيير كلمة مرور — '+esc(u.name),`
-    <div class="gnote">سيُعاد تغليف مفتاح البيانات بكلمة المرور الجديدة. الحسابات الأخرى لا تتأثر.</div>
-    <div class="fld"><label>كلمة المرور الجديدة <i>*</i></label><input id="rp_pw" type="text" value="${Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)}"></div>`,
-    `<button class="btn primary" id="rpGo">تعيين</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'sm');
+  const u=DB.users.find(x=>x.id===id),vu=VAULT.users.find(x=>x.id===id);
+  modal('إصدار دخول مؤقت — '+esc(u.name),`
+    <div class="gnote">ستُلغى كلمة المرور السابقة، ويدخل المستخدم بهذه الكلمة مرة واحدة ثم ينشئ كلمة خاصة به.</div>
+    <div class="fld"><label>كلمة المرور المؤقتة الجديدة <i>*</i></label><input id="rp_pw" type="text" value="${Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)}"></div>`,
+    `<button class="btn primary" id="rpGo">إصدار كلمة مؤقتة</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'sm');
   $('#rpGo').onclick=async()=>{
     const pw=$('#rp_pw').value; if(pw.length<8) return toast('8 أحرف على الأقل','err');
     const btn=$('#rpGo'); btn.innerHTML='<span class="spin"></span>'; btn.disabled=true;
-    try{ const vu=VAULT.users.find(x=>x.id===id);
+    try{
+      const cloud=await SB.functions.invoke('manage-users',{body:{action:'create',email:vu.email,password:pw,name:u.name,role:u.role}});if(cloud.error)throw cloud.error;if(cloud.data&&cloud.data.error)throw new Error(cloud.data.error);
       const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
       vu.salt=salt; vu.wrapIv=wr.wrapIv; vu.wrapped=wr.wrapped; vu.fails=0; vu.lockUntil=0;
-      audit('تغيير كلمة مرور',u.name); await persist(); openUsers(); toast('تم التغيير — سلّم كلمة المرور الجديدة');
-    }catch(e){ btn.disabled=false; btn.textContent='تعيين'; toast('تعذّر التغيير','err'); }
+      u.mustChangePassword=true;audit('إصدار دخول مؤقت',u.name); await persist();
+      const msg=`رابط النظام: ${location.origin+location.pathname}\nالبريد: ${vu.email}\nكلمة المرور المؤقتة: ${pw}\nسيطلب منك النظام إنشاء كلمة مرور جديدة بعد الدخول.`;
+      modal('تم إصدار الدخول المؤقت',`<div class="gnote">أرسل البيانات التالية للمستخدم عبر قناة آمنة.</div><div class="fld"><textarea id="resetMsg" readonly style="min-height:150px;line-height:1.9">${esc(msg)}</textarea></div>`,`<button class="btn primary" id="copyReset">نسخ البيانات</button><button class="btn ghost" onclick="openUsers()">عودة</button>`,'sm');$('#copyReset').onclick=async()=>{await navigator.clipboard.writeText(msg);toast('نُسخت بيانات الدخول');};
+    }catch(e){ btn.disabled=false; btn.textContent='إصدار كلمة مؤقتة'; toast('تعذّر الإصدار: '+authMessage(e.message),'err'); }
   };
 }
 function openChangePw(forced=false,current=''){
