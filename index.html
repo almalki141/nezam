@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="window.__noXLSX=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__noSupabase=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js" onerror="window.__noTus=1"></script>
 <style>
 :root{
   --bg:#EDF0EE; --surface:#FFFFFF; --surface-2:#F6F8F6; --paper:#FBF8F1;
@@ -178,6 +179,7 @@ select.filter{padding:10px 12px;border:1px solid var(--line);background:var(--su
 .pager .pginfo{font-size:12.5px;color:var(--ink-3);font-weight:700;min-width:95px;text-align:center}
 .date-summary{display:flex;align-items:center;gap:10px;padding:7px 11px;border:1px solid var(--line);background:var(--surface);border-radius:10px;box-shadow:var(--shadow-sm)}
 .date-summary b{font-size:12px}.date-summary span{display:block;font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.ticker{width:100%;overflow:hidden;background:var(--pine);color:#fff;border-top:1px solid rgba(216,181,115,.28);padding:5px 0;font-size:12.5px;font-weight:700}.ticker span{display:block;width:max-content;min-width:100%;padding-inline-start:100%;white-space:nowrap;animation:tickerMove 22s linear infinite}@keyframes tickerMove{to{transform:translateX(100%)}}
 .smart-summary{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:end;background:linear-gradient(135deg,var(--pine),var(--pine-2));color:#fff;border-radius:13px;padding:13px 15px;margin-bottom:12px;box-shadow:var(--shadow)}
 .smart-summary .result{min-width:115px}.smart-summary .result b{display:block;font-size:28px;line-height:1}.smart-summary .result span{font-size:11px;color:#AFC7C1}
 .smart-summary label{display:block;font-size:10.5px;color:#BFD2CD;font-weight:700;margin-bottom:4px}
@@ -1108,6 +1110,11 @@ async function fileUrl(f,downloadName){
   if(f.path){ const {data,error}=await SB.storage.from(FILE_BUCKET).createSignedUrl(f.path,600,downloadName?{download:downloadName}:undefined); if(error) throw error; return data.signedUrl; }
   return f.d;
 }
+async function uploadStoredFile(path,file){
+  if(file.size<=6*1024*1024||window.__noTus||!window.tus){ const {error}=await SB.storage.from(FILE_BUCKET).upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false}); if(error) throw error; return; }
+  if(!SB_SESSION) await cloudSession();
+  return new Promise((resolve,reject)=>{ const up=new tus.Upload(file,{endpoint:SB_URL+'/storage/v1/upload/resumable',retryDelays:[0,1000,3000,5000],headers:{authorization:'Bearer '+SB_SESSION.access_token,apikey:SB_KEY},uploadDataDuringCreation:true,removeFingerprintOnSuccess:true,chunkSize:6*1024*1024,metadata:{bucketName:FILE_BUCKET,objectName:path,contentType:file.type||'application/octet-stream',cacheControl:'3600'},onError:reject,onSuccess:resolve});up.findPreviousUploads().then(x=>{if(x[0])up.resumeFromPreviousUpload(x[0]);up.start();}).catch(reject); });
+}
 async function previewFile(f){
   try{ const url=await fileUrl(f);
     if(/pdf/i.test(f.t||f.n)) modal('معاينة PDF — '+esc(f.n),`<iframe class="pdf-viewer" src="${esc(url)}#toolbar=0&navpanes=0" title="${esc(f.n)}"></iframe>`,`<button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
@@ -1260,7 +1267,7 @@ function renderTop(){
     ${isAdmin()?`<div class="pgtools">
       <button class="btn ghost sm" id="btnCols">${ic('cols')} الأعمدة</button>
       <button class="btn ghost sm" id="btnPageSet">${ic('gear')} إعدادات الصفحة</button></div>`:''}
-    <div class="stripe">${stripeHTML(p)}</div>`;
+    <div class="stripe" id="stripe">${stripeHTML(p)}</div>${p.ticker?`<div class="ticker"><span>${esc(p.ticker)}</span></div>`:''}`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
   if(isAdmin()){ $('#btnCols').onclick=openCols; $('#btnPageSet').onclick=openPageSet; }
 }
@@ -1313,20 +1320,20 @@ function summaryHTML(p){
 function toolsHTML(p,extra){
   const u=U(), ch=chipsCol(p), fl=vis(p).filter(c=>c.filterable&&(!ch||c.id!==ch.id));
   return `<div class="tools">
-    <div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" placeholder="ابحث في ${esc(p.name)}…"></div>
+    ${p.showSearch!==false?`<div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" placeholder="ابحث في ${esc(p.name)}…"></div>`:''}
     ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>
       ${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
     <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
     <div class="spacer"></div>${extra||''}
-    ${canImport(p)?`<button class="btn ghost" id="bImp">${ic('up')} استيراد Excel</button>`:''}
-    ${canExport()?`<button class="btn ghost" id="bXls">${ic('xls')} تصدير Excel</button>
-    <button class="btn ghost" id="bPrn">${ic('print')} طباعة</button>`:''}
+    ${p.showImport!==false&&canImport(p)?`<button class="btn ghost" id="bImp">${ic('up')} استيراد Excel</button>`:''}
+    ${p.showExport!==false&&canExport()?`<button class="btn ghost" id="bXls">${ic('xls')} تصدير Excel</button>`:''}
+    ${p.showPrint!==false&&canExport()?`<button class="btn ghost" id="bPrn">${ic('print')} طباعة</button>`:''}
     ${can(p.id,'edit')?`<button class="btn primary" id="bAdd">${ic('plus')} إضافة سجل</button>`:''}
   </div>`;
 }
 function bindTools(p){
   const u=U(), qi=$('#q'); if(qi) qi.oninput=e=>{
-    u.q=e.target.value; u.page=1; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,120);
+    u.q=e.target.value; u.page=1; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,320);
   };
   document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;u.page=1;refreshBody();});
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{u.display=b.dataset.view;refreshBody();});
@@ -1370,10 +1377,10 @@ function renderTable(p){
         ${cols.map(c=>`<td data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
         ${p.showUpdated?`<td data-label="آخر تحديث" class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
         <td class="acts" data-label="إجراءات">
-          <button class="iconbtn" title="معاينة" data-vw="${r.id}">${ic('eye')}</button>
-          <button class="iconbtn" title="السجل" data-log="${r.id}">${ic('clock')}</button>
-          ${can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit')}</button>`:''}
-          ${can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
+          ${p.showPreview!==false?`<button class="iconbtn" title="معاينة" data-vw="${r.id}">${ic('eye')}</button>`:''}
+          ${p.showLog!==false?`<button class="iconbtn" title="السجل" data-log="${r.id}">${ic('clock')}</button>`:''}
+          ${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit')}</button>`:''}
+          ${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
   $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
@@ -1389,7 +1396,7 @@ function renderTable(p){
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
   if($('#pgPrev')) $('#pgPrev').onclick=()=>{u.page--;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
   if($('#pgNext')) $('#pgNext').onclick=()=>{u.page++;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
-  renderTop();
+  const stripe=$('#stripe'); if(stripe) stripe.innerHTML=stripeHTML(p);
 }
 function renderLetters(p){
   const u=U(), rows=rowsOf(p);
@@ -1576,13 +1583,12 @@ async function handleFiles(cid,files,kind){
       if(f.size>MAXFILE){ skipped++; continue; }
       if(!SB_SESSION) await cloudSession(); const wid=await workspaceId();
       const clean=f.name.replace(/[^\p{L}\p{N}._-]+/gu,'_'),path=`${wid}/${Date.now()}-${uid()}-${clean}`;
-      const {error}=await SB.storage.from(FILE_BUCKET).upload(path,f,{contentType:f.type||'application/octet-stream',upsert:false});
-      if(error) throw error;
+      await uploadStoredFile(path,f);
       FILB[cid].push({n:f.name,t:f.type,s:f.size,path});
     }
     drawFil(cid);
     toast(skipped?`أُضيفت الملفات · تُخطّي ${skipped} (نوع غير مدعوم أو حجم كبير)`:'أُضيفت الملفات');
-  }catch(e){ toast('تعذّرت معالجة الملف','err'); }
+  }catch(e){ toast('تعذّر رفع الملف: '+(e.message||'تحقق من الاتصال وحجم الملف'),'err'); }
 }
 function bindFileFields(){
   document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pickFiles(b.dataset.pick,'img'));
@@ -1768,6 +1774,7 @@ function openPageSet(){
     <div class="grid2">
       <div class="fld"><label>اسم الصفحة <i>*</i></label><input id="ps_name" value="${esc(p.name)}"></div>
       <div class="fld"><label>الوصف</label><input id="ps_sub" value="${esc(p.sub||'')}"></div>
+      <div class="fld full"><label>نص الشريط المتحرك</label><input id="ps_ticker" value="${esc(p.ticker||'')}" placeholder="اتركه فارغًا لإخفاء الشريط"></div>
       <div class="fld"><label>مجموعة الصفحة</label><input id="ps_group" value="${esc(p.group||'')}" list="pageGroups" placeholder="مثال: شؤون الأفراد"><datalist id="pageGroups">${uniq(DB.pages.map(x=>x.group)).map(g=>`<option value="${esc(g)}">`).join('')}</datalist><span class="hint">الصفحات التي تحمل اسم المجموعة نفسه تظهر تحت زر واحد قابل للفتح والإغلاق.</span></div>
       <div class="fld full"><label>الأيقونة</label><div class="iconpick" id="psIcons">
         ${Object.keys(ICONS).map(k=>`<button type="button" class="ip ${p.icon===k?'on':''}" data-ico="${k}">${icon(k,17)}</button>`).join('')}</div></div>
@@ -1784,6 +1791,9 @@ function openPageSet(){
       <div class="fld"><label>خيارات العرض</label>
         <label style="font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center;margin-top:4px"><input type="checkbox" id="ps_ava" ${p.avatars?'checked':''} style="width:auto"> صورة/حروف بجانب الاسم</label>
         <label style="font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="ps_upd" ${p.showUpdated?'checked':''} style="width:auto"> عمود «آخر تحديث»</label></div>
+      <div class="fld full"><label>الأدوات الظاهرة في الصفحة</label><div class="cmflags">
+        <label><input type="checkbox" id="ps_search" ${p.showSearch!==false?'checked':''}> البحث</label><label><input type="checkbox" id="ps_import" ${p.showImport!==false?'checked':''}> الاستيراد</label><label><input type="checkbox" id="ps_export" ${p.showExport!==false?'checked':''}> التصدير</label><label><input type="checkbox" id="ps_print" ${p.showPrint!==false?'checked':''}> الطباعة</label>
+        <label><input type="checkbox" id="ps_preview" ${p.showPreview!==false?'checked':''}> المعاينة</label><label><input type="checkbox" id="ps_history" ${p.showLog!==false?'checked':''}> سجل الإجراءات</label><label><input type="checkbox" id="ps_edit" ${p.showEdit!==false?'checked':''}> التعديل</label><label><input type="checkbox" id="ps_delete" ${p.showDelete!==false?'checked':''}> الحذف</label></div></div>
       ${p.view==='letters'?`
       <div class="fld"><label>مصدر بيانات التعبئة</label><select id="ps_peo">
         ${DB.pages.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.peoplePage===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
@@ -1812,7 +1822,8 @@ function openPageSet(){
     cur=DB.pages[0].id; save(); render(); toast('حُذفت الصفحة'); });
   $('#psSave').onclick=()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
-    p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
+    p.name=n; p.sub=$('#ps_sub').value.trim(); p.ticker=$('#ps_ticker').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
+    p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
