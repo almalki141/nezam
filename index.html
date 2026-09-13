@@ -522,6 +522,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 const $=s=>document.querySelector(s);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const todayISO=()=>new Date().toISOString().slice(0,10);
+const localISO=d=>{const x=d||new Date();return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`};
 const nowTs=()=>new Date().toISOString();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uniq=a=>[...new Set(a.filter(x=>x!==''&&x!=null))];
@@ -1318,10 +1319,11 @@ function showHome(){
   $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة القيادة</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${ic('shieldk',49)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div>${bannerHTML}${converter}<div class="welcome-section-title"><h3>بوابات العمل</h3><span>اضغط المجموعة لإظهار صفحاتها</span></div><div class="welcome-pages">${gateways||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div></section>`;
   document.querySelectorAll('[data-home-pg]').forEach(b=>b.onclick=()=>go(b.dataset.homePg));
   document.querySelectorAll('[data-hgroup]').forEach(b=>b.onclick=()=>b.closest('.home-group').classList.toggle('open'));
-  const showConv=(msg)=>{$('#convResult').textContent=msg;$('#convResult').style.display='block'};
-  $('#convG').onchange=()=>{const d=toDate($('#convG').value),h=d&&hijriNums(d);if(h){$('#convH').value=`${h.y}-${String(h.m).padStart(2,'0')}-${String(h.d).padStart(2,'0')}`;showConv(`الموافق هجريًا: ${$('#convH').value} هـ`)}};
-  $('#convH').onchange=()=>{const d=hijriToGregorian($('#convH').value);if(d){$('#convG').value=d.toISOString().slice(0,10);showConv(`الموافق ميلاديًا: ${fmtG(d)} م`)}else showConv('تحقق من التاريخ الهجري بصيغة 1448-04-02')};
-  $('#convSwap').onclick=()=>{if($('#convG').value)$('#convG').dispatchEvent(new Event('change'));else if($('#convH').value)$('#convH').dispatchEvent(new Event('change'));else toast('أدخل تاريخًا أولاً')};
+  let convFrom='h';const showConv=(msg)=>{$('#convResult').textContent=msg;$('#convResult').style.display='block';toast(msg)};
+  const fromG=()=>{const d=toDate($('#convG').value),h=d&&hijriNums(d);if(!h)return showConv('اختر تاريخًا ميلاديًا صحيحًا');$('#convH').value=`${h.y}-${String(h.m).padStart(2,'0')}-${String(h.d).padStart(2,'0')}`;showConv(`الموافق هجريًا: ${$('#convH').value} هـ`)};
+  const fromH=()=>{const d=hijriToGregorian($('#convH').value);if(!d)return showConv('تحقق من التاريخ الهجري بصيغة 1448-04-02');$('#convG').value=localISO(d);showConv(`الموافق ميلاديًا: ${fmtG(d)} م`)};
+  $('#convG').oninput=()=>convFrom='g';$('#convH').oninput=()=>convFrom='h';$('#convG').onchange=fromG;$('#convH').onchange=fromH;
+  $('#convSwap').onclick=()=>{if(convFrom==='g'&&$('#convG').value)fromG();else if($('#convH').value)fromH();else if($('#convG').value)fromG();else toast('أدخل تاريخًا أولاً')};
   if(banners.length>1){let active=0;const activate=i=>{active=i;document.querySelectorAll('[data-bi]').forEach((x,n)=>x.classList.toggle('on',n===i));document.querySelectorAll('[data-bdot]').forEach((x,n)=>x.classList.toggle('on',n===i))};document.querySelectorAll('[data-bdot]').forEach(x=>x.onclick=e=>{e.stopPropagation();activate(+x.dataset.bdot)});clearInterval(window.homeBannerTimer);window.homeBannerTimer=setInterval(()=>{if(!cur)activate((active+1)%banners.length)},5000)}
 }
 function showWelcomePopup(){
