@@ -357,6 +357,8 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 .permrow{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
 .permrow span{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .permrow select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;background:var(--surface-2)}
+.perm-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);margin-bottom:9px}.perm-toolbar b{width:100%;font-size:12px;color:var(--ink-3)}
+.perm-section{grid-column:1/-1;font-size:12px;font-weight:800;color:var(--pine-2);padding:8px 3px 2px;border-bottom:1px solid var(--line)}
 .toasts{position:fixed;bottom:20px;left:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--pine);color:#fff;padding:11px 17px;border-radius:9px;font-size:13.5px;font-weight:600;
   box-shadow:0 10px 30px rgba(0,0,0,.25);animation:pop .16s ease-out;border-inline-start:3px solid var(--brass-2);max-width:360px}
@@ -562,7 +564,7 @@ const SB_KEY='sb_publishable_nq98s8SPKegEmVrYcD9ewA_jEuYA7yh';
 const SB=(window.supabase&&!window.__noSupabase)?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
 const CACHE_KEY=VKEY+'_cloud_cache', PENDING_KEY=VKEY+'_pending', PENDING_INVITE=VKEY+'_invite';
 let INVITE_TOKEN=new URLSearchParams(location.search).get('invite')||'';
-let VAULT=null, DEK=null, ME=null, DB=null, MYREV=0;
+let VAULT=null, DEK=null, ME=null, DB=null, MYREV=0, FORCE_PW=false;
 let WORKSPACE_ID=null;
 let cur=null, ui={}, saveTimer=null, idleTimer=null, searchTimer=null;
 const IDLE_MIN=15;
@@ -804,8 +806,9 @@ async function boot(){
   if(!SB){ gate(`<div class="gerr">تعذّر تحميل خدمة المزامنة. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.</div>`); return; }
   try{
     const session=await cloudSession();
-    if(!session) return screenLogin();
+    if(!session) return (INVITE_TOKEN||localGet(PENDING_INVITE))?screenInvite():screenLogin();
     const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'', sessionMail=String(session.user.email||'').toLowerCase();
+    if(INVITE_TOKEN&&(!pi||pi.email!==sessionMail)){ await SB.auth.signOut(); SB_SESSION=null; WORKSPACE_ID=null; return screenInvite(); }
     if(token&&pi&&pi.email===sessionMail){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
     VAULT=await vaultRead();
     if(!VAULT||!VAULT.users||!VAULT.users.length){
@@ -941,13 +944,15 @@ async function doLogin(){
     const kek=await deriveKEK(pw,u.salt,VAULT.iters||ITERS);
     const dek=await unwrapDEK(kek,u);
     const data=await decObj(dek,VAULT.data);
-    u.fails=0; u.lockUntil=0; u.activatedAt=u.activatedAt||nowTs();
+    const firstActivation=!u.activatedAt; u.fails=0; u.lockUntil=0; u.activatedAt=u.activatedAt||nowTs();
     DEK=dek; DB=data; MYREV=VAULT.rev||1;
     ME=(DB.users||[]).find(x=>x.id===u.id);
     if(!ME){ ME={id:u.id,name:u.email,role:'admin',perms:{},canExport:true,canImport:true}; DB.users=DB.users||[]; DB.users.push(ME); }
+    if(firstActivation&&ME.role!=='admin') ME.mustChangePassword=true;
     audit('دخول','تسجيل دخول ناجح');
     await persist();
     enterApp();
+    if(ME.mustChangePassword) setTimeout(()=>openChangePw(true,pw),80);
   }catch(e){
     if(u){ u.fails=(u.fails||0)+1;
       if(u.fails>=5){ u.lockUntil=Date.now()+5*60000; u.fails=0; }
@@ -1513,7 +1518,7 @@ function modal(t,b,f,sz){
     <div class="m-body">${b}</div>${f?`<div class="m-foot">${f}</div>`:''}`;
   $('#ov').classList.add('on');
 }
-function closeModal(){ $('#ov').classList.remove('on'); }
+function closeModal(){ if(FORCE_PW) return toast('أنشئ كلمة مرور جديدة أولاً','err'); $('#ov').classList.remove('on'); }
 $('#ov').addEventListener('mousedown',e=>{if(e.target.id==='ov')closeModal();});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ if($('#lbx').classList.contains('on')) closeLB(); else closeModal(); }
@@ -1986,9 +1991,11 @@ function openUsers(){
       openUsers(); toast('حُذف الحساب وأُلغيت عضويته'); }); });
 }
 function permGrid(perms){
-  return `<div class="permgrid">${DB.pages.map(p=>`<div class="permrow"><span>${esc(p.name)}</span>
-    <select data-pp="${p.id}">${LEVELS.map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`).join('')}</div>`;
+  let last=''; return `<div class="perm-toolbar"><b>تطبيق صلاحية واحدة على جميع الصفحات</b>${LEVELS.map(l=>`<button type="button" class="btn ghost sm" data-perm-all="${l}">${LEVEL_AR[l]}</button>`).join('')}</div>
+    <div class="permgrid">${DB.pages.map(p=>{const g=p.group||'صفحات مستقلة',head=g!==last?(last=g,`<div class="perm-section">${esc(g)}</div>`):'';return head+`<div class="permrow"><span title="${esc(p.name)}">${esc(p.name)}</span>
+    <select data-pp="${p.id}">${LEVELS.map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`;}).join('')}</div>`;
 }
+function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات');});}
 function openAddUser(){
   modal('إضافة موظف',`
     <div class="grid2">
@@ -2003,6 +2010,7 @@ function openAddUser(){
       <div class="fld full"><label>صلاحيات الصفحات</label>${permGrid({})}</div>
     </div>`,
     `<button class="btn primary" id="uSave">إنشاء الحساب</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
+  bindPermPresets();
   $('#uSave').onclick=async()=>{
     const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw=$('#u_pw').value;
     if(!name) return toast('الاسم مطلوب','err');
@@ -2015,7 +2023,7 @@ function openAddUser(){
       const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
       const id=uid(), perms={}; createdId=id;
       document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value);
-      DB.users.push({id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,createdAt:nowTs()});
+      DB.users.push({id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,mustChangePassword:true,createdAt:nowTs()});
       VAULT.users.push({id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0});
       audit('إضافة مستخدم',name+' — '+mail);
       await persist();
@@ -2023,11 +2031,11 @@ function openAddUser(){
       if(inv.error) throw inv.error;
       const pendingUser=VAULT.users.find(x=>x.id===id); if(pendingUser){pendingUser.inviteToken=inv.data;await persist();}
       const link=location.origin+location.pathname+'?invite='+inv.data;
-      modal('تم إنشاء الدعوة',`<div class="gnote">أرسل للموظف رابط الدعوة وكلمة المرور المؤقتة عبر قناة آمنة. الرابط ينتهي خلال 7 أيام.</div>
-        <div class="fld" style="margin-bottom:10px"><label>رابط الدعوة</label><textarea id="inviteLink" readonly style="min-height:72px;direction:ltr">${esc(link)}</textarea></div>
-        <div class="fld"><label>كلمة المرور المؤقتة</label><input id="invitePw" readonly value="${esc(pw)}" style="direction:ltr"></div>`,
-        `<button class="btn primary" id="copyInvite">نسخ الرابط وكلمة المرور</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
-      $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText('رابط الدعوة: '+link+'\nكلمة المرور المؤقتة: '+pw); toast('نُسخت بيانات الدعوة'); };
+      const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\n1. افتح رابط التفعيل:\n${link}\n\n2. استخدم كلمة المرور المؤقتة:\n${pw}\n\n3. بعد أول دخول سيطلب منك النظام إنشاء كلمة مرور خاصة بك.\n\nتنتهي صلاحية رابط الدعوة خلال 7 أيام، ويُرجى عدم مشاركة بيانات الدخول.`;
+      modal('دعوة المستخدم جاهزة',`<div class="gnote"><b>تم إنشاء حساب ${esc(name)}</b><br>انسخ الرسالة التالية وأرسلها للموظف عبر قناة آمنة.</div>
+        <div class="fld"><label>رسالة الدعوة الجاهزة</label><textarea id="inviteMsg" readonly style="min-height:245px;direction:rtl;line-height:1.9">${esc(msg)}</textarea></div>`,
+        `<button class="btn primary" id="copyInvite">نسخ رسالة الدعوة</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
+      $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText(msg); toast('نُسخت رسالة الدعوة كاملة'); };
     }catch(e){
       if(createdId){
         DB.users=DB.users.filter(x=>x.id!==createdId);
@@ -2055,6 +2063,7 @@ function openPerms(id){
         <span class="hint">تُطبَّق على المدير تلقائياً كل الصلاحيات بغض النظر عن هذا الجدول.</span></div>
     </div>`,
     `<button class="btn primary" id="puSave">حفظ</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
+  bindPermPresets();
   $('#puSave').onclick=async()=>{
     u.name=$('#pu_name').value.trim()||u.name;
     if($('#pu_role')&&!$('#pu_role').disabled) u.role=$('#pu_role').value;
@@ -2083,14 +2092,16 @@ function openResetPw(id){
     }catch(e){ btn.disabled=false; btn.textContent='تعيين'; toast('تعذّر التغيير','err'); }
   };
 }
-function openChangePw(){
-  modal('تغيير كلمة المرور','<div class="grid2">'+
-    `<div class="fld full"><label>كلمة المرور الحالية <i>*</i></label><input id="cp_old" type="password"></div>
+function openChangePw(forced=false,current=''){
+  FORCE_PW=!!forced;
+  modal(forced?'إنشاء كلمة مرورك الخاصة':'تغيير كلمة المرور',(forced?'<div class="gnote">تم قبول كلمة المرور المؤقتة. أنشئ الآن كلمة مرور خاصة بك قبل فتح النظام.</div>':'')+'<div class="grid2">'+
+    `${forced?'':`<div class="fld full"><label>كلمة المرور الحالية <i>*</i></label><input id="cp_old" type="password"></div>`}
      <div class="fld full"><label>كلمة المرور الجديدة <i>*</i></label><input id="cp_new" type="password"></div>
      <div class="fld full"><label>تأكيد الجديدة <i>*</i></label><input id="cp_new2" type="password"></div>`+'</div>',
-    `<button class="btn primary" id="cpGo">تغيير</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
+    `<button class="btn primary" id="cpGo">${forced?'حفظ وفتح النظام':'تغيير'}</button>${forced?'':'<button class="btn ghost" onclick="closeModal()">إلغاء</button>'}`,'sm');
+  if(forced){const x=$('#mdl .m-head .x');if(x)x.style.display='none';}
   $('#cpGo').onclick=async()=>{
-    const o=$('#cp_old').value, n=$('#cp_new').value, n2=$('#cp_new2').value;
+    const o=forced?current:$('#cp_old').value, n=$('#cp_new').value, n2=$('#cp_new2').value;
     if(n.length<8) return toast('كلمة المرور الجديدة قصيرة','err');
     if(n!==n2) return toast('التأكيد غير مطابق','err');
     const vu=VAULT.users.find(x=>x.id===ME.id);
@@ -2100,7 +2111,7 @@ function openChangePw(){
     try{ const salt=ab2b64(rnd(16)), kek=await deriveKEK(n,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
       const auth=await SB.auth.updateUser({password:n}); if(auth.error) throw auth.error;
       vu.salt=salt; vu.wrapIv=wr.wrapIv; vu.wrapped=wr.wrapped;
-      audit('تغيير كلمة المرور','الحساب الشخصي'); await persist(); closeModal(); toast('تم تغيير كلمة المرور'); }
+      ME.mustChangePassword=false; audit('تغيير كلمة المرور',forced?'إكمال تفعيل الحساب':'الحساب الشخصي'); await persist(); FORCE_PW=false; closeModal(); toast(forced?'اكتمل تفعيل حسابك':'تم تغيير كلمة المرور'); }
     catch(e){ btn.disabled=false; btn.textContent='تغيير'; toast('تعذّر التغيير','err'); }
   };
 }
