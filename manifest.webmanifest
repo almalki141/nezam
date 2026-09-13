@@ -1,0 +1,13 @@
+{
+  "name": "منظومة الشؤون الإدارية",
+  "short_name": "نظام",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E3A38",
+  "theme_color": "#0E3A38",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {"src": "app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

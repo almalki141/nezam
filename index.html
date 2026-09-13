@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0E3A38">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="app-icon.svg">
 <title>منظومة الشؤون الإدارية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,7 +122,8 @@ button{cursor:pointer;border:none;background:none}
 .dot.warn{background:var(--brass-2);box-shadow:0 0 0 3px rgba(216,181,115,.18)}
 .dot.busy{background:#8FADA6}
 .side-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.side-tools-toggle{display:none;width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.08);color:#D4E3DF;font-size:12px;font-weight:700}
+.side-tools-toggle{display:block;width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.08);color:#D4E3DF;font-size:12px;font-weight:700}
+.side-foot #sideBtns{display:none}.side-foot.tools-open #sideBtns{display:grid}
 .sbtn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);color:#D4E3DF;border-radius:8px;
   padding:8px 5px;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px}
 .sbtn:hover{background:rgba(255,255,255,.14);color:#fff}
@@ -391,7 +397,6 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .brand{padding:13px 14px 11px}.brand .crest{width:36px;height:36px}.unit-name{margin-top:9px}
   .who{padding:9px 14px}.nav{min-height:0;padding:9px 10px}.nav-item{padding:8px 10px}
   .side-foot{padding:8px 10px;gap:5px}.sbtn{padding:7px 4px}.credit{display:none}
-  .side-tools-toggle{display:block}.side-foot #sideBtns{display:none}.side-foot.tools-open #sideBtns{display:grid}
   .app,.main,.topbar,.page{width:100%;max-width:100%;min-width:0}
   .topbar{padding:10px;gap:9px;align-items:flex-start}
   .topbar>div:nth-child(2){min-width:0;flex:1}.topbar h2{font-size:17px}.topbar .sub{font-size:11.5px}
@@ -422,9 +427,11 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .tablewrap tbody td.acts{display:flex;width:auto;justify-content:flex-end;gap:5px;padding:9px 0 0;border:0;text-align:start}
   .tablewrap tbody td.acts::before{content:'إجراءات';margin-inline-end:auto;align-self:center}
   .tablewrap .person{min-width:0}.tablewrap .person b,.tablewrap .person span,.tablewrap .trunc{white-space:normal;overflow-wrap:anywhere}
-  .register.view-compact tbody tr{padding-block:10px}
-  .register.view-compact tbody td:not(.num):not(.acts):nth-of-type(n+5){display:none}
-  .register.view-compact tbody td{padding-block:5px}
+  .register.view-compact tbody tr{padding:10px 10px 10px 44px;display:flex;align-items:center;gap:8px;min-height:62px}
+  .register.view-compact tbody td:not(.num):not(.acts){display:none}
+  .register.view-compact tbody td:nth-of-type(2){display:block!important;flex:1;padding:4px;border:0;font-size:14px;font-weight:700}
+  .register.view-compact tbody td:nth-of-type(2)::before{display:none}
+  .register.view-compact tbody td.acts{display:flex;margin:0;padding:0;flex:none}.register.view-compact tbody td.acts::before{display:none}
   .date-summary{order:2;margin-inline-start:auto;padding:5px 8px}.date-summary b{font-size:11.5px}.date-summary span{font-size:9.5px}
   .smart-summary{grid-template-columns:1fr 1fr;padding:12px;gap:9px}.smart-summary .result{grid-column:1/-1;display:flex;align-items:baseline;gap:8px}.smart-summary .result b{font-size:25px}.smart-summary .pair{grid-template-columns:1fr}
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
@@ -468,7 +475,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
     <div class="who" id="who"></div>
     <nav class="nav"><div class="nav-label">الصفحات</div><div id="navList"></div>
       <button class="nav-add" id="navAdd" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة صفحة</button>
-      <button class="nav-add" id="navSort" hidden>ترتيب الصفحات</button>
+      <button class="nav-add" id="navSort" hidden>ترتيب وتجميع الصفحات</button>
     </nav>
     <div class="side-foot">
       <div class="savepill"><span class="dot" id="saveDot"></span><span id="saveTxt">جاهز</span><span class="sz" id="sizeTxt"></span></div>
@@ -1249,12 +1256,12 @@ function renderTop(){
 }
 function stripeHTML(p){
   const cell=(n,t,c)=>`<div class="cell"><span class="n" ${c?`style="color:${c}"`:''}>${n}</span><span class="t">${esc(t)}</span></div>`;
-  let h=cell(p.rows.length,'إجمالي السجلات');
+  const rows=rowsOf(p); let h=cell(rows.length,(rows.length===p.rows.length?'إجمالي السجلات':'نتيجة التصفية من '+p.rows.length));
   const ch=chipsCol(p);
-  if(ch) (ch.options||[]).slice(0,4).forEach(o=>h+=cell(p.rows.filter(r=>r.v[ch.id]===o.label).length,o.label,CVAR[o.color]));
+  if(ch) (ch.options||[]).slice(0,4).forEach(o=>h+=cell(rows.filter(r=>r.v[ch.id]===o.label).length,o.label,CVAR[o.color]));
   else { const im=photoCol(p);
-    if(im) h+=cell(p.rows.filter(r=>r.v[im.id]).length,'سجلات بصورة');
-    vis(p).filter(c=>c.filterable).slice(0,im?1:2).forEach(c=>h+=cell(uniq(p.rows.map(r=>cellText(p,c,r))).length,'عدد قيم '+c.name)); }
+    if(im) h+=cell(rows.filter(r=>r.v[im.id]).length,'سجلات بصورة');
+    vis(p).filter(c=>c.filterable).slice(0,im?1:2).forEach(c=>h+=cell(uniq(rows.map(r=>cellText(p,c,r))).length,'عدد قيم '+c.name)); }
   return h;
 }
 function go(id){
@@ -1359,7 +1366,7 @@ function renderTable(p){
           ${can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
-  $('#pageBody').innerHTML=summaryHTML(p)+toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
+  $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
     <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3><span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${pager}</div>`;
   bindTools(p); bindCells();
   const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
@@ -1372,6 +1379,7 @@ function renderTable(p){
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
   if($('#pgPrev')) $('#pgPrev').onclick=()=>{u.page--;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
   if($('#pgNext')) $('#pgNext').onclick=()=>{u.page++;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
+  renderTop();
 }
 function renderLetters(p){
   const u=U(), rows=rowsOf(p);
@@ -1511,8 +1519,9 @@ function fieldHTML(p,c,v){
       ${t.rows.map(r=>`<option value="${r.id}" ${v===r.id?'selected':''}>${esc(rowTitle(t,r))}</option>`).join('')}</select></div>`; }
   if(c.type==='date') return `<div class="fld">${L}<input id="${id}" type="date" value="${esc(v||'')}" oninput="document.getElementById('hj_${c.id}').textContent=this.value?('يوافق '+window.fmtDate(this.value)):''">
     <span class="hint" id="hj_${c.id}">${v?'يوافق '+fmtDate(v):'اختر التاريخ الميلادي، وسيظهر مقابله الهجري هنا.'}</span></div>`;
-  if(c.type==='hijri') return `<div class="fld">${L}<input id="${id}" type="text" inputmode="numeric" value="${esc(v||'')}" placeholder="مثال: 1448/04/02" pattern="[0-9٠-٩]{4}[/.-][0-9٠-٩]{1,2}[/.-][0-9٠-٩]{1,2}">
-    <span class="hint">أدخل التاريخ الهجري بصيغة السنة/الشهر/اليوم.</span></div>`;
+  if(c.type==='hijri'){ const a=String(v||'').split('/'),cy=Number((HJL&&HJL.formatToParts(new Date()).find(x=>x.type==='year')||{}).value)||1448;
+    const ys=Array.from({length:21},(_,i)=>cy-10+i),ms=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+    return `<div class="fld">${L}<div style="display:grid;grid-template-columns:1.2fr 1fr .8fr;gap:6px"><select id="hy_${c.id}"><option value="">السنة</option>${ys.map(y=>`<option ${+a[0]===y?'selected':''}>${y}</option>`).join('')}</select><select id="hm_${c.id}"><option value="">الشهر</option>${ms.map((m,i)=>`<option value="${i+1}" ${+a[1]===i+1?'selected':''}>${m}</option>`).join('')}</select><select id="hd_${c.id}"><option value="">اليوم</option>${Array.from({length:30},(_,i)=>`<option ${+a[2]===i+1?'selected':''}>${i+1}</option>`).join('')}</select></div><span class="hint">تقويم هجري: سنة، شهر، يوم.</span></div>`; }
   const dl='dl_'+c.id, vals=uniq(p.rows.map(r=>r.v[c.id])).slice(0,60);
   const type=c.type==='number'?'number':'text';
   return `<div class="fld">${L}<input id="${id}" type="${type}" value="${esc(v??'')}" ${c.type==='phone'?'inputmode="tel"':''} list="${dl}">
@@ -1594,9 +1603,9 @@ function readField(c){
   if(c.type==='image') return IMGB[c.id]||'';
   if(c.type==='gallery') return GALB[c.id]||[];
   if(c.type==='files') return FILB[c.id]||[];
+  if(c.type==='hijri'){ const y=document.getElementById('hy_'+c.id),m=document.getElementById('hm_'+c.id),d=document.getElementById('hd_'+c.id); return y&&y.value&&m.value&&d.value?`${y.value}/${m.value.padStart(2,'0')}/${d.value.padStart(2,'0')}`:''; }
   const e=document.getElementById('f_'+c.id); if(!e) return undefined;
   if(c.type==='list') return e.value.split('\n').map(s=>s.trim()).filter(Boolean);
-  if(c.type==='hijri') return e.value.trim().replace(/[٠-٩]/g,d=>'0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]).replace(/[.-]/g,'/');
   return e.value.trim();
 }
 function normUnique(v){
@@ -1723,17 +1732,18 @@ function drawCM(){
 }
 function openPageOrder(){
   if(!isAdmin()) return;
-  modal('ترتيب الصفحات','<div id="pageOrder"></div>',
-    '<button class="btn primary" id="poDone">تم</button>','sm');
+  modal('ترتيب وتجميع الصفحات','<div class="gnote">اكتب اسم المجموعة نفسه للصفحات التي تريد جمعها تحت زر واحد، أو اتركه فارغًا.</div><div id="pageOrder"></div>',
+    '<button class="btn primary" id="poDone">حفظ</button>','lg');
+  const sync=()=>document.querySelectorAll('[data-pgroup]').forEach(x=>DB.pages[+x.dataset.pgroup].group=x.value.trim());
   const draw=()=>{
     $('#pageOrder').innerHTML=DB.pages.map((p,i)=>`<div class="frow">
-      <div class="fi">${icon(p.icon,16)}</div><b style="flex:1">${esc(p.name)}</b>
+      <div class="fi">${icon(p.icon,16)}</div><b style="min-width:150px">${esc(p.name)}</b><input data-pgroup="${i}" value="${esc(p.group||'')}" placeholder="اسم المجموعة" style="flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--surface)">
       <div class="fx"><button class="iconbtn" data-pu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-pd="${i}" ${i===DB.pages.length-1?'disabled':''}>▼</button></div></div>`).join('');
-    document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.pu;[DB.pages[i-1],DB.pages[i]]=[DB.pages[i],DB.pages[i-1]];draw();});
-    document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{const i=+b.dataset.pd;[DB.pages[i+1],DB.pages[i]]=[DB.pages[i],DB.pages[i+1]];draw();});
+    document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pu;[DB.pages[i-1],DB.pages[i]]=[DB.pages[i],DB.pages[i-1]];draw();});
+    document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pd;[DB.pages[i+1],DB.pages[i]]=[DB.pages[i],DB.pages[i+1]];draw();});
   };
   draw();
-  $('#poDone').onclick=()=>{audit('ترتيب الصفحات','تحديث ترتيب القائمة');save();closeModal();render();toast('حُفظ ترتيب الصفحات');};
+  $('#poDone').onclick=()=>{sync();audit('ترتيب وتجميع الصفحات','تحديث القائمة');save();closeModal();render();toast('حُفظ ترتيب وتجميع الصفحات');};
 }
 function openPageSet(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
