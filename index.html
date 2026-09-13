@@ -154,6 +154,7 @@ button{cursor:pointer;border:none;background:none}
 .welcome-section-title{display:flex;align-items:end;justify-content:space-between;margin:27px 2px 11px}.welcome-section-title h3{margin:0;font-size:18px}.welcome-section-title span{font-size:12px;color:var(--ink-3)}.welcome-pages{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:11px}
 .welcome-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:right;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:13px;transition:.18s;position:relative;overflow:hidden}.welcome-card:after{content:"←";margin-inline-start:auto;color:var(--ink-3);font-size:18px}.welcome-card:hover{transform:translateY(-3px);border-color:var(--brass);box-shadow:var(--shadow)}
 .welcome-card .wi{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:var(--surface-2);color:var(--pine);flex:none}.welcome-card b{display:block;font-size:15px;margin-bottom:2px}.welcome-card span span{font-size:11.5px;color:var(--ink-3)}
+.home-banners{margin-top:18px;position:relative;overflow:hidden;border-radius:18px;box-shadow:var(--shadow-sm)}.home-banner{display:none;min-height:150px;padding:26px 30px;color:#fff;background:linear-gradient(110deg,#073d39,#17615b);background-size:cover;background-position:center;align-items:flex-end;position:relative}.home-banner.on{display:flex}.home-banner:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,32,30,.15),rgba(3,32,30,.88))}.home-banner-content{position:relative;z-index:1;max-width:70%}.home-banner b{font-size:21px;display:block}.home-banner span{font-size:12px;color:#d5e5e1}.banner-dots{position:absolute;z-index:3;bottom:14px;left:18px;display:flex;gap:5px}.banner-dots button{width:7px;height:7px;border-radius:9px;background:rgba(255,255,255,.45)}.banner-dots button.on{width:21px;background:#efd18c}
 .welcome-popup-img{width:100%;max-height:55vh;object-fit:contain;border-radius:11px;background:var(--surface-2);display:block}.welcome-popup-text{text-align:center;line-height:1.9;margin:13px 4px 0;color:var(--ink-2)}
 
 .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
@@ -418,6 +419,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .stripe{order:4;margin:0;width:100%;overflow-x:auto}.stripe .cell{min-width:92px;padding:6px 10px}
   .page{padding:12px 10px 80px;min-width:0}
   .welcome{padding:4px 0}.welcome-hero{padding:25px 20px;border-radius:18px;grid-template-columns:1fr auto;min-height:165px;gap:12px}.welcome-logo{width:66px;height:66px;border-radius:18px}.welcome-logo svg{width:31px;height:31px}.welcome-hero h2{font-size:20px}.welcome-hero p{font-size:12px}.welcome-date{margin-top:12px}.welcome-date span{padding:5px 8px;font-size:10.5px}.welcome-stats{margin:-13px 9px 0;gap:5px}.welcome-stat{padding:11px 8px;text-align:center}.welcome-stat b{font-size:19px}.welcome-stat span{font-size:9.5px}.welcome-section-title{margin-top:22px}.welcome-pages{grid-template-columns:1fr;gap:8px}.welcome-card{padding:12px}.welcome-card .wi{width:42px;height:42px}
+  .home-banner{min-height:125px;padding:20px}.home-banner-content{max-width:88%}.home-banner b{font-size:17px}
   .tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
   .search{grid-column:1/-1;max-width:none;min-width:0;width:100%}
   .search input,.fld input,.fld select,.fld textarea,select.filter{font-size:16px}
@@ -1185,7 +1187,7 @@ const primary=p=>vis(p).find(c=>!['image','gallery','files'].includes(c.type))||
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:'',page:1,pageSize:25,display:'detail',summary:[{c:'',v:''},{c:'',v:''}]}; return ui[cur]; }
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]}; return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1302,8 +1304,11 @@ function showHome(){
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
   const pages=visiblePages();
   const total=pages.reduce((n,p)=>n+p.rows.length,0), populated=pages.filter(p=>p.rows.length).length;
-  $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة القيادة</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${ic('shieldk',49)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div><div class="welcome-section-title"><h3>الوصول السريع</h3><span>اختر الصفحة المطلوبة للبدء</span></div><div class="welcome-pages">${pages.map(p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} سجل · ${esc(p.sub||'فتح الصفحة')}</span></span></button>`).join('')||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div></section>`;
+  const banners=(DB.homeBanners||[]).filter(x=>x&&(x.title||x.image));
+  const bannerHTML=banners.length?`<div class="home-banners">${banners.map((b,i)=>`<button class="home-banner ${i?'':'on'}" data-bi="${i}" ${b.page?`data-home-pg="${esc(b.page)}"`:''} style="${b.image?`background-image:url('${esc(b.image)}')`:''}"><span class="home-banner-content"><b>${esc(b.title||'إعلان المنظومة')}</b><span>${esc(b.text||'')}</span></span></button>`).join('')}<div class="banner-dots">${banners.map((_,i)=>`<button class="${i?'':'on'}" data-bdot="${i}"></button>`).join('')}</div></div>`:'';
+  $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة القيادة</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${ic('shieldk',49)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div>${bannerHTML}<div class="welcome-section-title"><h3>بوابات العمل</h3><span>وصول مباشر وسريع إلى جميع أقسام المنظومة</span></div><div class="welcome-pages">${pages.map(p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} سجل · ${esc(p.sub||'فتح الصفحة')}</span></span></button>`).join('')||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div></section>`;
   document.querySelectorAll('[data-home-pg]').forEach(b=>b.onclick=()=>go(b.dataset.homePg));
+  if(banners.length>1){let active=0;const activate=i=>{active=i;document.querySelectorAll('[data-bi]').forEach((x,n)=>x.classList.toggle('on',n===i));document.querySelectorAll('[data-bdot]').forEach((x,n)=>x.classList.toggle('on',n===i))};document.querySelectorAll('[data-bdot]').forEach(x=>x.onclick=e=>{e.stopPropagation();activate(+x.dataset.bdot)});clearInterval(window.homeBannerTimer);window.homeBannerTimer=setInterval(()=>{if(!cur)activate((active+1)%banners.length)},5000)}
 }
 function showWelcomePopup(){
   if(sessionStorage.getItem('welcome_seen')) return;
@@ -1325,9 +1330,10 @@ function prepareWelcomeImage(file){
   });
 }
 function openWelcomeSettings(){
-  modal('إعدادات شاشة الترحيب',`<div class="grid2"><div class="fld"><label>عنوان الشاشة الأولى</label><input id="wt" value="${esc(DB.welcomeTitle||'')}"></div><div class="fld"><label>العنوان الفرعي</label><input id="ws" value="${esc(DB.welcomeSubtitle||'')}"></div></div><div class="fld"><label>عنوان النافذة المنبثقة</label><input id="wpt" value="${esc(DB.welcomePopupTitle||'')}"></div><div class="fld"><label>رسالة النافذة</label><textarea id="wpm">${esc(DB.welcomeMessage||'')}</textarea></div><div class="fld"><label>رابط الصورة أو اختر صورة من جهازك</label><input id="wimg" value="${esc(DB.welcomeImage||'')}" placeholder="https://..."><input id="wfile" type="file" accept="image/*" style="margin-top:7px"></div><label class="ck"><input type="checkbox" id="wpe" ${DB.welcomePopupEnabled!==false?'checked':''}> إظهار الصورة/الرسالة مرة واحدة بعد كل دخول</label>`,`<button class="btn primary" id="wsave">حفظ</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
+  const old=DB.homeBanners||[],bannerRows=Array.from({length:5},(_,i)=>{const b=old[i]||{};return `<div class="frow" style="align-items:end"><div class="fld fx"><label>بنر ${i+1} — العنوان</label><input data-btitle="${i}" value="${esc(b.title||'')}"></div><div class="fld fx"><label>رابط الصورة</label><input data-bimg="${i}" value="${esc(b.image||'')}" placeholder="https://..."></div><div class="fld" style="width:180px"><label>يفتح صفحة</label><select data-bpage="${i}"><option value="">بدون رابط</option>${DB.pages.map(p=>`<option value="${p.id}" ${b.page===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div></div>`}).join('');
+  modal('إعدادات شاشة الترحيب',`<div class="grid2"><div class="fld"><label>عنوان الشاشة الأولى</label><input id="wt" value="${esc(DB.welcomeTitle||'')}"></div><div class="fld"><label>العنوان الفرعي</label><input id="ws" value="${esc(DB.welcomeSubtitle||'')}"></div></div><div class="gnote">البنرات المتحركة تظهر في الرئيسية فقط. حدّد العدد ثم عبّئ البنرات المطلوبة.</div><div class="fld"><label>عدد البنرات المتحركة</label><select id="bcount">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${old.length===n?'selected':''}>${n?n+' بنر':'بدون بنرات'}</option>`).join('')}</select></div><div id="bannerRows">${bannerRows}</div><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div class="fld"><label>عنوان النافذة المنبثقة</label><input id="wpt" value="${esc(DB.welcomePopupTitle||'')}"></div><div class="fld"><label>رسالة النافذة</label><textarea id="wpm">${esc(DB.welcomeMessage||'')}</textarea></div><div class="fld"><label>رابط الصورة أو اختر صورة من جهازك</label><input id="wimg" value="${esc(DB.welcomeImage||'')}" placeholder="https://..."><input id="wfile" type="file" accept="image/*" style="margin-top:7px"></div><label class="ck"><input type="checkbox" id="wpe" ${DB.welcomePopupEnabled!==false?'checked':''}> إظهار الصورة/الرسالة مرة واحدة بعد كل دخول</label>`,`<button class="btn primary" id="wsave">حفظ</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'lg');
   $('#wfile').onchange=async()=>{const f=$('#wfile').files[0];if(!f)return;toast('جارٍ تجهيز الصورة…');try{$('#wimg').value=await prepareWelcomeImage(f);toast('تم ضغط الصورة وتجهيزها للحفظ')}catch(e){$('#wfile').value='';toast(e.message||'تعذرت معالجة الصورة','err')}};
-  $('#wsave').onclick=()=>{DB.welcomeTitle=$('#wt').value.trim();DB.welcomeSubtitle=$('#ws').value.trim();DB.welcomePopupTitle=$('#wpt').value.trim();DB.welcomeMessage=$('#wpm').value.trim();DB.welcomeImage=$('#wimg').value.trim();DB.welcomePopupEnabled=$('#wpe').checked;sessionStorage.removeItem('welcome_seen');audit('تعديل','إعدادات شاشة الترحيب');save();closeModal();showHome();toast('حُفظت شاشة الترحيب')};
+  $('#wsave').onclick=()=>{DB.welcomeTitle=$('#wt').value.trim();DB.welcomeSubtitle=$('#ws').value.trim();DB.welcomePopupTitle=$('#wpt').value.trim();DB.welcomeMessage=$('#wpm').value.trim();DB.welcomeImage=$('#wimg').value.trim();DB.welcomePopupEnabled=$('#wpe').checked;const count=+$('#bcount').value;DB.homeBanners=Array.from({length:count},(_,i)=>({title:document.querySelector(`[data-btitle="${i}"]`).value.trim(),image:document.querySelector(`[data-bimg="${i}"]`).value.trim(),page:document.querySelector(`[data-bpage="${i}"]`).value})).filter(x=>x.title||x.image);sessionStorage.removeItem('welcome_seen');audit('تعديل','إعدادات شاشة الترحيب والبنرات');save();closeModal();showHome();toast('حُفظت شاشة الترحيب والبنرات')};
 }
 function renderTop(){
   const p=pg();
@@ -1354,13 +1360,16 @@ function stripeHTML(p){
   return h;
 }
 function go(id){
+  const changed=!!(id&&id!==cur);
   if(id) cur=id;
+  if(changed&&cur) U().display='compact';
   $('#side').classList.remove('open'); $('#scrim').classList.remove('on');
   if(!cur||!pg()||!can(cur,'view')){ const v=visiblePages(); if(!v.length) return; cur=v[0].id; }
   renderNav(); renderTop();
   const p=pg();
   $('#pageBody').style.setProperty('--acc',CVAR[p.accent]||CVAR.gold);
   if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 const render=()=>go();
 
