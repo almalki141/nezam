@@ -793,6 +793,7 @@ function authMessage(m){ const s=String(m||'');
   if(/Email not confirmed/i.test(s)) return 'البريد الإلكتروني لم يُؤكَّد بعد.';
   if(/Invalid login credentials/i.test(s)) return 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
   if(/User already registered/i.test(s)) return 'يوجد حساب مسجل بهذا البريد مسبقًا.';
+  if(/Invitation email mismatch/i.test(s)) return 'هذه الدعوة مرتبطة ببريد موظف مختلف. يمكنك الدخول بحساب المدير بصورة طبيعية.';
   if(/rate limit/i.test(s)) return 'تم إرسال رسائل كثيرة. انتظر قليلًا ثم أعد المحاولة.';
   return s||'تعذّر إكمال العملية.';
 }
@@ -804,8 +805,8 @@ async function boot(){
   try{
     const session=await cloudSession();
     if(!session) return screenLogin();
-    const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'';
-    if(token){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
+    const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'', sessionMail=String(session.user.email||'').toLowerCase();
+    if(token&&pi&&pi.email===sessionMail){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
     VAULT=await vaultRead();
     if(!VAULT||!VAULT.users||!VAULT.users.length){
       const pending=localGet(PENDING_KEY);
@@ -925,7 +926,7 @@ async function doLogin(){
     if(auth.error) throw auth.error;
     SB_SESSION=auth.data.session; WORKSPACE_ID=null;
     const pi=localGet(PENDING_INVITE), token=INVITE_TOKEN||(pi&&pi.token)||'';
-    if(token){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
+    if(token&&pi&&pi.email===mail){ await claimInvite(token); localStorage.removeItem(PENDING_INVITE); INVITE_TOKEN=''; history.replaceState({},'',location.pathname); }
     VAULT=await vaultRead();
     if(!VAULT){
       const pending=localGet(PENDING_KEY);
