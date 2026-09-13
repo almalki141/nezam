@@ -1099,7 +1099,7 @@ async function syncQuietly(){
     VAULT=remote; DB=await decObj(DEK,VAULT.data); MYREV=VAULT.rev;
     ME=(DB.users||[]).find(x=>x.id===ME.id)||ME;
     const stillVisible=cur&&visiblePages().some(p=>p.id===cur);
-    if(!stillVisible) cur=(visiblePages()[0]||{}).id||null;
+    if(cur&&!stillVisible) cur=null;
     render(); setSave('تمت المزامنة تلقائياً');
   }catch(e){ /* تبقى المزامنة اليدوية متاحة عند انقطاع الشبكة */ }
 }
@@ -1999,7 +1999,7 @@ function openPageSet(){
   $('#psDel').onclick=()=>ask(`حذف صفحة <b>${esc(p.name)}</b> وكل سجلاتها (${p.rows.length})؟`,()=>{
     audit('حذف صفحة',p.name);
     DB.pages=DB.pages.filter(x=>x.id!==p.id); (DB.users||[]).forEach(u=>{ if(u.perms) delete u.perms[p.id]; });
-    cur=DB.pages[0].id; save(); render(); toast('حُذفت الصفحة'); });
+    cur=null; save(); render(); toast('حُذفت الصفحة'); });
   $('#psSave').onclick=()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
     p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
@@ -2437,7 +2437,7 @@ function openRestore(){
           }
           DB.audit=nd.audit||DB.audit||[];
           audit('استعادة','ملف بيانات');
-          ui={}; cur=(visiblePages()[0]||DB.pages[0]).id;
+          ui={}; cur=null;
           await persist(); enterApp(); toast('استُعيدت البيانات'); },'استعادة');
       };
       rd.readAsText(f); };
