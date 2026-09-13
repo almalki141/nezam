@@ -106,6 +106,10 @@ button{cursor:pointer;border:none;background:none}
 .nav-add{margin-top:7px;width:100%;padding:9px;border:1px dashed rgba(216,181,115,.45);border-radius:9px;
   color:var(--brass-2);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px}
 .nav-add:hover{background:rgba(216,181,115,.12)}
+.nav-group{margin:5px 0;border:1px solid rgba(255,255,255,.08);border-radius:9px;overflow:hidden;background:rgba(0,0,0,.08)}
+.nav-group-head{width:100%;display:flex;align-items:center;gap:7px;padding:8px 10px;color:#D8E6E2;font-size:12.5px;font-weight:700}
+.nav-group-head .count{margin-inline-start:auto;background:rgba(255,255,255,.1);padding:0 7px;border-radius:20px}.nav-group-head .arr{transition:transform .15s}.nav-group.closed .arr{transform:rotate(90deg)}
+.nav-group.closed .nav-group-pages{display:none}.nav-group-pages .nav-item{border-radius:0;padding-inline-start:15px}
 .side-foot{padding:11px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:7px}
 .savepill{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#93B0A9;padding:1px 4px}
 .savepill .sz{margin-inline-start:auto;color:#7C9992}
@@ -113,6 +117,7 @@ button{cursor:pointer;border:none;background:none}
 .dot.warn{background:var(--brass-2);box-shadow:0 0 0 3px rgba(216,181,115,.18)}
 .dot.busy{background:#8FADA6}
 .side-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.side-tools-toggle{display:none;width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.08);color:#D4E3DF;font-size:12px;font-weight:700}
 .sbtn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);color:#D4E3DF;border-radius:8px;
   padding:8px 5px;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px}
 .sbtn:hover{background:rgba(255,255,255,.14);color:#fff}
@@ -317,6 +322,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 .cmflags input{width:auto}
 .cmopts{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
 .cmopt{display:grid;grid-template-columns:1fr 130px auto;gap:6px;margin-bottom:5px;align-items:center}
+.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.preview-field{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface-2);min-width:0}.preview-field>span{display:block;color:var(--ink-3);font-size:11.5px;font-weight:700;margin-bottom:4px}.preview-field>div{overflow-wrap:anywhere}
 .cmprim{font-size:11px;font-weight:700;color:var(--brass);background:var(--gold-bg);border:1px solid var(--gold-br);padding:1px 7px;border-radius:5px;margin-inline-start:6px}
 .swatches{display:flex;gap:6px;flex-wrap:wrap}
 .sw{width:30px;height:30px;border-radius:8px;border:2px solid transparent}
@@ -385,6 +391,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .brand{padding:13px 14px 11px}.brand .crest{width:36px;height:36px}.unit-name{margin-top:9px}
   .who{padding:9px 14px}.nav{min-height:0;padding:9px 10px}.nav-item{padding:8px 10px}
   .side-foot{padding:8px 10px;gap:5px}.sbtn{padding:7px 4px}.credit{display:none}
+  .side-tools-toggle{display:block}.side-foot #sideBtns{display:none}.side-foot.tools-open #sideBtns{display:grid}
   .app,.main,.topbar,.page{width:100%;max-width:100%;min-width:0}
   .topbar{padding:10px;gap:9px;align-items:flex-start}
   .topbar>div:nth-child(2){min-width:0;flex:1}.topbar h2{font-size:17px}.topbar .sub{font-size:11.5px}
@@ -427,6 +434,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .m-head{padding:13px 15px}.m-body{padding:15px;max-height:calc(100dvh - 132px)}.m-foot{padding:11px 15px;padding-bottom:max(11px,env(safe-area-inset-bottom))}
   .m-foot .btn{flex:1;justify-content:center}.utable{min-width:620px}.m-body:has(.utable){overflow-x:auto}
   .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
+  .preview-grid{grid-template-columns:1fr}
   .toasts{left:10px;right:10px;bottom:12px}.toast{max-width:none;width:100%}
   .empty{padding:36px 15px}
 }
@@ -464,6 +472,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
     </nav>
     <div class="side-foot">
       <div class="savepill"><span class="dot" id="saveDot"></span><span id="saveTxt">جاهز</span><span class="sz" id="sizeTxt"></span></div>
+      <button class="side-tools-toggle" id="sideToolsToggle">أدوات النظام ▾</button>
       <div class="side-btns" id="sideBtns"></div>
       <div class="credit">إنشاء وعمل: أحمد السعيدي — خاص</div>
     </div>
@@ -1059,6 +1068,7 @@ const SVG={
  sync:'<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>',
  shieldk:'<path d="M12 2 4 5.5v6c0 5 3.4 9.2 8 10.5 4.6-1.3 8-5.5 8-10.5v-6L12 2Z"/><circle cx="12" cy="11" r="2"/><path d="M12 13v3"/>',
  dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+ eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
  lock:'<path d="M9 11V6a3 3 0 1 1 6 0v5"/><rect x="3" y="11" width="18" height="11" rx="2"/>',
  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'
 };
@@ -1067,7 +1077,7 @@ const ic=(k,s)=>`<svg width="${s||15}" height="${s||15}" viewBox="0 0 24 24" fil
 /* ==================================================================
    7) صور وملفات
 ================================================================== */
-const MAXDIM=620, QUALITY=.72, MAXFILE=3*1024*1024;
+const MAXDIM=620, QUALITY=.72, MAXFILE=10*1024*1024;
 function compressImage(file){
   return new Promise((res,rej)=>{
     const fr=new FileReader(); fr.onerror=()=>rej(new Error('read'));
@@ -1084,8 +1094,13 @@ function compressImage(file){
 const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});
 function dataUrlToBlob(d){ const [h,b]=d.split(','); const m=(h.match(/:(.*?);/)||[])[1]||'application/octet-stream';
   const bin=atob(b), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return new Blob([u],{type:m}); }
-function saveBlob(name,blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
-  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); }
+function saveBlob(name,blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;a.target='_blank';
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},10000); }
+function previewFile(f){
+  const blob=dataUrlToBlob(f.d), url=URL.createObjectURL(blob);
+  if(/pdf/i.test(f.t||f.n)){ const w=window.open(url,'_blank'); if(!w) toast('اسمح بفتح النوافذ لعرض PDF','err'); setTimeout(()=>URL.revokeObjectURL(url),60000); }
+  else lightbox([f.d],0,f.n);
+}
 function download(n,c,t){ saveBlob(n,new Blob([c],{type:t||'text/plain;charset=utf-8'})); }
 
 let LB={list:[],i:0,cap:''};
@@ -1168,11 +1183,11 @@ function openFiles(p,r,c){
     a.length?a.map((f,i)=>`<div class="frow"><div class="fi ${/image/.test(f.t)?'img':''}">${/image/.test(f.t)?icon('image',16):icon('file',16)}</div>
       <div style="min-width:0"><b>${esc(f.n)}</b><span>${fmtSize(f.s||0)}</span></div>
       <div class="fx"><button class="btn ghost sm" data-dlf="${i}">تنزيل</button>
-      ${/image/.test(f.t)?`<button class="btn ghost sm" data-vwf="${i}">عرض</button>`:''}</div></div>`).join('')
+      ${/image|pdf/.test(f.t)?`<button class="btn ghost sm" data-vwf="${i}">معاينة</button>`:''}</div></div>`).join('')
       :`<p style="margin:0;color:var(--ink-3);font-size:13.5px">لا توجد ملفات.</p>`,
     `<button class="btn ghost" onclick="closeModal()">إغلاق</button>`);
   document.querySelectorAll('[data-dlf]').forEach(b=>b.onclick=()=>{const f=a[+b.dataset.dlf]; saveBlob(f.n,dataUrlToBlob(f.d));});
-  document.querySelectorAll('[data-vwf]').forEach(b=>b.onclick=()=>{const f=a[+b.dataset.vwf]; lightbox([f.d],0,f.n);});
+  document.querySelectorAll('[data-vwf]').forEach(b=>b.onclick=()=>previewFile(a[+b.dataset.vwf]));
 }
 
 /* ==================================================================
@@ -1202,6 +1217,7 @@ function renderSideBtns(){
   $('#btnLock').onclick=lockSession;
   $('#btnTheme').onclick=()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
     document.documentElement.setAttribute('data-theme',d?'light':'dark');};
+  $('#sideToolsToggle').onclick=()=>{$('#side').querySelector('.side-foot').classList.toggle('tools-open');};
   if(isAdmin()){ $('#btnUsers').onclick=openUsers; $('#btnAudit').onclick=openAudit;
     $('#btnBackup').onclick=openBackup; $('#btnRestore').onclick=openRestore; }
   $('#navAdd').hidden=!isAdmin();
@@ -1210,9 +1226,12 @@ function renderSideBtns(){
 }
 function renderNav(){
   const list=visiblePages();
-  $('#navList').innerHTML=list.map(p=>`<button class="nav-item ${p.id===cur?'on':''}" data-pg="${p.id}" style="--acc:${CVAR[p.accent]||CVAR.gold}">
-    ${icon(p.icon)}<span class="nm">${esc(p.name)}</span><span class="count">${p.rows.length}</span></button>`).join('');
+  const item=p=>`<button class="nav-item ${p.id===cur?'on':''}" data-pg="${p.id}" style="--acc:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon)}<span class="nm">${esc(p.name)}</span><span class="count">${p.rows.length}</span></button>`;
+  const groups=[],seen=new Set(); list.forEach(p=>{const g=String(p.group||'').trim();if(g&&!seen.has(g)){seen.add(g);groups.push(g);}});
+  const grouped=new Set(groups),plain=list.filter(p=>!String(p.group||'').trim()).map(item).join('');
+  $('#navList').innerHTML=plain+groups.map(g=>{const ps=list.filter(p=>String(p.group||'').trim()===g);return `<div class="nav-group"><button class="nav-group-head" data-ng="${esc(g)}"><span class="arr">⌄</span>${esc(g)}<span class="count">${ps.length}</span></button><div class="nav-group-pages">${ps.map(item).join('')}</div></div>`;}).join('');
   $('#navList').querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>go(b.dataset.pg));
+  $('#navList').querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>b.closest('.nav-group').classList.toggle('closed'));
 }
 function renderTop(){
   const p=pg();
@@ -1334,6 +1353,7 @@ function renderTable(p){
         ${cols.map(c=>`<td data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
         ${p.showUpdated?`<td data-label="آخر تحديث" class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
         <td class="acts" data-label="إجراءات">
+          <button class="iconbtn" title="معاينة" data-vw="${r.id}">${ic('eye')}</button>
           <button class="iconbtn" title="السجل" data-log="${r.id}">${ic('clock')}</button>
           ${can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit')}</button>`:''}
           ${can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
@@ -1347,6 +1367,7 @@ function renderTable(p){
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{u.chip=b.dataset.ch;u.page=1;refreshBody();});
   document.querySelectorAll('[data-s]').forEach(h=>h.onclick=()=>{const k=h.dataset.s;u.sort=u.sort.k===k?{k,d:-u.sort.d}:{k,d:1};u.page=1;refreshBody();});
   document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>openRow(b.dataset.ed));
+  document.querySelectorAll('[data-vw]').forEach(b=>b.onclick=()=>openRecordPreview(b.dataset.vw));
   document.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>delRow(b.dataset.dl));
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
   if($('#pgPrev')) $('#pgPrev').onclick=()=>{u.page--;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
@@ -1612,6 +1633,13 @@ function delRow(rid){
     audit('حذف سجل',p.name+' · '+rowTitle(p,r));
     p.rows=p.rows.filter(x=>x.id!==rid); save(); render(); toast('حُذف السجل'); });
 }
+function openRecordPreview(rid){
+  const p=pg(),r=p.rows.find(x=>x.id===rid); if(!r) return;
+  const fields=vis(p).map(c=>`<div class="preview-field"><span>${esc(c.name)}</span><div>${cellHTML(p,c,r,c.id===primary(p).id)}</div></div>`).join('');
+  modal('معاينة — '+esc(rowTitle(p,r)),`<div class="preview-grid">${fields}</div>`,
+    `${can(p.id,'edit')?`<button class="btn primary" id="previewEdit">تعديل</button>`:''}<button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'lg');
+  bindCells(); if($('#previewEdit')) $('#previewEdit').onclick=()=>openRow(rid);
+}
 function openLog(rid){
   const p=pg(), r=p.rows.find(x=>x.id===rid), lg=r.log||[], imgs=[];
   p.cols.forEach(c=>{ if(c.type==='image'&&r.v[c.id]) imgs.push(r.v[c.id]);
@@ -1647,6 +1675,7 @@ function openCols(){
   drawCM();
   $('#cmSave').onclick=()=>{ cmSync();
     const p=pg(), final=CD.filter(c=>c.name.trim()), keep=new Set(final.map(c=>c.id));
+    for(const c of final.filter(c=>c.type==='select')){ const labels=(c.options||[]).map(o=>o.label.trim()).filter(Boolean); if(new Set(labels).size!==labels.length) return toast(`يوجد خيار مكرر في «${c.name}»`,'err'); c.options=(c.options||[]).filter(o=>o.label.trim()); }
     p.cols.forEach(c=>{ if(!keep.has(c.id)) p.rows.forEach(r=>{delete r.v[c.id];}); });
     if(p.chipsCol&&p.chipsCol!=='none'&&!keep.has(p.chipsCol)) p.chipsCol='';
     if(p.logCol&&!keep.has(p.logCol)) p.logCol='';
@@ -1670,7 +1699,7 @@ function drawCM(){
       <select id="cm_l_${i}" style="margin-top:5px">${DB.pages.filter(x=>x.id!==cur).map(x=>`<option value="${x.id}" ${c.link===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>`:''}
     ${c.type==='select'?`<div class="cmopts">
       ${(c.options||[]).map((o,j)=>`<div class="cmopt"><input id="cm_ol_${i}_${j}" value="${esc(o.label)}">
-        <select id="cm_oc_${i}_${j}">${COLORS.map(([v,l])=>`<option value="${v}" ${o.color===v?'selected':''}>${l}</option>`).join('')}</select>
+        <select id="cm_oc_${i}_${j}" data-color="${i}_${j}" style="border-inline-start:8px solid ${CVAR[o.color]||CVAR.slate}">${COLORS.map(([v,l])=>`<option value="${v}" ${o.color===v?'selected':''}>${l}</option>`).join('')}</select>
         <button class="iconbtn del" data-ro="${i}_${j}">${ic('trash',13)}</button></div>`).join('')}
       <button class="btn ghost sm" data-ao="${i}">${ic('plus',13)} إضافة خيار</button></div>`:''}
     ${c.type==='image'?`<div class="cmopts"><span style="font-size:12px;color:var(--ink-3)">اجعله «مخفياً» ليصبح صورة شخصية بجانب الاسم بدل عمود مستقل.</span></div>`:''}
@@ -1686,6 +1715,7 @@ function drawCM(){
   B('[data-rm]',b=>b.onclick=()=>R(()=>{CD.splice(+b.dataset.rm,1);}));
   B('[data-ao]',b=>b.onclick=()=>R(()=>{const c=CD[+b.dataset.ao];c.options=c.options||[];c.options.push({label:'خيار جديد',color:COLORS[c.options.length%7][0]});}));
   B('[data-ro]',b=>b.onclick=()=>R(()=>{const [i,j]=b.dataset.ro.split('_').map(Number);CD[i].options.splice(j,1);}));
+  B('[data-color]',s=>s.onchange=()=>R(()=>{}));
   B('[data-ty]',s=>s.onchange=()=>R(()=>{const i=+s.dataset.ty,c=CD[i];
     if(c.type==='select'&&!(c.options||[]).length) c.options=statusOpts();
     if(c.type==='link'&&!c.link){const o=DB.pages.find(x=>x.id!==cur);c.link=o?o.id:'';} }));
@@ -1713,6 +1743,7 @@ function openPageSet(){
     <div class="grid2">
       <div class="fld"><label>اسم الصفحة <i>*</i></label><input id="ps_name" value="${esc(p.name)}"></div>
       <div class="fld"><label>الوصف</label><input id="ps_sub" value="${esc(p.sub||'')}"></div>
+      <div class="fld"><label>مجموعة الصفحة</label><input id="ps_group" value="${esc(p.group||'')}" list="pageGroups" placeholder="مثال: شؤون الأفراد"><datalist id="pageGroups">${uniq(DB.pages.map(x=>x.group)).map(g=>`<option value="${esc(g)}">`).join('')}</datalist><span class="hint">الصفحات التي تحمل اسم المجموعة نفسه تظهر تحت زر واحد قابل للفتح والإغلاق.</span></div>
       <div class="fld full"><label>الأيقونة</label><div class="iconpick" id="psIcons">
         ${Object.keys(ICONS).map(k=>`<button type="button" class="ip ${p.icon===k?'on':''}" data-ico="${k}">${icon(k,17)}</button>`).join('')}</div></div>
       <div class="fld full"><label>لون الصفحة</label><div class="swatches" id="psCols">
@@ -1756,7 +1787,7 @@ function openPageSet(){
     cur=DB.pages[0].id; save(); render(); toast('حُذفت الصفحة'); });
   $('#psSave').onclick=()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
-    p.name=n; p.sub=$('#ps_sub').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
+    p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
