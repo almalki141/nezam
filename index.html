@@ -144,6 +144,7 @@ button{cursor:pointer;border:none;background:none}
 .topbar h2 .tag{width:9px;height:9px;border-radius:3px;background:var(--acc)}
 .topbar .sub{margin:1px 0 0;font-size:12.5px;color:var(--ink-3);font-weight:500}
 .burger{display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;width:40px;height:40px;place-items:center}
+.mobile-nav{display:none}
 .pgtools{display:flex;gap:6px;flex-wrap:wrap}
 .stripe{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;
   margin-inline-start:auto;box-shadow:var(--shadow-sm)}
@@ -431,7 +432,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .topbar>div:nth-child(2){min-width:0;flex:1}.topbar h2{font-size:17px}.topbar .sub{font-size:11.5px}
   .pgtools{order:3;width:100%}.pgtools .btn{flex:1;justify-content:center}
   .stripe{order:4;margin:0;width:100%;overflow-x:auto}.stripe .cell{min-width:92px;padding:6px 10px}
-  .page{padding:12px 10px 80px;min-width:0}
+  .page{padding:12px 10px calc(96px + env(safe-area-inset-bottom));min-width:0}
   .welcome{padding:4px 0}.welcome-hero{padding:25px 20px;border-radius:18px;grid-template-columns:1fr auto;min-height:165px;gap:12px}.welcome-logo{width:66px;height:66px;border-radius:18px}.welcome-logo svg{width:31px;height:31px}.welcome-hero h2{font-size:20px}.welcome-hero p{font-size:12px}.welcome-date{margin-top:12px}.welcome-date span{padding:5px 8px;font-size:10.5px}.welcome-stats{margin:-13px 9px 0;gap:5px}.welcome-stat{padding:11px 8px;text-align:center}.welcome-stat b{font-size:19px}.welcome-stat span{font-size:9.5px}.welcome-section-title{margin-top:22px}.welcome-pages{grid-template-columns:1fr;gap:8px}.welcome-card{padding:12px}.welcome-card .wi{width:42px;height:42px}
   .home-banners{background:#0b403c}.home-banner{aspect-ratio:16/9;min-height:0;padding:18px;background-size:contain;background-repeat:no-repeat;background-position:center}.home-banner:before{background:linear-gradient(0deg,rgba(3,32,30,.75),transparent 52%)}.home-banner-content{max-width:92%}.home-banner b{font-size:17px}.home-banner-open{padding:6px 11px;font-size:11px}.welcome-pages{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.welcome-card,.home-group-head{min-height:120px;padding:13px 5px}.welcome-card .wi,.home-group-head .wi{width:45px;height:45px}.welcome-card b,.home-group-head b{font-size:11px}.welcome-card span span,.home-group-head small{font-size:9px}.home-group-menu{position:absolute;z-index:8;right:0;left:0;min-width:185px}.home-group-menu button{font-size:11px}.date-converter-grid{grid-template-columns:1fr}.date-swap{margin:auto;transform:rotate(90deg)}
   .tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
@@ -461,9 +462,10 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .tablewrap .person{min-width:0}.tablewrap .person b,.tablewrap .person span,.tablewrap .trunc{white-space:normal;overflow-wrap:anywhere}
   .register.view-compact tbody tr{padding:10px 10px 10px 44px;display:flex;align-items:center;gap:8px;min-height:62px}
   .register.view-compact tbody td:not(.num):not(.acts):not(.pick){display:none}
-  .register.view-compact tbody td:nth-of-type(2){display:block!important;flex:1;padding:4px;border:0;font-size:14px;font-weight:700}
-  .register.view-compact tbody td:nth-of-type(2)::before{display:none}
+  .register.view-compact tbody td.main-cell{display:block!important;flex:1;padding:4px;border:0;font-size:14px;font-weight:700}
+  .register.view-compact tbody td.main-cell::before{display:none}
   .register.view-compact tbody td.acts{display:flex;margin:0;padding:0;flex:none}.register.view-compact tbody td.acts::before{display:none}
+  .tablewrap tbody tr:has([data-pick]:checked){border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.12),var(--shadow-sm)}
   .date-summary{order:2;margin-inline-start:auto;padding:5px 8px}.date-summary b{font-size:11.5px}.date-summary span{font-size:9.5px}
   .smart-summary{grid-template-columns:1fr 1fr;padding:12px;gap:9px}.smart-summary .result{grid-column:1/-1;display:flex;align-items:baseline;gap:8px}.smart-summary .result b{font-size:25px}.smart-summary .pair{grid-template-columns:1fr}
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
@@ -474,7 +476,14 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .m-foot .btn{flex:1;justify-content:center}.utable{min-width:620px}.m-body:has(.utable){overflow-x:auto}
   .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
   .preview-grid{grid-template-columns:1fr}
-  .toasts{left:10px;right:10px;bottom:12px}.toast{max-width:none;width:100%}
+  .toasts{left:10px;right:10px;bottom:calc(78px + env(safe-area-inset-bottom))}.toast{max-width:none;width:100%}
+  .mobile-nav{position:fixed;z-index:34;right:8px;left:8px;bottom:max(8px,env(safe-area-inset-bottom));height:64px;padding:6px 8px;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:rgba(255,255,255,.94);border:1px solid rgba(14,58,56,.13);border-radius:20px;box-shadow:0 12px 38px rgba(5,39,37,.24);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  [data-theme="dark"] .mobile-nav{background:rgba(19,35,34,.94)}
+  .mobile-nav button{min-width:0;border-radius:14px;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9.5px;font-weight:800;transition:.15s}
+  .mobile-nav button svg{width:20px;height:20px}.mobile-nav button:active{transform:scale(.93);background:var(--surface-2)}
+  .mobile-nav button.on{background:var(--pine);color:#fff;box-shadow:0 5px 14px rgba(14,58,56,.23)}
+  .mobile-nav .mobile-add{width:48px;height:48px;align-self:center;justify-self:center;border-radius:16px;background:linear-gradient(145deg,var(--brass-2),var(--brass));color:#123b38;box-shadow:0 7px 18px rgba(176,134,64,.3)}
+  .mobile-nav .mobile-add span{display:none}.mobile-nav .mobile-add svg{width:23px;height:23px}
   .empty{padding:36px 15px}
 }
 </style>
@@ -521,6 +530,13 @@ html[data-theme="dark"] .ph{background:#3A2E14}
     <header class="topbar" id="topbar"></header>
     <div class="page" id="pageBody"></div>
   </main>
+  <nav class="mobile-nav" id="mobileNav" aria-label="التنقل السريع">
+    <button id="mobHome"><span id="mobHomeIcon"></span><span>الرئيسية</span></button>
+    <button id="mobPages"><span id="mobPagesIcon"></span><span>الصفحات</span></button>
+    <button class="mobile-add" id="mobAdd"><span id="mobAddIcon"></span><span>إضافة</span></button>
+    <button id="mobRefresh"><span id="mobRefreshIcon"></span><span>تحديث</span></button>
+    <button id="mobMore"><span id="mobMoreIcon"></span><span>المزيد</span></button>
+  </nav>
 </div>
 <div class="overlay" id="ov"><div class="modal" id="mdl"></div></div>
 <div class="lbx" id="lbx"></div>
@@ -1369,6 +1385,16 @@ function renderSideBtns(){
   $('#navAdd').hidden=!isAdmin();
   $('#navSort').hidden=!isAdmin();
   if(isAdmin()) $('#navSort').onclick=openPageOrder;
+  renderMobileNav();
+}
+function renderMobileNav(){
+  const nav=$('#mobileNav');if(!nav||!ME)return;
+  $('#mobHomeIcon').innerHTML=ic('shieldk',20);$('#mobPagesIcon').innerHTML=icon('folder',20);$('#mobAddIcon').innerHTML=ic('plus',22);$('#mobRefreshIcon').innerHTML=ic('sync',20);$('#mobMoreIcon').innerHTML=ic('gear',20);
+  $('#mobHome').classList.toggle('on',!cur);$('#mobPages').classList.toggle('on',!!cur);$('#mobAdd').hidden=!isAdmin();
+  const openSide=tools=>{$('#side').classList.add('open');$('#scrim').classList.add('on');$('#side').querySelector('.side-foot').classList.toggle('tools-open',!!tools)};
+  $('#mobHome').onclick=showHome;$('#mobPages').onclick=()=>openSide(false);$('#mobMore').onclick=()=>openSide(true);
+  if(isAdmin())$('#mobAdd').onclick=openNewPage;
+  $('#mobRefresh').onclick=()=>$('#sideRefresh').click();
 }
 function renderNav(){
   const list=visiblePages();
@@ -1379,6 +1405,7 @@ function renderNav(){
   $('#navHome').onclick=showHome;
   $('#navList').querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>go(b.dataset.pg));
   $('#navList').querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>b.closest('.nav-group').classList.toggle('closed'));
+  renderMobileNav();
 }
 function showHome(){
   cur=null; renderNav();
@@ -1567,7 +1594,7 @@ function renderTable(p){
       ${rows.map((r,i)=>`<tr>
         ${can(p.id,'full')?`<td class="pick" data-label="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></td>`:''}
         <td class="num" data-label="الرقم" ${ch?`style="box-shadow:inset 3px 0 0 ${CVAR[((ch.options||[]).find(o=>o.label===r.v[ch.id])||{}).color]||'transparent'}"`:''}>${first+i+1}</td>
-        ${cols.map(c=>`<td data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
+        ${cols.map(c=>`<td class="${c.id===pcol.id?'main-cell':''}" data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
         ${p.showUpdated?`<td data-label="آخر تحديث" class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
         <td class="acts" data-label="إجراءات">
           ${p.showPreview!==false?`<button class="iconbtn" title="معاينة" data-vw="${r.id}">${ic('eye')}</button>`:''}
