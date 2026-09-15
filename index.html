@@ -12,14 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="window.__noXLSX=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__noSupabase=1"></script>
-<script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js" onerror="window.__noTus=1"></script>
-<script type="module">
-import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
-window.pdfjsLib=pdfjsLib;
-</script>
 <style>
 :root{
   --bg:#EDF0EE; --surface:#FFFFFF; --surface-2:#F6F8F6; --paper:#FBF8F1;
@@ -173,6 +166,7 @@ button{cursor:pointer;border:none;background:none}
 .search input{width:100%;padding:10px 38px 10px 14px;border:1px solid var(--line);background:var(--surface);border-radius:9px;font-size:14px}
 .search input:focus{outline:none;border-color:var(--pine-2);box-shadow:0 0 0 3px rgba(20,81,77,.1)}
 select.filter{padding:10px 12px;border:1px solid var(--line);background:var(--surface);border-radius:9px;font-size:13.5px;font-weight:500;max-width:180px}
+.filter-suite{position:relative}.filter-suite-toggle{height:42px;padding:0 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink-2);display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800}.filter-suite-toggle b{min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--pine);color:#fff;display:grid;place-items:center;font-size:10px}.filter-suite-panel{display:none;position:absolute;z-index:18;top:calc(100% + 6px);right:0;width:min(680px,88vw);padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface);box-shadow:var(--shadow);grid-template-columns:repeat(2,minmax(160px,1fr));gap:8px}.filter-suite.open .filter-suite-panel{display:grid}.filter-suite-panel select{width:100%;max-width:none}.filter-suite-actions{grid-column:1/-1;display:flex;gap:7px}.filter-suite-actions .btn{flex:1;justify-content:center}.sort-direction.on{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-br)}
 .spacer{flex:1}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:9px;font-size:13.5px;font-weight:700;
   border:1px solid transparent;transition:transform .1s,filter .14s;white-space:nowrap}
@@ -451,6 +445,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .search input,.fld input,.fld select,.fld textarea,select.filter{font-size:16px}
   .search input{height:48px;padding-inline-start:14px;border-radius:12px}
   select.filter{width:100%;max-width:none;min-width:0;height:46px;border-radius:11px}
+  .filter-suite{grid-column:1/-1}.filter-suite-toggle{width:100%;height:44px;justify-content:center;border-radius:12px}.filter-suite-panel{position:static;width:100%;margin-top:7px;grid-template-columns:1fr;padding:8px;border-radius:12px;box-shadow:none;background:var(--surface-2)}.filter-suite-actions{grid-column:1;display:grid;grid-template-columns:1fr 1fr}.filter-suite-actions #clearFilters{grid-column:1/-1}
   .tools .spacer{display:none}.tools>.btn{flex:1;justify-content:center;min-width:calc(50% - 4px);padding:9px 8px;font-size:12.5px}
   .tools>.btn,.tools>.seg{min-width:0;width:100%;margin:0}
   .file-tools{grid-column:1/-1;display:block;padding:0;background:transparent}
@@ -467,16 +462,17 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
   .register{background:transparent;border:0;box-shadow:none;overflow:visible}.reg-head{padding:10px 12px;border-radius:11px;margin-bottom:9px;position:sticky;top:0;z-index:5}
   .tablewrap{display:none}.mobile-mode-page .tablewrap{display:block;overflow:visible}.mobile-mode-page .tablewrap table{display:block;width:100%}.mobile-mode-page .tablewrap thead{display:none}.mobile-mode-page .tablewrap tbody{width:100%}.mobile-mode-page .mobile-cards{display:none}.mobile-cards{display:grid;gap:11px}.mobile-mode-cards .reg-head:not(:has(#bulkDelete)){display:none}.mobile-mode-cards .reg-head:has(#bulkDelete){position:static;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow-sm)}.mobile-mode-cards .reg-head:has(#bulkDelete)>svg,.mobile-mode-cards .reg-head:has(#bulkDelete)>h3,.mobile-mode-cards .reg-head:has(#bulkDelete)>.meta,.mobile-mode-cards .reg-head:has(#bulkDelete)>.mobile-select-all{display:none}
-  .mobile-record{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--surface) 78%,color-mix(in srgb,var(--card-accent) 6%,var(--surface)));border:1px solid color-mix(in srgb,var(--card-accent) 18%,var(--line));border-radius:17px;padding:12px;box-shadow:0 7px 20px rgba(5,45,42,.08)}
+  .mobile-record{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:12px;box-shadow:0 7px 20px rgba(5,45,42,.08)}
   .mobile-record:has([data-pick]:checked){border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.13),0 8px 24px rgba(5,45,42,.11)}
   .mobile-record-head{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0 10px;border-bottom:1px solid var(--line-2)}
+  .mobile-record.no-avatar .mobile-record-head{grid-template-columns:1fr;padding-inline:4px}.mobile-record.no-avatar .mobile-record-title{padding-inline:5px}
   .mobile-record.avatar-left .ava{grid-column:2;grid-row:1}.mobile-record.avatar-left .mobile-record-title{grid-column:1;grid-row:1}
-  .mobile-record .ava{width:58px;height:58px;border-radius:50%;font-size:15px;background:linear-gradient(145deg,#eef3f2,#dfe7e5);border:2px solid #fff;outline:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.09)}
-  .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 5px;font-size:15px;line-height:1.35;color:var(--ink);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mobile-record .ava{width:58px;height:58px;border-radius:50%;font-size:15px;background:linear-gradient(145deg,#eef3f2,#dfe7e5);border:2px solid #fff;outline:2px solid #d8b573;box-shadow:0 4px 12px rgba(0,0,0,.09)}
+  .mobile-record-title{min-width:0}.mobile-record-title h4{display:inline-block;max-width:100%;margin:0 0 5px;padding:3px 8px;border-radius:9px;background:#e8f5f2;font-size:15px;line-height:1.35;color:#0e625b;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mobile-rank-badge{display:inline-flex;align-items:center;padding:4px 10px;border:0;border-radius:18px;background:linear-gradient(135deg,#fbf3df,var(--gold-bg));color:#806020;font-size:10.5px;font-weight:900}
   .mobile-card-status{position:absolute;top:12px;left:12px;z-index:2}.mobile-card-status .badge{padding:5px 9px;border:0;border-radius:18px;font-size:10px}
   .mobile-record-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px;max-height:43px;overflow:hidden}.mobile-record-tags:empty{display:none}.mobile-record-tags .badge{font-size:9.5px;padding:4px 7px}
-  .mobile-card-field{display:inline-flex;align-items:center;gap:5px;padding:1px 2px;border:0;background:transparent}.mobile-card-field small{display:none}.mobile-card-field b{font-size:10.5px;color:var(--ink-3);font-weight:700;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mobile-card-field{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid color-mix(in srgb,var(--field-color) 20%,transparent);border-radius:9px;background:color-mix(in srgb,var(--field-color) 9%,#fff);color:var(--field-color)}.mobile-card-field small{display:none}.mobile-card-field b{font-size:10.5px;color:inherit;font-weight:800;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mobile-record-sub{margin-top:6px;color:var(--ink-3);font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center}
   .mobile-record-pick{position:absolute;top:12px;right:12px;z-index:2}.mobile-record-pick input{width:20px;height:20px;accent-color:var(--pine);cursor:pointer}
   .mobile-record-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px;padding-top:8px}
@@ -612,6 +608,11 @@ const uniq=a=>[...new Set(a.filter(x=>x!==''&&x!=null))];
 function toast(m,t){const e=document.createElement('div');e.className='toast '+(t||'');e.textContent=m;$('#toasts').appendChild(e);setTimeout(()=>e.remove(),3200);}
 function fmtSize(b){ return b>=1048576?(b/1048576).toFixed(1)+' م.ب':Math.max(1,Math.round(b/1024))+' ك.ب'; }
 function initials(n){const p=String(n||'').trim().split(/\s+/);return ((p[0]||'')[0]||'')+((p[1]||'')[0]||'');}
+const LIBLOAD={};
+function loadScriptOnce(src,test){if(test())return Promise.resolve(true);if(LIBLOAD[src])return LIBLOAD[src];LIBLOAD[src]=new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.async=true;s.onload=()=>resolve(!!test());s.onerror=()=>resolve(false);document.head.appendChild(s)});return LIBLOAD[src]}
+const ensureXLSX=()=>loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',()=>!!window.XLSX);
+const ensureTus=()=>loadScriptOnce('https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js',()=>!!window.tus);
+async function ensurePdf(){if(window.pdfjsLib)return true;try{const m=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');m.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';window.pdfjsLib=m;return true}catch(e){return false}}
 
 /* ---- التاريخ الهجري ---- */
 let HJ,HJL;
@@ -1270,7 +1271,7 @@ async function fileUrl(f,downloadName){
   return f.d;
 }
 async function uploadStoredFile(path,file){
-  if(file.size<=6*1024*1024||window.__noTus||!window.tus){ const {error}=await SB.storage.from(FILE_BUCKET).upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false}); if(error) throw error; return; }
+  if(file.size<=6*1024*1024||!(await ensureTus())){ const {error}=await SB.storage.from(FILE_BUCKET).upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false}); if(error) throw error; return; }
   if(!SB_SESSION) await cloudSession();
   return new Promise((resolve,reject)=>{ const up=new tus.Upload(file,{endpoint:SB_URL+'/storage/v1/upload/resumable',retryDelays:[0,1000,3000,5000],headers:{authorization:'Bearer '+SB_SESSION.access_token,apikey:SB_KEY},uploadDataDuringCreation:true,removeFingerprintOnSuccess:true,chunkSize:6*1024*1024,metadata:{bucketName:FILE_BUCKET,objectName:path,contentType:file.type||'application/octet-stream',cacheControl:'3600'},onError:reject,onSuccess:resolve});up.findPreviousUploads().then(x=>{if(x[0])up.resumeFromPreviousUpload(x[0]);up.start();}).catch(reject); });
 }
@@ -1287,8 +1288,7 @@ async function previewPdfMobile(url,name){
   const id='pdfPage_'+Date.now();
   const key=Date.now();
   modal('معاينة PDF — '+esc(name),`<div class="pdf-pages" id="${id}"><div class="pdf-preview-loading">جارٍ تجهيز الملف…</div></div>`,`<div class="pdf-controls"><button class="btn ghost" id="pdfPrev${key}">السابق</button><span class="pdf-count" id="pdfCount${key}">—</span><button class="btn ghost" id="pdfNext${key}">التالي</button><button class="btn ghost" id="pdfMinus${key}" title="تصغير">−</button><button class="btn ghost" id="pdfPlus${key}" title="تكبير">＋</button><button class="btn ghost" onclick="closeModal()">إغلاق</button></div>`,'lg');
-  for(let i=0;i<30&&!window.pdfjsLib;i++) await new Promise(r=>setTimeout(r,100));
-  if(!window.pdfjsLib) throw new Error('pdf viewer unavailable');
+  if(!(await ensurePdf())) throw new Error('pdf viewer unavailable');
   const pdf=await window.pdfjsLib.getDocument({url}).promise;
   const box=document.getElementById(id);
   if(!box) return;
@@ -1337,7 +1337,7 @@ $('#lbx').onclick=e=>{ if(e.target.id==='lbx') closeLB(); };
 ================================================================== */
 const pg=id=>DB.pages.find(p=>p.id===(id||cur));
 const vis=p=>p.cols.filter(c=>!c.hidden);
-const primary=p=>vis(p).find(c=>c.id===p.primaryCol)||vis(p).find(c=>!['image','gallery','files'].includes(c.type))||vis(p)[0]||p.cols[0];
+const primary=p=>p.cols.find(c=>c.id===p.primaryCol&&!['image','gallery','files'].includes(c.type))||vis(p).find(c=>!['image','gallery','files'].includes(c.type))||vis(p)[0]||p.cols[0];
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
@@ -1600,11 +1600,13 @@ function summaryHTML(p){
   return `<div class="smart-summary"><div class="result"><b>${matches}</b><span>سجل مطابق من ${p.rows.length}</span></div>${u.summary.map(block).join('')}</div>`;
 }
 function toolsHTML(p,extra){
-  const u=U(), ch=chipsCol(p), fl=vis(p).filter(c=>c.filterable&&(!ch||c.id!==ch.id));
+  const u=U(), ch=chipsCol(p), fl=vis(p).filter(c=>c.filterable&&(!ch||c.id!==ch.id)),sortCols=vis(p).filter(c=>!['image','gallery','files','list','longtext'].includes(c.type)),activeFilters=Object.values(u.f||{}).filter(Boolean).length+(u.sort.k?1:0);
   return `<div class="tools">
     ${p.showSearch!==false?`<div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" placeholder="ابحث في ${esc(p.name)}…"></div>`:''}
-    ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>
-      ${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
+    ${(fl.length||sortCols.length)?`<div class="filter-suite ${u.filtersOpen?'open':''}"><button type="button" class="filter-suite-toggle" id="filtersToggle">${ic('cols',15)} الفرز والتصفية ${activeFilters?`<b>${activeFilters}</b>`:''}<span>⌄</span></button><div class="filter-suite-panel">
+      ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
+      <select id="sortCol"><option value="">بدون فرز</option>${sortCols.map(c=>`<option value="${c.id}" ${u.sort.k===c.id?'selected':''}>فرز حسب ${esc(c.name)}</option>`).join('')}${p.showUpdated?`<option value="__u" ${u.sort.k==='__u'?'selected':''}>فرز حسب آخر تحديث</option>`:''}</select>
+      <div class="filter-suite-actions"><button type="button" class="btn ghost sm sort-direction ${u.sort.d>0?'on':''}" id="sortAsc">تصاعدي ↑</button><button type="button" class="btn ghost sm sort-direction ${u.sort.d<0?'on':''}" id="sortDesc">تنازلي ↓</button><button type="button" class="btn ghost sm" id="clearFilters">مسح الفرز والتصفية</button></div></div></div>`:''}
     <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
     <div class="mobile-view-toggle"><button data-mobile-view="cards" class="${u.mobileView==='cards'?'on':''}">${icon('users',14)} عرض البطاقات</button><button data-mobile-view="page" class="${u.mobileView==='page'?'on':''}">${ic('file',14)} عرض الصفحة</button></div>
     <div class="spacer"></div>${extra||''}
@@ -1619,7 +1621,12 @@ function bindTools(p){
   const u=U(), qi=$('#q'); if(qi) qi.oninput=e=>{
     u.q=e.target.value; u.page=1; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,320);
   };
+  const fst=$('#filtersToggle');if(fst)fst.onclick=()=>{u.filtersOpen=!u.filtersOpen;fst.parentElement.classList.toggle('open',u.filtersOpen)};
   document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;u.page=1;refreshBody();});
+  if($('#sortCol'))$('#sortCol').onchange=e=>{u.sort={k:e.target.value,d:u.sort.d||1};u.page=1;refreshBody()};
+  if($('#sortAsc'))$('#sortAsc').onclick=()=>{u.sort.d=1;u.page=1;refreshBody()};
+  if($('#sortDesc'))$('#sortDesc').onclick=()=>{u.sort.d=-1;u.page=1;refreshBody()};
+  if($('#clearFilters'))$('#clearFilters').onclick=()=>{u.f={};u.sort={k:null,d:1};u.page=1;refreshBody()};
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{u.display=b.dataset.view;refreshBody();});
   document.querySelectorAll('[data-mobile-view]').forEach(b=>b.onclick=()=>{u.mobileView=b.dataset.mobileView;refreshBody();});
   const ft=$('#fileToolsToggle');if(ft)ft.onclick=()=>ft.parentElement.classList.toggle('open');
@@ -1640,19 +1647,19 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const byId=id=>cols.find(c=>c.id===id),titleCol=byId(p.mobileCardTitle)||primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),tone=CVAR[p.mobileCardColor]||CVAR[p.accent]||CVAR.teal;
-  const cardFields=cardCols.filter(c=>c!==titleCol&&c!==rank&&c!==status).map(c=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join(''),showStatus=status&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
-  return `<article class="mobile-record avatar-${p.mobileAvatarSide==='left'?'left':'right'}" style="--card-accent:${tone}">
+  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showPhoto=p.mobileCardPhoto!==false;
+  const fieldColors=['#1767aa','#17795e','#70418f','#b2740b','#a3231c'],cardFields=cardCols.filter(c=>c!==titleCol&&c!==rank&&c!==status).map((c,i)=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field" style="--field-color:${fieldColors[(p.cols.indexOf(c)+i)%fieldColors.length]}"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join(''),showStatus=status&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
+  return `<article class="mobile-record ${showPhoto?'':'no-avatar'} avatar-${p.mobileAvatarSide==='left'?'left':'right'}">
     ${showStatus?`<div class="mobile-card-status">${cellHTML(p,status,r,false)}</div>`:''}
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
-    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${dept&&cardCols.includes(dept)?anyIcon(p.mobileSubIcon||'gear',15):''}${cardFields}</div></div></div>
+    <div class="mobile-record-head">${showPhoto?avaHTML(p,r,title):''}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${cardFields}</div></div></div>
     <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" data-vw="${r.id}">${ic('eye',20)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" data-ed="${r.id}">${ic('edit',20)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',20)}</button>`:''}</div>
   </article>`;
 }
 function renderTable(p){
   const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
   u.picked=(u.picked||[]).filter(id=>p.rows.some(r=>r.id===id));
-  const pageSize=matchMedia('(max-width:600px)').matches?20:Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
+  const isMobile=matchMedia('(max-width:600px)').matches,pageSize=isMobile?20:Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
   u.page=Math.min(Math.max(1,Number(u.page)||1),pages);
   const first=(u.page-1)*pageSize, rows=allRows.slice(first,first+pageSize);
   const seg=p.view==='letters'?`<div class="seg"><button class="on">جدول</button><button id="toLetter">خطاب</button></div>`:'';
@@ -1666,7 +1673,7 @@ function renderTable(p){
   }
   const th=cols.map(c=>`<th class="sortable" data-s="${c.id}">${esc(c.name)}${u.sort.k===c.id?`<span class="arrow">${u.sort.d>0?'▲':'▼'}</span>`:''}</th>`).join('')
     +(p.showUpdated?`<th class="sortable" data-s="__u">آخر تحديث${u.sort.k==='__u'?`<span class="arrow">${u.sort.d>0?'▲':'▼'}</span>`:''}</th>`:'');
-  const body = !p.rows.length ? empty('الصفحة فارغة',can(p.id,'edit')?'ابدأ بإضافة أول سجل أو استورد ملف Excel.':'لا توجد سجلات.',can(p.id,'edit')?'bAdd2':'','إضافة سجل')
+  const body = isMobile&&u.mobileView==='cards'?'':!p.rows.length ? empty('الصفحة فارغة',can(p.id,'edit')?'ابدأ بإضافة أول سجل أو استورد ملف Excel.':'لا توجد سجلات.',can(p.id,'edit')?'bAdd2':'','إضافة سجل')
     : !rows.length ? empty('لا نتائج مطابقة','غيّر كلمة البحث أو أعد ضبط عوامل التصفية.')
     : `<div class="tablewrap"><table><thead><tr>${can(p.id,'full')?`<th class="pick"><input type="checkbox" id="pickAll" title="تحديد كل السجلات الظاهرة" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}></th>`:''}<th class="num">م</th>${th}<th class="acts"></th></tr></thead><tbody>
       ${rows.map((r,i)=>`<tr>
@@ -1681,7 +1688,7 @@ function renderTable(p){
           ${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
-  const mobileCards=rows.length?`<div class="mobile-cards">${rows.map((r,i)=>mobileCardHTML(p,r,first+i+1,cols,u)).join('')}</div>`:'';
+  const mobileCards=isMobile&&u.mobileView==='cards'&&rows.length?`<div class="mobile-cards">${rows.map((r,i)=>mobileCardHTML(p,r,first+i+1,cols,u)).join('')}</div>`:'';
   $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register mobile-mode-${u.mobileView} view-${u.mobileView==='page'?'detail':(u.display==='compact'?'compact':'detail')}">
     <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')?`<label class="mobile-select-all"><input type="checkbox" id="mobileSelectAll" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}> الكل</label>`:''}${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${mobileCards}${pager}</div>`;
   bindTools(p); bindCells();
@@ -2145,16 +2152,15 @@ function openPageSet(){
       </div></details>
       <details class="settings-section"><summary>٣ · بطاقة الجوال</summary><div class="settings-content grid2">
       <div class="fld full"><div class="gnote"><b>رتّب البطاقة بسهولة:</b> اختر المعلومة المناسبة لكل موضع. تعرض البطاقة أهم المعلومات فقط لتبقى صغيرة وواضحة.</div></div>
+      <div class="fld full"><label style="font-weight:700;font-size:13px;display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)"><input type="checkbox" id="ps_card_photo" ${p.mobileCardPhoto!==false?'checked':''} style="width:20px;height:20px"> إظهار الصورة في بطاقة الجوال</label></div>
       <div class="fld full"><div class="card-layout-settings">
         <div class="card-slot"><b>أعلى اليمين</b><span>الصورة والتحديد</span><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>الصورة يمينًا</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>الصورة يسارًا</option></select></div>
-        <div class="card-slot featured"><b>منتصف البطاقة — العنوان</b><span>الاسم أو الرقم الرئيسي</span><select id="ps_card_title">${cardOpts(p.mobileCardTitle)}</select></div>
+        <div class="card-slot featured"><b>عنوان البطاقة</b><span>يتبع «العمود الرئيسي» الذي اخترته تلقائيًا</span><strong id="ps_card_title_label" style="font-size:13px;color:var(--pine)">${esc(primary(p).name)}</strong></div>
         <div class="card-slot"><b>أعلى اليسار</b><span>شارة الحالة</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
         <div class="card-slot"><b>المنتصف الأول</b><span>الرتبة</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
         <div class="card-slot"><b>المعلومة الأساسية</b><span>معلومة إضافية واحدة</span><select id="ps_card_mid1">${cardOpts((p.mobileCardMiddle||[])[0])}</select></div>
         <div class="card-slot"><b>أسفل المحتوى</b><span>الوحدة أو القسم</span><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
       </div></div>
-      <div class="fld full"><label>لون البطاقة</label><div class="swatches" id="psCardColors">${['teal','gold','green','blue','red','amber','plum'].map(k=>`<button type="button" class="sw ${(p.mobileCardColor||p.accent)===k?'on':''}" data-card-color="${k}" style="background:${CVAR[k]}"></button>`).join('')}</div></div>
-      <div class="fld full"><label>أيقونة المعلومة السفلية</label><div class="iconpick" id="psCardIcons">${['gear','users','folder','shield','star','file','clipboard','phone'].map(k=>`<button type="button" class="ip ${(p.mobileSubIcon||'gear')===k?'on':''}" data-card-icon="${k}">${anyIcon(k,17)}</button>`).join('')}</div></div>
       </div></details>
       <details class="settings-section"><summary>٤ · خيارات متقدمة</summary><div class="settings-content grid2">
       ${p.view==='letters'?`
@@ -2172,13 +2178,12 @@ function openPageSet(){
     </div>`,
     `<button class="btn primary" id="psSave">حفظ الإعدادات</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
   const sections=[...document.querySelectorAll('.settings-section')];sections.forEach(d=>d.ontoggle=()=>{if(d.open)sections.forEach(x=>{if(x!==d)x.open=false})});
-  let ico=p.icon, acc=p.accent,cardColor=p.mobileCardColor||p.accent,cardIcon=p.mobileSubIcon||'gear';
+  $('#ps_primary').onchange=()=>{$('#ps_card_title_label').textContent=$('#ps_primary').selectedOptions[0]?.textContent||''};
+  let ico=p.icon, acc=p.accent;
   $('#psIcons').querySelectorAll('[data-ico]').forEach(b=>b.onclick=()=>{ico=b.dataset.ico;
     $('#psIcons').querySelectorAll('.ip').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   $('#psCols').querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{acc=b.dataset.acc;
     $('#psCols').querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
-  $('#psCardColors').querySelectorAll('[data-card-color]').forEach(b=>b.onclick=()=>{cardColor=b.dataset.cardColor;$('#psCardColors').querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
-  $('#psCardIcons').querySelectorAll('[data-card-icon]').forEach(b=>b.onclick=()=>{cardIcon=b.dataset.cardIcon;$('#psCardIcons').querySelectorAll('.ip').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   $('#psUp').onclick=()=>{DB.pages.splice(i-1,0,DB.pages.splice(i,1)[0]);save();closeModal();render();};
   $('#psDn').onclick=()=>{DB.pages.splice(i+1,0,DB.pages.splice(i,1)[0]);save();closeModal();render();};
   $('#psDup').onclick=()=>{const c=JSON.parse(JSON.stringify(p));c.id=uid();c.name=p.name+' — نسخة';
@@ -2194,7 +2199,7 @@ function openPageSet(){
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
     p.mobileCardCols=[];
-    p.mobileCardTitle=$('#ps_card_title').value;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value].filter(Boolean);p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardColor=cardColor;p.mobileSubIcon=cardIcon;
+    p.mobileCardTitle=p.primaryCol;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value].filter(Boolean);p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardPhoto=$('#ps_card_photo').checked;
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
     if($('#ps_tgt')) p.targetPage=$('#ps_tgt').value;
     if($('#ps_photo')) p.showPhoto=$('#ps_photo').checked;
@@ -2489,7 +2494,8 @@ function pickImport(p){
     try{
       let rows;
       if(/\.(xlsx|xls)$/i.test(f.name)){
-        if(window.__noXLSX||typeof XLSX==='undefined'){ return toast('محرّك Excel غير متاح — احفظ الملف بصيغة CSV واستورده','err'); }
+        toast('جارٍ تجهيز قارئ Excel…');
+        if(!(await ensureXLSX())){ return toast('محرّك Excel غير متاح — احفظ الملف بصيغة CSV واستورده','err'); }
         const buf=await f.arrayBuffer();
         const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
         const ws=wb.Sheets[wb.SheetNames[0]];
