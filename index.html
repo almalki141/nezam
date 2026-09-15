@@ -219,6 +219,7 @@ tbody td{padding:10px 13px;border-bottom:1px solid var(--line-2);font-size:13.5p
 tbody tr:hover{background:var(--surface-2)}
 tbody tr:last-child td{border-bottom:none}
 td.num,th.num{width:44px;color:var(--ink-3);font-size:12px;font-weight:700;text-align:center}
+td.pick,th.pick{width:42px;text-align:center;padding-inline:8px}td.pick input,th.pick input{width:18px;height:18px;accent-color:var(--pine);cursor:pointer}
 td.acts,th.acts{width:112px;white-space:nowrap;text-align:left}
 .iconbtn{width:30px;height:30px;border-radius:7px;display:inline-grid;place-items:center;color:var(--ink-3);transition:background .12s,color .12s}
 .iconbtn:hover{background:var(--line-2);color:var(--pine-2)}
@@ -454,11 +455,12 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .tablewrap tbody td::before{content:attr(data-label);color:var(--ink-3);font-size:12px;font-weight:700;line-height:1.7}
   .tablewrap tbody td.num{display:block;position:absolute;left:10px;top:9px;width:auto;padding:2px 8px;border:0;border-radius:20px;background:var(--surface-2);box-shadow:none!important}
   .tablewrap tbody td.num::before{display:none}
+  .tablewrap tbody td.pick{display:block;position:absolute;right:10px;top:9px;width:auto;padding:2px;border:0}.tablewrap tbody td.pick::before{display:none}
   .tablewrap tbody td.acts{display:flex;width:auto;justify-content:flex-end;gap:5px;padding:9px 0 0;border:0;text-align:start}
   .tablewrap tbody td.acts::before{content:'إجراءات';margin-inline-end:auto;align-self:center}
   .tablewrap .person{min-width:0}.tablewrap .person b,.tablewrap .person span,.tablewrap .trunc{white-space:normal;overflow-wrap:anywhere}
   .register.view-compact tbody tr{padding:10px 10px 10px 44px;display:flex;align-items:center;gap:8px;min-height:62px}
-  .register.view-compact tbody td:not(.num):not(.acts){display:none}
+  .register.view-compact tbody td:not(.num):not(.acts):not(.pick){display:none}
   .register.view-compact tbody td:nth-of-type(2){display:block!important;flex:1;padding:4px;border:0;font-size:14px;font-weight:700}
   .register.view-compact tbody td:nth-of-type(2)::before{display:none}
   .register.view-compact tbody td.acts{display:flex;margin:0;padding:0;flex:none}.register.view-compact tbody td.acts::before{display:none}
@@ -1258,7 +1260,7 @@ const primary=p=>vis(p).find(c=>!['image','gallery','files'].includes(c.type))||
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,mode:'letter',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]}; return ui[cur]; }
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'letter',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1534,6 +1536,7 @@ function empty(h,t,id,btn){
 }
 function renderTable(p){
   const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
+  u.picked=(u.picked||[]).filter(id=>p.rows.some(r=>r.id===id));
   const pageSize=Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
   u.page=Math.min(Math.max(1,Number(u.page)||1),pages);
   const first=(u.page-1)*pageSize, rows=allRows.slice(first,first+pageSize);
@@ -1550,8 +1553,9 @@ function renderTable(p){
     +(p.showUpdated?`<th class="sortable" data-s="__u">آخر تحديث${u.sort.k==='__u'?`<span class="arrow">${u.sort.d>0?'▲':'▼'}</span>`:''}</th>`:'');
   const body = !p.rows.length ? empty('الصفحة فارغة',can(p.id,'edit')?'ابدأ بإضافة أول سجل أو استورد ملف Excel.':'لا توجد سجلات.',can(p.id,'edit')?'bAdd2':'','إضافة سجل')
     : !rows.length ? empty('لا نتائج مطابقة','غيّر كلمة البحث أو أعد ضبط عوامل التصفية.')
-    : `<div class="tablewrap"><table><thead><tr><th class="num">م</th>${th}<th class="acts"></th></tr></thead><tbody>
+    : `<div class="tablewrap"><table><thead><tr>${can(p.id,'full')?`<th class="pick"><input type="checkbox" id="pickAll" title="تحديد كل السجلات الظاهرة" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}></th>`:''}<th class="num">م</th>${th}<th class="acts"></th></tr></thead><tbody>
       ${rows.map((r,i)=>`<tr>
+        ${can(p.id,'full')?`<td class="pick" data-label="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></td>`:''}
         <td class="num" data-label="الرقم" ${ch?`style="box-shadow:inset 3px 0 0 ${CVAR[((ch.options||[]).find(o=>o.label===r.v[ch.id])||{}).color]||'transparent'}"`:''}>${first+i+1}</td>
         ${cols.map(c=>`<td data-label="${esc(c.name)}">${cellHTML(p,c,r,c.id===pcol.id)}</td>`).join('')}
         ${p.showUpdated?`<td data-label="آخر تحديث" class="mono dim" style="font-size:12.5px">${fmtDate(r.updated)}</td>`:''}
@@ -1563,7 +1567,7 @@ function renderTable(p){
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
   $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
-    <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3><span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${pager}</div>`;
+    <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${pager}</div>`;
   bindTools(p); bindCells();
   const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
   const a2=$('#bAdd2'); if(a2) a2.onclick=()=>openRow();
@@ -1573,6 +1577,10 @@ function renderTable(p){
   document.querySelectorAll('[data-vw]').forEach(b=>b.onclick=()=>openRecordPreview(b.dataset.vw));
   document.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>delRow(b.dataset.dl));
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onchange=()=>{u.picked=b.checked?uniq([...u.picked,b.dataset.pick]):u.picked.filter(id=>id!==b.dataset.pick);renderTable(p)});
+  if($('#pickAll')) $('#pickAll').onchange=e=>{const ids=rows.map(r=>r.id);u.picked=e.target.checked?uniq([...u.picked,...ids]):u.picked.filter(id=>!ids.includes(id));renderTable(p)};
+  if($('#clearPicked')) $('#clearPicked').onclick=()=>{u.picked=[];renderTable(p)};
+  if($('#bulkDelete')) $('#bulkDelete').onclick=()=>delRows(u.picked.slice());
   if($('#pgPrev')) $('#pgPrev').onclick=()=>{u.page--;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
   if($('#pgNext')) $('#pgNext').onclick=()=>{u.page++;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
   const stripe=$('#stripe'); if(stripe) stripe.innerHTML=stripeHTML(p);
@@ -1845,6 +1853,19 @@ function delRow(rid){
     const ok=await persist();
     if(!ok){p.rows.splice(i,0,r);render();return toast('تعذّر الحفظ؛ أُعيد السجل ولم يُحذف','err');}
     toast('حُذف السجل وحُفظ نهائياً'); });
+}
+function delRows(ids){
+  const p=pg(),u=U(),selected=uniq(ids||[]).filter(id=>p.rows.some(r=>r.id===id));
+  if(!can(p.id,'full')) return toast('ليس لديك صلاحية الحذف','err');
+  if(!selected.length) return toast('حدد سجلاً واحداً على الأقل','err');
+  ask(`حذف <b>${selected.length}</b> سجل محدد من ${esc(p.name)}؟`,async()=>{
+    const oldRows=p.rows.slice(),oldAudit=(DB.audit||[]).slice();
+    p.rows=p.rows.filter(r=>!selected.includes(r.id));u.picked=[];
+    audit('حذف جماعي',p.name+' · '+selected.length+' سجل');render();
+    const ok=await persist();
+    if(!ok){p.rows=oldRows;DB.audit=oldAudit;u.picked=selected;render();return toast('تعذّر الحفظ؛ أُعيدت السجلات ولم تُحذف','err');}
+    toast(`حُذف ${selected.length} سجل وحُفظت العملية نهائياً`);
+  },`حذف ${selected.length} سجل`);
 }
 function openRecordPreview(rid){
   const p=pg(),r=p.rows.find(x=>x.id===rid); if(!r) return;
