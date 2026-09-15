@@ -51,7 +51,7 @@ html[data-theme="dark"]{
   --shadow:0 2px 4px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal','IBM Plex Sans Arabic','Segoe UI',Tahoma,Arial,sans-serif;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Noto Sans Arabic','Tajawal','Segoe UI',Tahoma,Arial,sans-serif;
   font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -365,6 +365,8 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 .sw{width:30px;height:30px;border-radius:8px;border:2px solid transparent}
 .sw.on{border-color:var(--ink)}
 .iconpick{display:flex;gap:6px;flex-wrap:wrap}
+.card-layout-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px;border-radius:15px;background:var(--surface-2);border:1px solid var(--line)}
+.card-slot{padding:11px;border-radius:12px;background:var(--surface);border:1px solid var(--line);min-width:0}.card-slot.featured{border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.08)}.card-slot b,.card-slot span{display:block}.card-slot b{font-size:12px;color:var(--ink)}.card-slot span{font-size:10px;color:var(--ink-3);margin:2px 0 7px}.card-slot select{width:100%;min-width:0}
 .ip{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink-2)}
 .ip.on{background:var(--pine);color:#fff;border-color:var(--pine)}
 .starters{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
@@ -437,7 +439,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .date-summary{background:transparent;border:0;box-shadow:none;padding:2px;color:#d5e2df}.date-summary b{display:none}.date-summary span{color:#bcd0cc;font-size:10.5px}.date-summary svg{display:none}
   .pgtools{position:absolute;left:14px;top:14px;width:auto}.pgtools .btn{width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:0;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14);color:#fff}.pgtools .btn:first-child{display:none}.pgtools .btn svg{width:18px;height:18px}
   .stripe{display:none}
-  .page{padding:14px 10px calc(96px + env(safe-area-inset-bottom));min-width:0;background:#eef1f0}
+  .page{padding:20px 10px calc(96px + env(safe-area-inset-bottom));min-width:0;background:#eef1f0;margin-top:-13px;border-radius:24px 24px 0 0;position:relative;z-index:2}
   .welcome{padding:4px 0}.welcome-hero{padding:25px 20px;border-radius:18px;grid-template-columns:1fr auto;min-height:165px;gap:12px}.welcome-logo{width:66px;height:66px;border-radius:18px}.welcome-logo svg{width:31px;height:31px}.welcome-hero h2{font-size:20px}.welcome-hero p{font-size:12px}.welcome-date{margin-top:12px}.welcome-date span{padding:5px 8px;font-size:10.5px}.welcome-stats{margin:-13px 9px 0;gap:5px}.welcome-stat{padding:11px 8px;text-align:center}.welcome-stat b{font-size:19px}.welcome-stat span{font-size:9.5px}.welcome-section-title{margin-top:22px}.welcome-pages{grid-template-columns:1fr;gap:8px}.welcome-card{padding:12px}.welcome-card .wi{width:42px;height:42px}
   .home-banners{background:#0b403c}.home-banner{aspect-ratio:16/9;min-height:0;padding:18px;background-size:contain;background-repeat:no-repeat;background-position:center}.home-banner:before{background:linear-gradient(0deg,rgba(3,32,30,.75),transparent 52%)}.home-banner-content{max-width:92%}.home-banner b{font-size:17px}.home-banner-open{padding:6px 11px;font-size:11px}.welcome-pages{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.welcome-card,.home-group-head{min-height:120px;padding:13px 5px}.welcome-card .wi,.home-group-head .wi{width:45px;height:45px}.welcome-card b,.home-group-head b{font-size:11px}.welcome-card span span,.home-group-head small{font-size:9px}.home-group-menu{position:absolute;z-index:8;right:0;left:0;min-width:185px}.home-group-menu button{font-size:11px}.date-converter-grid{grid-template-columns:1fr}.date-swap{margin:auto;transform:rotate(90deg)}
   .tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
@@ -467,23 +469,23 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .mobile-record.avatar-left .ava{grid-column:2;grid-row:1}.mobile-record.avatar-left .mobile-record-title{grid-column:1;grid-row:1}
   .mobile-record .ava{width:70px;height:70px;border-radius:50%;font-size:17px;background:linear-gradient(145deg,#eef3f2,#dfe7e5);border:3px solid #fff;outline:1px solid var(--line);box-shadow:0 5px 16px rgba(0,0,0,.10)}
   .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 8px;font-size:17px;line-height:1.45;color:var(--ink);font-weight:900}
-  .mobile-rank-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border:0;border-radius:20px;background:linear-gradient(135deg,#fbf3df,var(--gold-bg));color:#806020;font-size:11.5px;font-weight:900}.rank-insignia{display:inline-flex;align-items:center;color:#98711f;font-size:12px;line-height:1;letter-spacing:-1px;font-family:Arial,sans-serif}
+  .mobile-rank-badge{display:inline-flex;align-items:center;padding:5px 12px;border:0;border-radius:20px;background:linear-gradient(135deg,#fbf3df,var(--gold-bg));color:#806020;font-size:11.5px;font-weight:900}
   .mobile-card-status{position:absolute;top:16px;left:16px;z-index:2}.mobile-card-status .badge{padding:7px 11px;border:0;border-radius:20px;font-size:11px}
-  .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}.mobile-record-tags:empty{display:none}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}.mobile-record-tags .mobile-card-field:first-child:before{content:"⚙";font-size:14px;color:var(--ink-3)}
+  .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}.mobile-record-tags:empty{display:none}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}
   .mobile-card-field{display:inline-flex;align-items:center;gap:6px;padding:2px 3px;border:0;background:transparent}.mobile-card-field small{display:none}.mobile-card-field b{font-size:12px;color:var(--ink-3);font-weight:700}
   .mobile-record-sub{margin-top:6px;color:var(--ink-3);font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center}
   .mobile-record-pick{position:absolute;top:16px;right:16px;z-index:2}.mobile-record-pick input{width:23px;height:23px;accent-color:var(--pine);cursor:pointer}
   .mobile-record-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:7px;padding-top:11px}
   .mobile-record-actions .iconbtn{width:100%;height:58px;padding:6px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:14px;background:var(--surface-2);font-size:10.5px;font-weight:900;color:var(--pine);box-shadow:inset 0 0 0 1px rgba(20,81,77,.04)}
   .mobile-record-actions .iconbtn::after{content:attr(title)}.mobile-record-actions .iconbtn.del{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
-  .mobile-record-actions .act-view{background:linear-gradient(145deg,#eef9f6,#e4f2ef);color:var(--pine)}.mobile-record-actions .act-edit{background:linear-gradient(145deg,#eef6ff,#e5f0fb);color:#1767aa}
+  .mobile-record-actions .act-view{background:linear-gradient(145deg,#eef9f6,#e4f2ef);color:var(--pine)}.mobile-record-actions .act-edit{background:linear-gradient(145deg,#eef6ff,#e5f0fb);color:#1767aa}.mobile-record-actions .act-detail{background:linear-gradient(145deg,#f3f5f8,#e9edf2);color:#526c84}
   .mobile-select-all{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:#fff}.mobile-select-all input{width:18px;height:18px;accent-color:var(--brass)}
   .tablewrap tbody{display:grid;gap:9px}.mobile-mode-page .tablewrap tbody{gap:12px}
-  .tablewrap tbody tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 8px;box-shadow:var(--shadow-sm);overflow:hidden}.mobile-mode-page .tablewrap tbody tr{background:#fff;border-color:#dce4e2;border-radius:17px;padding:17px 14px 10px;box-shadow:0 8px 22px rgba(5,45,42,.08)}
+  .tablewrap tbody tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 8px;box-shadow:var(--shadow-sm);overflow:hidden}.mobile-mode-page .tablewrap tbody tr{background:#fff;border-color:#dce4e2;border-radius:17px;padding:48px 14px 10px;box-shadow:0 8px 22px rgba(5,45,42,.08)}
   .tablewrap tbody tr:hover{background:var(--surface)}
   .tablewrap tbody td{display:grid;grid-template-columns:minmax(88px,34%) 1fr;gap:10px;align-items:start;padding:8px 5px;border-bottom:1px solid var(--line-2);font-size:14px;min-width:0;text-align:start}.mobile-mode-page .tablewrap tbody td:nth-of-type(even):not(.num):not(.pick):not(.acts){background:#f6f8f7;border-radius:8px}
   .tablewrap tbody td::before{content:attr(data-label);color:var(--ink-3);font-size:12px;font-weight:700;line-height:1.7}
-  .tablewrap tbody td.num{display:block;position:absolute;left:10px;top:9px;width:auto;padding:2px 8px;border:0;border-radius:20px;background:var(--surface-2);box-shadow:none!important}
+  .tablewrap tbody td.num{display:block;position:absolute;left:14px;top:14px;width:auto;min-width:30px;padding:4px 9px;border:0;border-radius:20px;background:var(--pine);color:#fff;box-shadow:none!important;z-index:2}
   .tablewrap tbody td.num::before{display:none}
   .tablewrap tbody td.pick{display:block;position:absolute;right:10px;top:9px;width:auto;padding:2px;border:0}.tablewrap tbody td.pick::before{display:none}
   .tablewrap tbody td.acts{display:flex;width:auto;justify-content:stretch;gap:6px;padding:10px 0 0;border:0;text-align:center;flex-wrap:wrap}
@@ -508,6 +510,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .m-body:has(.utable){overflow-x:visible}.utable{min-width:0;display:block}.utable thead{display:none}.utable tbody{display:grid;gap:9px}.utable tr{display:block;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}.utable td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid var(--line-2)}.utable td::before{content:attr(data-label);font-size:10.5px;color:var(--ink-3);font-weight:800}.utable td:last-child{border:0;padding-top:10px}.utable td.acts{width:auto}.utable td.acts .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line);margin-inline-start:5px}
   #pageOrder .frow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:7px;padding:11px;border:1px solid var(--line);border-radius:13px;margin-bottom:8px;background:var(--surface-2)}#pageOrder .frow>b{min-width:0!important;align-self:center}#pageOrder .frow>input{grid-column:1/-1;width:100%;min-height:44px;font-size:16px}#pageOrder .frow .fx{grid-column:3;grid-row:1;display:flex}#pageOrder .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line)}
   .mobile-col-picker{display:grid;grid-template-columns:1fr;gap:6px}.mobile-col-picker label,.permrow{min-height:44px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);display:flex;align-items:center;gap:8px}.mobile-col-picker input{width:19px!important;height:19px}
+  .card-layout-settings{grid-template-columns:1fr 1fr;padding:8px;gap:7px}.card-slot{padding:9px}.card-slot select{font-size:16px;min-height:42px}.card-slot.featured{grid-column:1/-1}
   .perm-toolbar{display:grid!important;grid-template-columns:1fr 1fr;gap:6px}.perm-toolbar>b{grid-column:1/-1}.perm-toolbar .btn{width:100%;justify-content:center;white-space:normal;min-height:42px}.permrow select{min-width:145px;font-size:14px}.starters{grid-template-columns:1fr 1fr}.starters .st{min-height:90px;padding:12px 9px}
   .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
   .preview-grid{grid-template-columns:1fr}
@@ -516,10 +519,10 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   [data-theme="dark"] .mobile-nav{background:rgba(19,35,34,.94)}
   .mobile-nav button{min-width:0;border-radius:14px;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9.5px;font-weight:800;transition:.15s}
   .mobile-nav button svg{width:20px;height:20px}.mobile-nav button:active{transform:scale(.93);background:var(--surface-2)}
-  .mobile-nav button.on{background:var(--pine);color:#fff;box-shadow:0 5px 14px rgba(14,58,56,.23)}
-  .mobile-nav .mobile-add{width:48px;height:48px;align-self:center;justify-self:center;border-radius:16px;background:linear-gradient(145deg,var(--brass-2),var(--brass));color:#123b38;box-shadow:0 7px 18px rgba(176,134,64,.3)}
+  .mobile-nav button.on{background:transparent;color:var(--pine);box-shadow:none}
+  .mobile-nav .mobile-add{width:52px;height:52px;align-self:center;justify-self:center;margin-top:-22px;border-radius:50%;background:linear-gradient(145deg,var(--brass-2),var(--brass));color:#fff;box-shadow:0 8px 20px rgba(176,134,64,.36)}
   .mobile-nav .mobile-add span{display:none}.mobile-nav .mobile-add svg{width:23px;height:23px}
-  .welcome{max-width:none}.welcome-hero{background:radial-gradient(circle at 12% 5%,rgba(216,181,115,.23),transparent 33%),linear-gradient(145deg,#07534f,#063633 76%);border:1px solid rgba(216,181,115,.16);box-shadow:0 14px 32px rgba(5,45,42,.18)}
+  .welcome{max-width:none}.welcome-hero{background:radial-gradient(circle at 12% 5%,rgba(216,181,115,.23),transparent 33%),linear-gradient(145deg,#07534f,#063633 76%);border:1px solid rgba(216,181,115,.16);box-shadow:0 14px 32px rgba(5,45,42,.18);min-height:190px}.welcome-stats{position:static;margin:10px 0 0;gap:8px}.welcome-stat{border-radius:13px;padding:13px 8px}.home-banners{margin-top:14px}.date-converter{margin-top:14px}
   .welcome-section-title{align-items:center;margin-inline:4px}.welcome-section-title h3{font-size:16px}.welcome-section-title span{display:none}
   .welcome-pages{padding:3px}.welcome-card,.home-group-head{background:linear-gradient(150deg,#fff,#f7f9f8);border-color:#dce5e2;border-radius:17px;box-shadow:0 7px 18px rgba(5,45,42,.07)}.welcome-card .wi,.home-group-head .wi{background:color-mix(in srgb,var(--acc) 9%,#fff);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 18%,#fff)}
   .empty{padding:36px 15px}
@@ -1321,7 +1324,7 @@ $('#lbx').onclick=e=>{ if(e.target.id==='lbx') closeLB(); };
 ================================================================== */
 const pg=id=>DB.pages.find(p=>p.id===(id||cur));
 const vis=p=>p.cols.filter(c=>!c.hidden);
-const primary=p=>vis(p).find(c=>!['image','gallery','files'].includes(c.type))||vis(p)[0]||p.cols[0];
+const primary=p=>vis(p).find(c=>c.id===p.primaryCol)||vis(p).find(c=>!['image','gallery','files'].includes(c.type))||vis(p)[0]||p.cols[0];
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
@@ -1617,19 +1620,14 @@ function empty(h,t,id,btn){
   return `<div class="empty"><div class="ic">${icon('file',24)}</div><h4>${esc(h)}</h4><p>${esc(t)}</p>
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
-function rankInsigniaHTML(v){
-  const enlisted={'جندي':'━','جندي أول':'⌃','عريف':'⌃⌃','وكيل رقيب':'⌃⌃⌃','رقيب':'⌃⌃⌃⌃','رقيب أول':'✦⌃⌃⌃','رئيس رقباء':'✦⌃⌃⌃⌃'};
-  const officers={'ملازم':'✦','ملازم أول':'✦✦','نقيب':'✦✦✦','رائد':'♛','مقدم':'♛✦','عقيد':'♛✦✦','عميد':'♛✦✦✦','لواء':'♛⚔','فريق':'♛⚔✦','فريق أول':'♛⚔✦✦'};
-  return `<span class="rank-insignia" aria-label="شارة ${esc(v)}">${esc(enlisted[v]||officers[v]||'◆')}</span>`;
-}
 function mobileCardHTML(p,r,n,cols,u){
-  const byId=id=>cols.find(c=>c.id===id),titleCol=byId(p.mobileCardTitle)||primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,cardCols=[...new Set([...chosen,...(p.mobileCardSub&&dept?[dept]:[])])],showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),tone=CVAR[p.mobileCardColor]||CVAR[p.accent]||CVAR.teal;
+  const byId=id=>cols.find(c=>c.id===id),titleCol=byId(p.mobileCardTitle)||primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])],showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),tone=CVAR[p.mobileCardColor]||CVAR[p.accent]||CVAR.teal;
   const cardFields=cardCols.filter(c=>c!==titleCol&&c!==rank&&c!==status).map(c=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join(''),showStatus=status&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
   return `<article class="mobile-record avatar-${p.mobileAvatarSide==='left'?'left':'right'}" style="--card-accent:${tone}">
     ${showStatus?`<div class="mobile-card-status">${cellHTML(p,status,r,false)}</div>`:''}
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
-    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}${rankInsigniaHTML(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${dept&&cardCols.includes(dept)?anyIcon(p.mobileSubIcon||'gear',15):''}${cardFields}</div></div></div>
-    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" data-vw="${r.id}">${ic('eye',20)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" data-ed="${r.id}">${ic('edit',20)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',20)}</button>`:''}</div>
+    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${dept&&cardCols.includes(dept)?anyIcon(p.mobileSubIcon||'gear',15):''}${cardFields}</div></div></div>
+    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" data-vw="${r.id}">${ic('eye',20)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" data-ed="${r.id}">${ic('edit',20)}</button>`:''}${p.showLog!==false?`<button class="iconbtn act-detail" title="تفاصيل" data-log="${r.id}">${ic('file',20)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',20)}</button>`:''}</div>
   </article>`;
 }
 function renderTable(p){
@@ -2097,6 +2095,7 @@ function openPageSet(){
       <div class="fld"><label>نوع العرض</label><select id="ps_view">
         <option value="table" ${p.view==='table'?'selected':''}>جدول فقط</option>
         <option value="letters" ${p.view==='letters'?'selected':''}>جدول + محرر خطابات</option></select></div>
+      <div class="fld"><label>العمود الرئيسي في الصفحة</label><select id="ps_primary">${cardOpts(p.primaryCol,false)}</select><span class="hint">يُستخدم كعنوان السجل في الجدول والبطاقة والبحث.</span></div>
       <div class="fld"><label>رقائق التصفية السريعة</label><select id="ps_chips">
         <option value="" ${!p.chipsCol?'selected':''}>تلقائي</option><option value="none" ${p.chipsCol==='none'?'selected':''}>بدون</option>
         ${sels.map(c=>`<option value="${c.id}" ${p.chipsCol===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
@@ -2109,12 +2108,17 @@ function openPageSet(){
         <label><input type="checkbox" id="ps_search" ${p.showSearch!==false?'checked':''}> البحث</label><label><input type="checkbox" id="ps_import" ${p.showImport!==false?'checked':''}> الاستيراد</label><label><input type="checkbox" id="ps_export" ${p.showExport!==false?'checked':''}> التصدير</label><label><input type="checkbox" id="ps_print" ${p.showPrint!==false?'checked':''}> الطباعة</label>
         <label><input type="checkbox" id="ps_preview" ${p.showPreview!==false?'checked':''}> المعاينة</label><label><input type="checkbox" id="ps_history" ${p.showLog!==false?'checked':''}> سجل الإجراءات</label><label><input type="checkbox" id="ps_edit" ${p.showEdit!==false?'checked':''}> التعديل</label><label><input type="checkbox" id="ps_delete" ${p.showDelete!==false?'checked':''}> الحذف</label></div></div>
       <div class="fld full"><label>الحقول الظاهرة في بطاقة الجوال</label><div class="mobile-col-picker">${p.cols.filter(c=>c.type!=='image').map(c=>`<label><input type="checkbox" data-mobile-col="${c.id}" ${(p.mobileCardCols||[]).includes(c.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div><span class="hint">إذا لم تحدد شيئًا تختار المنظومة أهم الحقول تلقائيًا. «عرض الصفحة» يعرض جميع الحقول بشكل مستقل.</span></div>
-      <div class="fld full"><div class="gnote"><b>تخصيص تصميم البطاقة:</b> تحكم في مكان كل معلومة ولون البطاقة والأيقونة وموضع الصورة.</div></div>
-      <div class="fld"><label>العنوان الرئيسي</label><select id="ps_card_title">${cardOpts(p.mobileCardTitle)}</select></div>
-      <div class="fld"><label>حقل الرتبة</label><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
-      <div class="fld"><label>حقل الحالة</label><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
-      <div class="fld"><label>المعلومة أسفل الرتبة</label><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
-      <div class="fld"><label>موضع الصورة</label><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>يمين البطاقة</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>يسار البطاقة</option></select></div>
+      <div class="fld full"><div class="gnote"><b>خريطة تصميم البطاقة:</b> كل قائمة أدناه تمثل مكانًا ظاهرًا داخل البطاقة.</div></div>
+      <div class="fld full"><div class="card-layout-settings">
+        <div class="card-slot"><b>أعلى اليمين</b><span>الصورة والتحديد</span><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>الصورة يمينًا</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>الصورة يسارًا</option></select></div>
+        <div class="card-slot featured"><b>منتصف البطاقة — العنوان</b><span>الاسم أو الرقم الرئيسي</span><select id="ps_card_title">${cardOpts(p.mobileCardTitle)}</select></div>
+        <div class="card-slot"><b>أعلى اليسار</b><span>شارة الحالة</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
+        <div class="card-slot"><b>المنتصف الأول</b><span>الرتبة</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
+        <div class="card-slot"><b>المنتصف الثاني</b><span>معلومة إضافية</span><select id="ps_card_mid1">${cardOpts((p.mobileCardMiddle||[])[0])}</select></div>
+        <div class="card-slot"><b>المنتصف الثالث</b><span>معلومة إضافية</span><select id="ps_card_mid2">${cardOpts((p.mobileCardMiddle||[])[1])}</select></div>
+        <div class="card-slot"><b>أسفل المحتوى</b><span>الوحدة أو القسم</span><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
+        <div class="card-slot"><b>أسفل إضافي</b><span>معلومة اختيارية</span><select id="ps_card_mid3">${cardOpts((p.mobileCardMiddle||[])[2])}</select></div>
+      </div></div>
       <div class="fld full"><label>لون البطاقة</label><div class="swatches" id="psCardColors">${['teal','gold','green','blue','red','amber','plum'].map(k=>`<button type="button" class="sw ${(p.mobileCardColor||p.accent)===k?'on':''}" data-card-color="${k}" style="background:${CVAR[k]}"></button>`).join('')}</div></div>
       <div class="fld full"><label>أيقونة المعلومة السفلية</label><div class="iconpick" id="psCardIcons">${['gear','users','folder','shield','star','file','clipboard','phone'].map(k=>`<button type="button" class="ip ${(p.mobileSubIcon||'gear')===k?'on':''}" data-card-icon="${k}">${anyIcon(k,17)}</button>`).join('')}</div></div>
       ${p.view==='letters'?`
@@ -2147,12 +2151,12 @@ function openPageSet(){
     cur=null; save(); render(); toast('حُذفت الصفحة'); });
   $('#psSave').onclick=()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
-    p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;
+    p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;p.primaryCol=$('#ps_primary').value;
     p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
     p.mobileCardCols=Array.from(document.querySelectorAll('[data-mobile-col]:checked')).map(x=>x.dataset.mobileCol);
-    p.mobileCardTitle=$('#ps_card_title').value;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardColor=cardColor;p.mobileSubIcon=cardIcon;
+    p.mobileCardTitle=$('#ps_card_title').value;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value,$('#ps_card_mid2').value,$('#ps_card_mid3').value].filter(Boolean);p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardColor=cardColor;p.mobileSubIcon=cardIcon;
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
     if($('#ps_tgt')) p.targetPage=$('#ps_tgt').value;
     if($('#ps_photo')) p.showPhoto=$('#ps_photo').checked;
