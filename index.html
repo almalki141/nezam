@@ -344,6 +344,8 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 .lbx .cls{position:absolute;top:20px;left:20px;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.13);color:#fff;display:grid;place-items:center}
 .lbx .cap{position:absolute;bottom:20px;color:#C9D9D5;font-size:13.5px;font-weight:600}
 .cmrow{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--surface-2)}
+.cmrow>summary,.settings-section>summary{list-style:none;cursor:pointer}.cmrow>summary::-webkit-details-marker,.settings-section>summary::-webkit-details-marker{display:none}
+.cm-summary{display:flex;align-items:center;gap:9px;padding:3px;font-size:13px;font-weight:800;color:var(--ink)}.cm-summary:before{content:'⌄';width:25px;height:25px;border-radius:7px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--pine);transition:.16s}.cmrow:not([open]) .cm-summary:before{transform:rotate(90deg)}.cm-summary small{margin-inline-start:auto;color:var(--ink-3);font-size:10.5px;font-weight:700}.cm-editor{padding-top:10px;margin-top:8px;border-top:1px solid var(--line)}
 .cmtop{display:grid;grid-template-columns:auto 1fr 180px auto;gap:8px;align-items:center}
 .cmmove{display:flex;flex-direction:column;gap:2px}
 .cmmove button{width:22px;height:17px;display:grid;place-items:center;border-radius:4px;color:var(--ink-3);font-size:9px;background:var(--surface);border:1px solid var(--line)}
@@ -368,6 +370,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 .iconpick{display:flex;gap:6px;flex-wrap:wrap}
 .card-layout-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px;border-radius:15px;background:var(--surface-2);border:1px solid var(--line)}
 .card-slot{padding:11px;border-radius:12px;background:var(--surface);border:1px solid var(--line);min-width:0}.card-slot.featured{border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.08)}.card-slot b,.card-slot span{display:block}.card-slot b{font-size:12px;color:var(--ink)}.card-slot span{font-size:10px;color:var(--ink-3);margin:2px 0 7px}.card-slot select{width:100%;min-width:0}
+.settings-section{grid-column:1/-1;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}.settings-section>summary{display:flex;align-items:center;gap:9px;padding:13px 15px;background:var(--surface-2);color:var(--ink);font-size:13.5px;font-weight:900}.settings-section>summary:before{content:'⌄';width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--pine);transition:.16s}.settings-section:not([open])>summary:before{transform:rotate(90deg)}.settings-content{padding:14px}.settings-content.grid2{display:grid}
 .ip{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink-2)}
 .ip.on{background:var(--pine);color:#fff;border-color:var(--pine)}
 .starters{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
@@ -513,6 +516,8 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .m-body:has(.utable){overflow-x:visible}.utable{min-width:0;display:block}.utable thead{display:none}.utable tbody{display:grid;gap:9px}.utable tr{display:block;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}.utable td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid var(--line-2)}.utable td::before{content:attr(data-label);font-size:10.5px;color:var(--ink-3);font-weight:800}.utable td:last-child{border:0;padding-top:10px}.utable td.acts{width:auto}.utable td.acts .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line);margin-inline-start:5px}
   #pageOrder .frow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:7px;padding:11px;border:1px solid var(--line);border-radius:13px;margin-bottom:8px;background:var(--surface-2)}#pageOrder .frow>b{min-width:0!important;align-self:center}#pageOrder .frow>input{grid-column:1/-1;width:100%;min-height:44px;font-size:16px}#pageOrder .frow .fx{grid-column:3;grid-row:1;display:flex}#pageOrder .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line)}
   .mobile-col-picker{display:grid;grid-template-columns:1fr;gap:6px}.mobile-col-picker label,.permrow{min-height:44px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);display:flex;align-items:center;gap:8px}.mobile-col-picker input{width:19px!important;height:19px}
+  .settings-section{border-radius:12px}.settings-section>summary{min-height:52px;padding:11px 12px;font-size:13px}.settings-content{padding:11px}.settings-content.grid2{grid-template-columns:1fr;gap:11px}
+  .cmrow{padding:9px;border-radius:12px;background:var(--surface)}.cm-summary{min-height:42px}.cm-editor{padding-top:9px}.cmtop{grid-template-columns:38px minmax(0,1fr) 44px;gap:7px}.cmtop>select{grid-column:2/-1}.cmtop>.iconbtn{grid-column:3;grid-row:1}.cmmove{grid-row:1/3}.cmmove button{width:36px;height:25px}.cmflags{display:grid;grid-template-columns:1fr 1fr;gap:6px}.cmflags label{min-height:40px;padding:7px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}.cmopt{grid-template-columns:1fr auto}.cmopt select{grid-column:1}.cmopt .iconbtn{grid-column:2;grid-row:1/3}
   .card-layout-settings{grid-template-columns:1fr 1fr;padding:8px;gap:7px}.card-slot{padding:9px}.card-slot select{font-size:16px;min-height:42px}.card-slot.featured{grid-column:1/-1}
   .perm-toolbar{display:grid!important;grid-template-columns:1fr 1fr;gap:6px}.perm-toolbar>b{grid-column:1/-1}.perm-toolbar .btn{width:100%;justify-content:center;white-space:normal;min-height:42px}.permrow select{min-width:145px;font-size:14px}.starters{grid-template-columns:1fr 1fr}.starters .st{min-height:90px;padding:12px 9px}
   .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
@@ -1647,7 +1652,7 @@ function mobileCardHTML(p,r,n,cols,u){
 function renderTable(p){
   const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
   u.picked=(u.picked||[]).filter(id=>p.rows.some(r=>r.id===id));
-  const pageSize=matchMedia('(max-width:600px)').matches?3:Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
+  const pageSize=matchMedia('(max-width:600px)').matches?20:Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
   u.page=Math.min(Math.max(1,Number(u.page)||1),pages);
   const first=(u.page-1)*pageSize, rows=allRows.slice(first,first+pageSize);
   const seg=p.view==='letters'?`<div class="seg"><button class="on">جدول</button><button id="toLetter">خطاب</button></div>`:'';
@@ -2021,7 +2026,7 @@ let CD=[];
 function openCols(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
   CD=JSON.parse(JSON.stringify(pg().cols));
-  modal('التحكم بأعمدة — '+esc(pg().name),`<div id="cmBox"></div>
+  modal('التحكم بأعمدة — '+esc(pg().name),`<div class="gnote"><b>${CD.length} عمودًا</b> — اضغط اسم أي عمود لفتح إعداداته، ويمكنك تحريكه أو تغيير نوعه أو إخفاءه.</div><div id="cmBox"></div>
     <button class="btn ghost" id="cmAdd" style="width:100%;justify-content:center;border-style:dashed">${ic('plus')} إضافة عمود</button>`,
     `<button class="btn primary" id="cmSave">حفظ الأعمدة</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'lg');
   drawCM();
@@ -2042,7 +2047,7 @@ function cmSync(){ CD.forEach((c,i)=>{ const g=k=>document.getElementById('cm_'+
     const oc=document.getElementById(`cm_oc_${i}_${j}`); if(oc) o.color=oc.value; }); }); }
 function drawCM(){
   const pid=(CD.find(c=>!c.hidden&&!['image','gallery','files'].includes(c.type))||CD[0]||{}).id;
-  $('#cmBox').innerHTML=CD.map((c,i)=>`<div class="cmrow">
+  $('#cmBox').innerHTML=CD.map((c,i)=>`<details class="cmrow" ${i===0?'open':''}><summary class="cm-summary"><span>${esc(c.name||'عمود جديد')}</span><small>${esc(((TYPES.find(x=>x[0]===c.type)||[])[1])||c.type)}</small></summary><div class="cm-editor">
     <div class="cmtop">
       <div class="cmmove"><button data-up="${i}" ${i===0?'disabled':''}>▲</button><button data-dn="${i}" ${i===CD.length-1?'disabled':''}>▼</button></div>
       <div><input id="cm_n_${i}" value="${esc(c.name)}" placeholder="اسم العمود">${c.id===pid?'<span class="cmprim">العمود الرئيسي</span>':''}</div>
@@ -2062,7 +2067,7 @@ function drawCM(){
       <label><input type="checkbox" id="cm_q_${i}" ${c.required?'checked':''}> حقل إلزامي</label>
       <label><input type="checkbox" id="cm_u_${i}" ${c.unique?'checked':''}> منع تكرار القيمة</label>
       ${c.type==='files'?`<label><input type="checkbox" id="cm_d_${i}" ${c.allowDownload!==false?'checked':''}> السماح بتنزيل الملفات</label>`:''}
-    </div></div>`).join('')||`<p style="color:var(--ink-3);font-size:13.5px">لا توجد أعمدة.</p>`;
+    </div></div></details>`).join('')||`<p style="color:var(--ink-3);font-size:13.5px">لا توجد أعمدة.</p>`;
   const R=f=>{cmSync();f();drawCM();}, B=(s,fn)=>$('#cmBox').querySelectorAll(s).forEach(fn);
   B('[data-up]',b=>b.onclick=()=>R(()=>{const i=+b.dataset.up;[CD[i-1],CD[i]]=[CD[i],CD[i-1]];}));
   B('[data-dn]',b=>b.onclick=()=>R(()=>{const i=+b.dataset.dn;[CD[i+1],CD[i]]=[CD[i],CD[i+1]];}));
@@ -2112,6 +2117,7 @@ function openPageSet(){
   const cardCols=p.cols.filter(c=>!['image','gallery','files'].includes(c.type)),cardOpts=(selected,auto=true)=>`${auto?'<option value="">تلقائي</option>':''}${cardCols.map(c=>`<option value="${c.id}" ${selected===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}`;
   modal('إعدادات صفحة — '+esc(p.name),`
     <div class="grid2">
+      <details class="settings-section" open><summary>١ · معلومات الصفحة</summary><div class="settings-content grid2">
       <div class="fld"><label>اسم الصفحة <i>*</i></label><input id="ps_name" value="${esc(p.name)}"></div>
       <div class="fld"><label>الوصف</label><input id="ps_sub" value="${esc(p.sub||'')}"></div>
       <div class="fld"><label>مجموعة الصفحة</label><input id="ps_group" value="${esc(p.group||'')}" list="pageGroups" placeholder="مثال: شؤون الأفراد"><datalist id="pageGroups">${uniq(DB.pages.map(x=>x.group)).map(g=>`<option value="${esc(g)}">`).join('')}</datalist><span class="hint">الصفحات التي تحمل اسم المجموعة نفسه تظهر تحت زر واحد قابل للفتح والإغلاق.</span></div>
@@ -2119,6 +2125,8 @@ function openPageSet(){
         ${Object.keys(ICONS).map(k=>`<button type="button" class="ip ${p.icon===k?'on':''}" data-ico="${k}">${icon(k,17)}</button>`).join('')}</div></div>
       <div class="fld full"><label>لون الصفحة</label><div class="swatches" id="psCols">
         ${['teal','gold','green','blue','red','amber','plum'].map(k=>`<button type="button" class="sw ${p.accent===k?'on':''}" data-acc="${k}" style="background:${CVAR[k]}"></button>`).join('')}</div></div>
+      </div></details>
+      <details class="settings-section"><summary>٢ · العرض والأدوات</summary><div class="settings-content grid2">
       <div class="fld"><label>نوع العرض</label><select id="ps_view">
         <option value="table" ${p.view==='table'?'selected':''}>جدول فقط</option>
         <option value="letters" ${p.view==='letters'?'selected':''}>جدول + محرر خطابات</option></select></div>
@@ -2134,20 +2142,21 @@ function openPageSet(){
       <div class="fld full"><label>الأدوات الظاهرة في الصفحة</label><div class="cmflags">
         <label><input type="checkbox" id="ps_search" ${p.showSearch!==false?'checked':''}> البحث</label><label><input type="checkbox" id="ps_import" ${p.showImport!==false?'checked':''}> الاستيراد</label><label><input type="checkbox" id="ps_export" ${p.showExport!==false?'checked':''}> التصدير</label><label><input type="checkbox" id="ps_print" ${p.showPrint!==false?'checked':''}> الطباعة</label>
         <label><input type="checkbox" id="ps_preview" ${p.showPreview!==false?'checked':''}> المعاينة</label><label><input type="checkbox" id="ps_history" ${p.showLog!==false?'checked':''}> سجل الإجراءات</label><label><input type="checkbox" id="ps_edit" ${p.showEdit!==false?'checked':''}> التعديل</label><label><input type="checkbox" id="ps_delete" ${p.showDelete!==false?'checked':''}> الحذف</label></div></div>
-      <div class="fld full"><label>الحقول الظاهرة في بطاقة الجوال</label><div class="mobile-col-picker">${p.cols.filter(c=>c.type!=='image').map(c=>`<label><input type="checkbox" data-mobile-col="${c.id}" ${(p.mobileCardCols||[]).includes(c.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div><span class="hint">إذا لم تحدد شيئًا تختار المنظومة أهم الحقول تلقائيًا. «عرض الصفحة» يعرض جميع الحقول بشكل مستقل.</span></div>
-      <div class="fld full"><div class="gnote"><b>خريطة تصميم البطاقة:</b> كل قائمة أدناه تمثل مكانًا ظاهرًا داخل البطاقة.</div></div>
+      </div></details>
+      <details class="settings-section"><summary>٣ · بطاقة الجوال</summary><div class="settings-content grid2">
+      <div class="fld full"><div class="gnote"><b>رتّب البطاقة بسهولة:</b> اختر المعلومة المناسبة لكل موضع. تعرض البطاقة أهم المعلومات فقط لتبقى صغيرة وواضحة.</div></div>
       <div class="fld full"><div class="card-layout-settings">
         <div class="card-slot"><b>أعلى اليمين</b><span>الصورة والتحديد</span><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>الصورة يمينًا</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>الصورة يسارًا</option></select></div>
         <div class="card-slot featured"><b>منتصف البطاقة — العنوان</b><span>الاسم أو الرقم الرئيسي</span><select id="ps_card_title">${cardOpts(p.mobileCardTitle)}</select></div>
         <div class="card-slot"><b>أعلى اليسار</b><span>شارة الحالة</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
         <div class="card-slot"><b>المنتصف الأول</b><span>الرتبة</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
-        <div class="card-slot"><b>المنتصف الثاني</b><span>معلومة إضافية</span><select id="ps_card_mid1">${cardOpts((p.mobileCardMiddle||[])[0])}</select></div>
-        <div class="card-slot"><b>المنتصف الثالث</b><span>معلومة إضافية</span><select id="ps_card_mid2">${cardOpts((p.mobileCardMiddle||[])[1])}</select></div>
+        <div class="card-slot"><b>المعلومة الأساسية</b><span>معلومة إضافية واحدة</span><select id="ps_card_mid1">${cardOpts((p.mobileCardMiddle||[])[0])}</select></div>
         <div class="card-slot"><b>أسفل المحتوى</b><span>الوحدة أو القسم</span><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
-        <div class="card-slot"><b>أسفل إضافي</b><span>معلومة اختيارية</span><select id="ps_card_mid3">${cardOpts((p.mobileCardMiddle||[])[2])}</select></div>
       </div></div>
       <div class="fld full"><label>لون البطاقة</label><div class="swatches" id="psCardColors">${['teal','gold','green','blue','red','amber','plum'].map(k=>`<button type="button" class="sw ${(p.mobileCardColor||p.accent)===k?'on':''}" data-card-color="${k}" style="background:${CVAR[k]}"></button>`).join('')}</div></div>
       <div class="fld full"><label>أيقونة المعلومة السفلية</label><div class="iconpick" id="psCardIcons">${['gear','users','folder','shield','star','file','clipboard','phone'].map(k=>`<button type="button" class="ip ${(p.mobileSubIcon||'gear')===k?'on':''}" data-card-icon="${k}">${anyIcon(k,17)}</button>`).join('')}</div></div>
+      </div></details>
+      <details class="settings-section"><summary>٤ · خيارات متقدمة</summary><div class="settings-content grid2">
       ${p.view==='letters'?`
       <div class="fld"><label>مصدر بيانات التعبئة</label><select id="ps_peo">
         ${DB.pages.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.peoplePage===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
@@ -2159,8 +2168,10 @@ function openPageSet(){
         <button class="btn ghost sm" id="psDn" ${i===DB.pages.length-1?'disabled':''}>▼ تأخير</button>
         <button class="btn ghost sm" id="psDup">نسخ الصفحة</button><div class="spacer"></div>
         <button class="btn danger sm" id="psDel" ${DB.pages.length<2?'disabled':''}>حذف الصفحة</button></div></div>
+      </div></details>
     </div>`,
     `<button class="btn primary" id="psSave">حفظ الإعدادات</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
+  const sections=[...document.querySelectorAll('.settings-section')];sections.forEach(d=>d.ontoggle=()=>{if(d.open)sections.forEach(x=>{if(x!==d)x.open=false})});
   let ico=p.icon, acc=p.accent,cardColor=p.mobileCardColor||p.accent,cardIcon=p.mobileSubIcon||'gear';
   $('#psIcons').querySelectorAll('[data-ico]').forEach(b=>b.onclick=()=>{ico=b.dataset.ico;
     $('#psIcons').querySelectorAll('.ip').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
@@ -2182,8 +2193,8 @@ function openPageSet(){
     p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
-    p.mobileCardCols=Array.from(document.querySelectorAll('[data-mobile-col]:checked')).map(x=>x.dataset.mobileCol);
-    p.mobileCardTitle=$('#ps_card_title').value;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value,$('#ps_card_mid2').value,$('#ps_card_mid3').value].filter(Boolean);p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardColor=cardColor;p.mobileSubIcon=cardIcon;
+    p.mobileCardCols=[];
+    p.mobileCardTitle=$('#ps_card_title').value;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value].filter(Boolean);p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardColor=cardColor;p.mobileSubIcon=cardIcon;
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
     if($('#ps_tgt')) p.targetPage=$('#ps_tgt').value;
     if($('#ps_photo')) p.showPhoto=$('#ps_photo').checked;
