@@ -210,7 +210,7 @@ select.filter{padding:10px 12px;border:1px solid var(--line);background:var(--su
 .reg-head h3{margin:0;font-size:14.5px;font-weight:700}
 .reg-head .meta{margin-inline-start:auto;font-size:12px;color:#9DBAB3;font-weight:600}
 .tablewrap{overflow-x:auto}
-.mobile-cards,.mobile-select-all{display:none}
+.mobile-cards,.mobile-select-all,.mobile-view-toggle{display:none}
 table{width:100%;border-collapse:collapse}
 thead th{background:var(--surface-2);color:var(--ink-2);font-size:12.5px;font-weight:700;text-align:right;
   padding:11px 13px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -444,6 +444,8 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .tools .spacer{display:none}.tools>.btn{flex:1;justify-content:center;min-width:calc(50% - 4px);padding:9px 8px;font-size:12.5px}
   .tools>.btn,.tools>.seg{min-width:0;width:100%;margin:0}
   .view-switch{display:none!important}
+  .mobile-view-toggle{display:flex;grid-column:1/-1;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:4px;gap:4px}
+  .mobile-view-toggle button{flex:1;min-height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--ink-3);font-size:12px;font-weight:800}.mobile-view-toggle button.on{background:var(--pine);color:#fff;box-shadow:0 4px 12px rgba(14,58,56,.18)}
   .view-switch button{flex:1;padding:7px 5px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink-3)}
   .view-switch button.on{background:var(--pine);color:#fff}
   .seg{width:100%}.seg button{flex:1}
@@ -456,11 +458,13 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .mobile-record .ava{width:54px;height:54px;border-radius:50%;font-size:17px;background:linear-gradient(145deg,var(--gold-bg),var(--surface-2));border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
   .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 6px;font-size:16px;line-height:1.45;color:var(--ink)}
   .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}
+  .mobile-card-field{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line)}.mobile-card-field small{font-size:9px;color:var(--ink-3)}.mobile-card-field b{font-size:10.5px;color:var(--ink)}
   .mobile-record-sub{margin-top:6px;color:var(--ink-3);font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center}
   .mobile-record-pick{align-self:start}.mobile-record-pick input{width:21px;height:21px;accent-color:var(--pine);cursor:pointer}
   .mobile-record-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding-top:11px}
   .mobile-record-actions .iconbtn{width:100%;height:51px;padding:5px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:10px;font-weight:800;color:var(--pine)}
   .mobile-record-actions .iconbtn::after{content:attr(title)}.mobile-record-actions .iconbtn.del{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
+  .mobile-record-details{display:none;padding-top:12px;grid-template-columns:1fr 1fr;gap:7px}.mobile-details .mobile-record-details{display:grid}.mobile-record-details>div{padding:9px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface)}.mobile-record-details span{display:block;font-size:9.5px;color:var(--ink-3);font-weight:700;margin-bottom:4px}.mobile-record-details b{font-size:11.5px;color:var(--ink);overflow-wrap:anywhere}.mobile-record-details .thumb{width:36px;height:36px}
   .mobile-select-all{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:#fff}.mobile-select-all input{width:18px;height:18px;accent-color:var(--brass)}
   .tablewrap tbody{display:grid;gap:9px}
   .tablewrap tbody tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 8px;box-shadow:var(--shadow-sm);overflow:hidden}
@@ -488,7 +492,11 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .sheetwrap{padding:8px;max-height:none}.sheet{padding:22px 18px;font-size:15px;line-height:1.9}
   .overlay{padding:0;align-items:flex-end}.modal,.modal.sm,.modal.lg{max-width:none;border-radius:16px 16px 0 0;max-height:94dvh}
   .m-head{padding:13px 15px}.m-body{padding:15px;max-height:calc(100dvh - 132px)}.m-foot{padding:11px 15px;padding-bottom:max(11px,env(safe-area-inset-bottom))}
-  .m-foot .btn{flex:1;justify-content:center}.utable{min-width:620px}.m-body:has(.utable){overflow-x:auto}
+  .m-head{position:sticky;top:0;z-index:3;background:var(--surface)}.m-foot{position:sticky;bottom:0;z-index:3}.m-foot .btn{flex:1;justify-content:center;min-height:46px}
+  .m-body:has(.utable){overflow-x:visible}.utable{min-width:0;display:block}.utable thead{display:none}.utable tbody{display:grid;gap:9px}.utable tr{display:block;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}.utable td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid var(--line-2)}.utable td::before{content:attr(data-label);font-size:10.5px;color:var(--ink-3);font-weight:800}.utable td:last-child{border:0;padding-top:10px}.utable td.acts{width:auto}.utable td.acts .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line);margin-inline-start:5px}
+  #pageOrder .frow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:7px;padding:11px;border:1px solid var(--line);border-radius:13px;margin-bottom:8px;background:var(--surface-2)}#pageOrder .frow>b{min-width:0!important;align-self:center}#pageOrder .frow>input{grid-column:1/-1;width:100%;min-height:44px;font-size:16px}#pageOrder .frow .fx{grid-column:3;grid-row:1;display:flex}#pageOrder .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line)}
+  .mobile-col-picker{display:grid;grid-template-columns:1fr;gap:6px}.mobile-col-picker label,.permrow{min-height:44px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);display:flex;align-items:center;gap:8px}.mobile-col-picker input{width:19px!important;height:19px}
+  .perm-toolbar{display:grid!important;grid-template-columns:1fr 1fr;gap:6px}.perm-toolbar>b{grid-column:1/-1}.perm-toolbar .btn{width:100%;justify-content:center;white-space:normal;min-height:42px}.permrow select{min-width:145px;font-size:14px}.starters{grid-template-columns:1fr 1fr}.starters .st{min-height:90px;padding:12px 9px}
   .drop{align-items:flex-start}.drop .pv{width:62px;height:62px}
   .preview-grid{grid-template-columns:1fr}
   .toasts{left:10px;right:10px;bottom:calc(78px + env(safe-area-inset-bottom))}.toast{max-width:none;width:100%}
@@ -1301,7 +1309,8 @@ const primary=p=>vis(p).find(c=>!['image','gallery','files'].includes(c.type))||
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'letter',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];return ui[cur]; }
+const DEFAULT_AVATAR='default-soldier-avatar.png';
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'letter',mobileView:'cards',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];ui[cur].mobileView=ui[cur].mobileView||'cards';return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1309,7 +1318,8 @@ const rowTitle=(p,r)=>r.v[primary(p).id]||'(بدون عنوان)';
 const linkPage=c=>DB.pages.find(x=>x.id===c.link)||DB.pages[0];
 function subLine(p,r){ const c=vis(p).find(x=>x.type==='select')||vis(p).filter(x=>x.type==='text')[1]; return c?cellText(p,c,r):''; }
 function avaHTML(p,r,txt){ const pc=photoCol(p), src=pc?r.v[pc.id]:'';
-  return `<div class="ava">${src?`<img src="${src}" alt="" data-img="${p.id}|${r.id}|${pc.id}">`:esc(initials(txt))}</div>`; }
+  const fallback=p.avatars||/أفراد|تشكيل|القوة/.test(p.name||'');
+  return `<div class="ava">${src?`<img src="${src}" alt="" data-img="${p.id}|${r.id}|${pc.id}">`:(fallback?`<img src="${DEFAULT_AVATAR}" alt="صورة عسكري افتراضية">`:esc(initials(txt)))}</div>`; }
 function cellText(p,c,r){ const v=r.v[c.id];
   if(c.type==='image') return v?'صورة':'';
   if(c.type==='gallery') return (Array.isArray(v)?v:[]).length?((v||[]).length+' صور'):'';
@@ -1557,6 +1567,7 @@ function toolsHTML(p,extra){
     ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>
       ${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
     <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
+    <div class="mobile-view-toggle"><button data-mobile-view="cards" class="${u.mobileView==='cards'?'on':''}">${icon('users',14)} بطاقات</button><button data-mobile-view="details" class="${u.mobileView==='details'?'on':''}">${ic('file',14)} تفاصيل</button></div>
     <div class="spacer"></div>${extra||''}
     ${p.showImport!==false&&canImport(p)?`<button class="btn ghost" id="bImp">${ic('up')} استيراد Excel</button>`:''}
     ${p.showExport!==false&&canExport()?`<button class="btn ghost" id="bXls">${ic('xls')} تصدير Excel</button>`:''}
@@ -1570,6 +1581,7 @@ function bindTools(p){
   };
   document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;u.page=1;refreshBody();});
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{u.display=b.dataset.view;refreshBody();});
+  document.querySelectorAll('[data-mobile-view]').forEach(b=>b.onclick=()=>{u.mobileView=b.dataset.mobileView;refreshBody();});
   document.querySelectorAll('[data-sc]').forEach(s=>s.onchange=()=>{const x=u.summary[+s.dataset.sc];x.c=s.value;x.v='';refreshBody();});
   document.querySelectorAll('[data-sv]').forEach(s=>s.onchange=()=>{u.summary[+s.dataset.sv].v=s.value;refreshBody();});
   const a=$('#bAdd'); if(a) a.onclick=()=>openRow();
@@ -1587,10 +1599,12 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const title=rowTitle(p,r),status=cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),rank=cols.find(c=>c.type==='select'&&c!==status),dept=cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type));
+  const title=rowTitle(p,r),status=cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),rank=cols.find(c=>c.type==='select'&&c!==status),dept=cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,detailCols=cols.filter(c=>c!==photoCol(p));
+  const cardFields=chosen.filter(c=>c!==primary(p)).map(c=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join('');
   return `<article class="mobile-record">
-    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4><div class="mobile-record-tags">${rank?cellHTML(p,rank,r,false):''}${status?cellHTML(p,status,r,false):''}</div>${dept?`<div class="mobile-record-sub">${icon(p.icon,13)} ${esc(cellText(p,dept,r)||dept.name)}</div>`:''}</div>
+    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4><div class="mobile-record-tags">${cardFields}</div></div>
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:`<span class="dim">${n}</span>`}</div>
+    <div class="mobile-record-details">${detailCols.map(c=>`<div><span>${esc(c.name)}</span><b>${cellHTML(p,c,r,false)}</b></div>`).join('')}</div>
     <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn" title="عرض" data-vw="${r.id}">${ic('eye',18)}</button>`:''}${p.showLog!==false?`<button class="iconbtn" title="التفاصيل" data-log="${r.id}">${ic('file',18)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit',18)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',18)}</button>`:''}</div>
   </article>`;
 }
@@ -1627,7 +1641,7 @@ function renderTable(p){
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
   const mobileCards=rows.length?`<div class="mobile-cards">${rows.map((r,i)=>mobileCardHTML(p,r,first+i+1,cols,u)).join('')}</div>`:'';
-  $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
+  $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register mobile-${u.mobileView} view-${u.display==='compact'?'compact':'detail'}">
     <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')?`<label class="mobile-select-all"><input type="checkbox" id="mobileSelectAll" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}> الكل</label>`:''}${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${mobileCards}${pager}</div>`;
   bindTools(p); bindCells();
   const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
@@ -2069,6 +2083,7 @@ function openPageSet(){
       <div class="fld full"><label>الأدوات الظاهرة في الصفحة</label><div class="cmflags">
         <label><input type="checkbox" id="ps_search" ${p.showSearch!==false?'checked':''}> البحث</label><label><input type="checkbox" id="ps_import" ${p.showImport!==false?'checked':''}> الاستيراد</label><label><input type="checkbox" id="ps_export" ${p.showExport!==false?'checked':''}> التصدير</label><label><input type="checkbox" id="ps_print" ${p.showPrint!==false?'checked':''}> الطباعة</label>
         <label><input type="checkbox" id="ps_preview" ${p.showPreview!==false?'checked':''}> المعاينة</label><label><input type="checkbox" id="ps_history" ${p.showLog!==false?'checked':''}> سجل الإجراءات</label><label><input type="checkbox" id="ps_edit" ${p.showEdit!==false?'checked':''}> التعديل</label><label><input type="checkbox" id="ps_delete" ${p.showDelete!==false?'checked':''}> الحذف</label></div></div>
+      <div class="fld full"><label>الحقول الظاهرة في بطاقة الجوال</label><div class="mobile-col-picker">${p.cols.filter(c=>c.type!=='image').map(c=>`<label><input type="checkbox" data-mobile-col="${c.id}" ${(p.mobileCardCols||[]).includes(c.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div><span class="hint">إذا لم تحدد شيئًا تختار المنظومة أهم الحقول تلقائيًا. العرض التفصيلي يُظهر جميع الحقول.</span></div>
       ${p.view==='letters'?`
       <div class="fld"><label>مصدر بيانات التعبئة</label><select id="ps_peo">
         ${DB.pages.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.peoplePage===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
@@ -2101,6 +2116,7 @@ function openPageSet(){
     p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
+    p.mobileCardCols=Array.from(document.querySelectorAll('[data-mobile-col]:checked')).map(x=>x.dataset.mobileCol);
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
     if($('#ps_tgt')) p.targetPage=$('#ps_tgt').value;
     if($('#ps_photo')) p.showPhoto=$('#ps_photo').checked;
@@ -2217,11 +2233,11 @@ function openUsers(){
   const rows=(DB.users||[]).map(u=>{
     const vu=VAULT.users.find(x=>x.id===u.id)||{};
     const np=u.role==='admin'?'كل الصفحات':Object.values(u.perms||{}).filter(x=>x&&x!=='none').length+' صفحة';
-    return `<tr><td><b>${esc(u.name)}</b><br><span class="dim" style="font-size:11.5px">${esc(vu.email||'')}</span></td>
-      <td><span class="badge ${u.role==='admin'?'b-gold':'b-blue'}">${u.role==='admin'?'مدير':'موظف'}</span></td>
-      <td>${esc(np)}</td>
-      <td>${vu.active===false?'<span class="badge b-red">موقوف</span>':(!vu.activatedAt&&u.id!==ME.id?'<span class="badge b-amber">بانتظار التفعيل</span>':'<span class="badge b-green">نشط</span>')}</td>
-      <td class="acts">
+    return `<tr><td data-label="المستخدم"><b>${esc(u.name)}</b><br><span class="dim" style="font-size:11.5px">${esc(vu.email||'')}</span></td>
+      <td data-label="الدور"><span class="badge ${u.role==='admin'?'b-gold':'b-blue'}">${u.role==='admin'?'مدير':'موظف'}</span></td>
+      <td data-label="الصلاحيات">${esc(np)}</td>
+      <td data-label="الحالة">${vu.active===false?'<span class="badge b-red">موقوف</span>':(!vu.activatedAt&&u.id!==ME.id?'<span class="badge b-amber">بانتظار التفعيل</span>':'<span class="badge b-green">نشط</span>')}</td>
+      <td class="acts" data-label="الإجراءات">
         <button class="iconbtn" data-eu="${u.id}" title="الصلاحيات">${ic('gear',14)}</button>
         ${u.id!==ME.id?`<button class="iconbtn" data-rp="${u.id}" title="إصدار كلمة مؤقتة جديدة">${ic('lock',14)}</button>`:''}
         ${u.id!==ME.id?`<button class="iconbtn del" data-du="${u.id}" title="حذف">${ic('trash',14)}</button>`:''}
