@@ -998,8 +998,8 @@ async function doLogin(){
     if(!ME){ ME={id:u.id,name:u.email,role:'admin',perms:{},canExport:true,canImport:true}; DB.users=DB.users||[]; DB.users.push(ME); }
     if(firstActivation&&ME.role!=='admin') ME.mustChangePassword=true;
     audit('دخول','تسجيل دخول ناجح');
-    await persist();
     enterApp();
+    save();
     if(ME.mustChangePassword) setTimeout(()=>openChangePw(true,pw),80);
   }catch(e){
     if(u){ u.fails=(u.fails||0)+1;
@@ -1053,11 +1053,13 @@ function audit(act,detail){ DB.audit=DB.audit||[]; DB.audit.unshift({at:nowTs(),
    5) الحفظ التلقائي
 ================================================================== */
 function setSave(t,w,busy){ $('#saveTxt').textContent=t; $('#saveDot').className='dot'+(w?' warn':(busy?' busy':'')); }
-function save(){ clearTimeout(saveTimer); setSave('جارٍ الحفظ…',false,true); saveTimer=setTimeout(persist,250); }
+let saveVersion=0,savedVersion=0;
+function save(){ saveVersion++;clearTimeout(saveTimer); setSave('جارٍ الحفظ…',false,true); saveTimer=setTimeout(persist,250); }
 let persisting=false, pendingAgain=false;
 async function persist(){
   if(!DEK||!DB) return false;
   if(persisting){ pendingAgain=true; return false; }
+  const targetVersion=saveVersion;
   persisting=true;
   try{
     const remote=await vaultRead();
@@ -1068,6 +1070,7 @@ async function persist(){
     VAULT.data=await encObj(DEK,DB);
     VAULT.rev=(VAULT.rev||0)+1; VAULT.updatedAt=nowTs();
     await vaultWrite(VAULT); MYREV=VAULT.rev;
+    savedVersion=Math.max(savedVersion,targetVersion);
     const sz=JSON.stringify(DB).length; $('#sizeTxt').textContent=fmtSize(sz);
     setSave(sz>4000000?'محفوظ · اقترب حد المساحة':'محفوظ تلقائياً',sz>4000000);
     persisting=false;
@@ -1077,6 +1080,13 @@ async function persist(){
   persisting=false;
   if(pendingAgain){ pendingAgain=false; persist(); }
   return false;
+}
+async function flushPendingSave(){
+  clearTimeout(saveTimer);
+  if(savedVersion<saveVersion&&!persisting) await persist();
+  while(persisting) await new Promise(r=>setTimeout(r,40));
+  if(savedVersion<saveVersion) await persist();
+  return savedVersion>=saveVersion;
 }
 function conflict(remote){
   setSave('تعارض في الحفظ',true);
@@ -1348,7 +1358,7 @@ function renderSideBtns(){
   b.push(`<button class="sbtn wide" id="btnLock">${ic('lock',13)} قفل الجلسة الآن</button>`);
   $('#sideBtns').innerHTML=b.join('');
   $('#sideRefreshIcon').innerHTML=ic('sync',14);
-  $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث المنظومة…';try{await persist();const kept=await keepSessionForRefresh();if(!kept)throw new Error('resume');const u=new URL(location.href);u.searchParams.set('_refresh',Date.now());location.replace(u.href);}catch(e){btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة';toast('تعذّر تحديث المنظومة، حاول مرة أخرى','err')}};
+  $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث المنظومة…';try{if(!(await flushPendingSave()))throw new Error('save');const kept=await keepSessionForRefresh();if(!kept)throw new Error('resume');const u=new URL(location.href);u.searchParams.set('_refresh',Date.now());location.replace(u.href);}catch(e){btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة';toast('تعذّر تحديث المنظومة، حاول مرة أخرى','err')}};
   $('#btnPw').onclick=openChangePw;
   $('#btnLock').onclick=lockSession;
   $('#btnTheme').onclick=()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
