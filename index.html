@@ -210,6 +210,7 @@ select.filter{padding:10px 12px;border:1px solid var(--line);background:var(--su
 .reg-head h3{margin:0;font-size:14.5px;font-weight:700}
 .reg-head .meta{margin-inline-start:auto;font-size:12px;color:#9DBAB3;font-weight:600}
 .tablewrap{overflow-x:auto}
+.mobile-cards,.mobile-select-all{display:none}
 table{width:100%;border-collapse:collapse}
 thead th{background:var(--surface-2);color:var(--ink-2);font-size:12.5px;font-weight:700;text-align:right;
   padding:11px 13px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -442,13 +443,25 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   select.filter{width:100%;max-width:none;min-width:0;height:46px;border-radius:11px}
   .tools .spacer{display:none}.tools>.btn{flex:1;justify-content:center;min-width:calc(50% - 4px);padding:9px 8px;font-size:12.5px}
   .tools>.btn,.tools>.seg{min-width:0;width:100%;margin:0}
-  .view-switch{display:flex;grid-column:1/-1;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:3px;gap:3px}
+  .view-switch{display:none!important}
   .view-switch button{flex:1;padding:7px 5px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink-3)}
   .view-switch button.on{background:var(--pine);color:#fff}
   .seg{width:100%}.seg button{flex:1}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
   .register{background:transparent;border:0;box-shadow:none;overflow:visible}.reg-head{padding:10px 12px;border-radius:11px;margin-bottom:9px;position:sticky;top:0;z-index:5}
-  .tablewrap{overflow:visible}.tablewrap table{min-width:0}.tablewrap thead{display:none}
+  .tablewrap{display:none}.mobile-cards{display:grid;gap:11px}
+  .mobile-record{position:relative;background:linear-gradient(145deg,var(--surface),var(--surface-2));border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:0 8px 24px rgba(5,45,42,.09)}
+  .mobile-record:has([data-pick]:checked){border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.13),0 8px 24px rgba(5,45,42,.11)}
+  .mobile-record-head{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:11px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line-2)}
+  .mobile-record .ava{width:54px;height:54px;border-radius:50%;font-size:17px;background:linear-gradient(145deg,var(--gold-bg),var(--surface-2));border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+  .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 6px;font-size:16px;line-height:1.45;color:var(--ink)}
+  .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}
+  .mobile-record-sub{margin-top:6px;color:var(--ink-3);font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center}
+  .mobile-record-pick{align-self:start}.mobile-record-pick input{width:21px;height:21px;accent-color:var(--pine);cursor:pointer}
+  .mobile-record-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding-top:11px}
+  .mobile-record-actions .iconbtn{width:100%;height:51px;padding:5px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:10px;font-weight:800;color:var(--pine)}
+  .mobile-record-actions .iconbtn::after{content:attr(title)}.mobile-record-actions .iconbtn.del{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
+  .mobile-select-all{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:#fff}.mobile-select-all input{width:18px;height:18px;accent-color:var(--brass)}
   .tablewrap tbody{display:grid;gap:9px}
   .tablewrap tbody tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 8px;box-shadow:var(--shadow-sm);overflow:hidden}
   .tablewrap tbody tr:hover{background:var(--surface)}
@@ -1573,6 +1586,14 @@ function empty(h,t,id,btn){
   return `<div class="empty"><div class="ic">${icon('file',24)}</div><h4>${esc(h)}</h4><p>${esc(t)}</p>
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
+function mobileCardHTML(p,r,n,cols,u){
+  const title=rowTitle(p,r),status=cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),rank=cols.find(c=>c.type==='select'&&c!==status),dept=cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type));
+  return `<article class="mobile-record">
+    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4><div class="mobile-record-tags">${rank?cellHTML(p,rank,r,false):''}${status?cellHTML(p,status,r,false):''}</div>${dept?`<div class="mobile-record-sub">${icon(p.icon,13)} ${esc(cellText(p,dept,r)||dept.name)}</div>`:''}</div>
+    ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:`<span class="dim">${n}</span>`}</div>
+    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn" title="عرض" data-vw="${r.id}">${ic('eye',18)}</button>`:''}${p.showLog!==false?`<button class="iconbtn" title="التفاصيل" data-log="${r.id}">${ic('file',18)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit',18)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',18)}</button>`:''}</div>
+  </article>`;
+}
 function renderTable(p){
   const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
   u.picked=(u.picked||[]).filter(id=>p.rows.some(r=>r.id===id));
@@ -1605,8 +1626,9 @@ function renderTable(p){
           ${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
+  const mobileCards=rows.length?`<div class="mobile-cards">${rows.map((r,i)=>mobileCardHTML(p,r,first+i+1,cols,u)).join('')}</div>`:'';
   $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register view-${u.display==='compact'?'compact':'detail'}">
-    <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${pager}</div>`;
+    <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')?`<label class="mobile-select-all"><input type="checkbox" id="mobileSelectAll" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}> الكل</label>`:''}${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${mobileCards}${pager}</div>`;
   bindTools(p); bindCells();
   const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
   const a2=$('#bAdd2'); if(a2) a2.onclick=()=>openRow();
@@ -1618,6 +1640,7 @@ function renderTable(p){
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
   document.querySelectorAll('[data-pick]').forEach(b=>b.onchange=()=>{u.picked=b.checked?uniq([...u.picked,b.dataset.pick]):u.picked.filter(id=>id!==b.dataset.pick);renderTable(p)});
   if($('#pickAll')) $('#pickAll').onchange=e=>{const ids=rows.map(r=>r.id);u.picked=e.target.checked?uniq([...u.picked,...ids]):u.picked.filter(id=>!ids.includes(id));renderTable(p)};
+  if($('#mobileSelectAll')) $('#mobileSelectAll').onchange=e=>{const ids=rows.map(r=>r.id);u.picked=e.target.checked?uniq([...u.picked,...ids]):u.picked.filter(id=>!ids.includes(id));renderTable(p)};
   if($('#clearPicked')) $('#clearPicked').onclick=()=>{u.picked=[];renderTable(p)};
   if($('#bulkDelete')) $('#bulkDelete').onclick=()=>delRows(u.picked.slice());
   if($('#pgPrev')) $('#pgPrev').onclick=()=>{u.page--;renderTable(p);window.scrollTo({top:0,behavior:'smooth'});};
