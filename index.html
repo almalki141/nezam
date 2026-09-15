@@ -291,6 +291,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 .overlay{position:fixed;inset:0;background:rgba(10,32,30,.5);backdrop-filter:blur(3px);display:none;
   align-items:flex-start;justify-content:center;padding:26px 14px;z-index:90;overflow-y:auto}
 .overlay.on{display:flex}
+body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
 .modal{background:var(--surface);border-radius:14px;width:100%;max-width:660px;box-shadow:0 24px 70px rgba(0,0,0,.3);
   animation:pop .16s ease-out;overflow:hidden}
 .modal.sm{max-width:430px}.modal.lg{max-width:900px}
@@ -300,7 +301,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
 .m-head h3{margin:0;font-size:17px;font-weight:800}
 .m-head .x{margin-inline-start:auto;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3)}
 .m-head .x:hover{background:var(--line-2);color:var(--ink)}
-.m-body{padding:19px 21px;max-height:68vh;overflow-y:auto}
+.m-body{padding:19px 21px;max-height:68vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .m-foot{padding:13px 21px;border-top:1px solid var(--line);display:flex;gap:9px;background:var(--surface-2);flex-wrap:wrap}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .fld{display:flex;flex-direction:column;gap:5px}
@@ -463,20 +464,21 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
   .register{background:transparent;border:0;box-shadow:none;overflow:visible}.reg-head{padding:10px 12px;border-radius:11px;margin-bottom:9px;position:sticky;top:0;z-index:5}
   .tablewrap{display:none}.mobile-mode-page .tablewrap{display:block;overflow:visible}.mobile-mode-page .tablewrap table{display:block;width:100%}.mobile-mode-page .tablewrap thead{display:none}.mobile-mode-page .tablewrap tbody{width:100%}.mobile-mode-page .mobile-cards{display:none}.mobile-cards{display:grid;gap:11px}.mobile-mode-cards .reg-head:not(:has(#bulkDelete)){display:none}.mobile-mode-cards .reg-head:has(#bulkDelete){position:static;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow-sm)}.mobile-mode-cards .reg-head:has(#bulkDelete)>svg,.mobile-mode-cards .reg-head:has(#bulkDelete)>h3,.mobile-mode-cards .reg-head:has(#bulkDelete)>.meta,.mobile-mode-cards .reg-head:has(#bulkDelete)>.mobile-select-all{display:none}
-  .mobile-record{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--surface) 72%,color-mix(in srgb,var(--card-accent) 7%,var(--surface)));border:1px solid color-mix(in srgb,var(--card-accent) 20%,var(--line));border-radius:21px;padding:17px;box-shadow:0 10px 30px rgba(5,45,42,.10)}
+  .mobile-record{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--surface) 78%,color-mix(in srgb,var(--card-accent) 6%,var(--surface)));border:1px solid color-mix(in srgb,var(--card-accent) 18%,var(--line));border-radius:17px;padding:12px;box-shadow:0 7px 20px rgba(5,45,42,.08)}
   .mobile-record:has([data-pick]:checked){border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.13),0 8px 24px rgba(5,45,42,.11)}
-  .mobile-record-head{display:grid;grid-template-columns:70px minmax(0,1fr);gap:13px;align-items:center;padding:12px 0 16px;border-bottom:1px solid var(--line-2)}
+  .mobile-record-head{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0 10px;border-bottom:1px solid var(--line-2)}
   .mobile-record.avatar-left .ava{grid-column:2;grid-row:1}.mobile-record.avatar-left .mobile-record-title{grid-column:1;grid-row:1}
-  .mobile-record .ava{width:70px;height:70px;border-radius:50%;font-size:17px;background:linear-gradient(145deg,#eef3f2,#dfe7e5);border:3px solid #fff;outline:1px solid var(--line);box-shadow:0 5px 16px rgba(0,0,0,.10)}
-  .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 8px;font-size:17px;line-height:1.45;color:var(--ink);font-weight:900}
-  .mobile-rank-badge{display:inline-flex;align-items:center;padding:5px 12px;border:0;border-radius:20px;background:linear-gradient(135deg,#fbf3df,var(--gold-bg));color:#806020;font-size:11.5px;font-weight:900}
-  .mobile-card-status{position:absolute;top:16px;left:16px;z-index:2}.mobile-card-status .badge{padding:7px 11px;border:0;border-radius:20px;font-size:11px}
-  .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}.mobile-record-tags:empty{display:none}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}
-  .mobile-card-field{display:inline-flex;align-items:center;gap:6px;padding:2px 3px;border:0;background:transparent}.mobile-card-field small{display:none}.mobile-card-field b{font-size:12px;color:var(--ink-3);font-weight:700}
+  .mobile-record .ava{width:58px;height:58px;border-radius:50%;font-size:15px;background:linear-gradient(145deg,#eef3f2,#dfe7e5);border:2px solid #fff;outline:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.09)}
+  .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 5px;font-size:15px;line-height:1.35;color:var(--ink);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mobile-rank-badge{display:inline-flex;align-items:center;padding:4px 10px;border:0;border-radius:18px;background:linear-gradient(135deg,#fbf3df,var(--gold-bg));color:#806020;font-size:10.5px;font-weight:900}
+  .mobile-card-status{position:absolute;top:12px;left:12px;z-index:2}.mobile-card-status .badge{padding:5px 9px;border:0;border-radius:18px;font-size:10px}
+  .mobile-record-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px;max-height:43px;overflow:hidden}.mobile-record-tags:empty{display:none}.mobile-record-tags .badge{font-size:9.5px;padding:4px 7px}
+  .mobile-card-field{display:inline-flex;align-items:center;gap:5px;padding:1px 2px;border:0;background:transparent}.mobile-card-field small{display:none}.mobile-card-field b{font-size:10.5px;color:var(--ink-3);font-weight:700;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .mobile-record-sub{margin-top:6px;color:var(--ink-3);font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center}
-  .mobile-record-pick{position:absolute;top:16px;right:16px;z-index:2}.mobile-record-pick input{width:23px;height:23px;accent-color:var(--pine);cursor:pointer}
-  .mobile-record-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:7px;padding-top:11px}
-  .mobile-record-actions .iconbtn{width:100%;height:58px;padding:6px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:14px;background:var(--surface-2);font-size:10.5px;font-weight:900;color:var(--pine);box-shadow:inset 0 0 0 1px rgba(20,81,77,.04)}
+  .mobile-record-pick{position:absolute;top:12px;right:12px;z-index:2}.mobile-record-pick input{width:20px;height:20px;accent-color:var(--pine);cursor:pointer}
+  .mobile-record-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px;padding-top:8px}
+  .mobile-record-actions .iconbtn{width:100%;height:48px;padding:4px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;border-radius:11px;background:var(--surface-2);font-size:9.5px;font-weight:900;color:var(--pine);box-shadow:inset 0 0 0 1px rgba(20,81,77,.04)}
+  .mobile-record-actions .iconbtn svg{width:18px;height:18px}
   .mobile-record-actions .iconbtn::after{content:attr(title)}.mobile-record-actions .iconbtn.del{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
   .mobile-record-actions .act-view{background:linear-gradient(145deg,#eef9f6,#e4f2ef);color:var(--pine)}.mobile-record-actions .act-edit{background:linear-gradient(145deg,#eef6ff,#e5f0fb);color:#1767aa}.mobile-record-actions .act-detail{background:linear-gradient(145deg,#f3f5f8,#e9edf2);color:#526c84}
   .mobile-select-all{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:#fff}.mobile-select-all input{width:18px;height:18px;accent-color:var(--brass)}
@@ -527,6 +529,11 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .welcome-section-title{align-items:center;margin-inline:4px}.welcome-section-title h3{font-size:16px}.welcome-section-title span{display:none}
   .welcome-pages{padding:3px}.welcome-card,.home-group-head{background:linear-gradient(150deg,#fff,#f7f9f8);border-color:#dce5e2;border-radius:17px;box-shadow:0 7px 18px rgba(5,45,42,.07)}.welcome-card .wi,.home-group-head .wi{background:color-mix(in srgb,var(--acc) 9%,#fff);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 18%,#fff)}
   .empty{padding:36px 15px}
+}
+@media (max-width:420px){
+  .card-layout-settings{grid-template-columns:1fr}.card-slot.featured{grid-column:auto}
+  .m-head h3{font-size:15px;line-height:1.55}.m-body{padding:13px 12px 24px}.m-foot{gap:7px;padding-inline:12px}
+  #groupOrder .frow{grid-template-columns:36px minmax(0,1fr) auto}
 }
 </style>
 </head>
@@ -1441,10 +1448,14 @@ function renderMobileNav(){
   $('#mobAdd').onclick=()=>cur?openRow():openNewPage();
   $('#mobRefresh').onclick=()=>$('#sideRefresh').click();
 }
+function orderedGroupNames(pages){
+  const found=[],seen=new Set();(pages||[]).forEach(p=>{const g=String(p.group||'').trim();if(g&&!seen.has(g)){seen.add(g);found.push(g)}});
+  const preferred=(DB.groupOrder||[]).filter(g=>seen.has(g));return [...preferred,...found.filter(g=>!preferred.includes(g))];
+}
 function renderNav(){
   const list=visiblePages();
   const item=p=>`<button class="nav-item ${p.id===cur?'on':''}" data-pg="${p.id}" style="--acc:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon)}<span class="nm">${esc(p.name)}</span><span class="count">${p.rows.length}</span></button>`;
-  const groups=[],seen=new Set(); list.forEach(p=>{const g=String(p.group||'').trim();if(g&&!seen.has(g)){seen.add(g);groups.push(g);}});
+  const groups=orderedGroupNames(list);
   const grouped=new Set(groups),plain=list.filter(p=>!String(p.group||'').trim()).map(item).join('');
   $('#navList').innerHTML=`<button class="nav-item ${cur?'':'on'}" id="navHome">${ic('shieldk',16)}<span class="nm">الرئيسية</span></button>`+plain+groups.map(g=>{const ps=list.filter(p=>String(p.group||'').trim()===g);return `<div class="nav-group closed"><button class="nav-group-head" data-ng="${esc(g)}"><span class="arr">⌄</span>${esc(g)}<span class="count">${ps.length}</span></button><div class="nav-group-pages">${ps.map(item).join('')}</div></div>`;}).join('');
   $('#navHome').onclick=showHome;
@@ -1453,7 +1464,7 @@ function renderNav(){
   renderMobileNav();
 }
 function showHome(){
-  cur=null; renderNav();
+  cur=null;$('#side').classList.remove('open');$('#scrim').classList.remove('on');renderNav();
   $('#pageBody').className='page home-page';
   $('#topbar').style.setProperty('--acc',CVAR.gold);
   $('#topbar').innerHTML=`<button class="burger" id="burger"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div><h2><span class="tag"></span>الرئيسية</h2><p class="sub">اختر الصفحة التي تريد العمل عليها</p></div><div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>`;
@@ -1465,7 +1476,7 @@ function showHome(){
   const hm=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
   const hy=(hijriNums(new Date())||{y:1448}).y;
   const converter=`<div class="date-converter"><div class="date-converter-head"><i>${ic('calendar',18)}</i><div><b>محول التاريخ المعتمد</b><span>تقويم أم القرى السعودي</span></div></div><div class="date-converter-grid"><div class="fld" style="margin:0"><label>التقويم الميلادي</label><input type="date" id="convG" min="1900-04-30" max="2077-11-16"></div><button class="date-swap" id="convSwap">⇄</button><div class="fld" style="margin:0"><label>التاريخ الهجري</label><div class="hijri-selects"><select id="convHY"><option value="">السنة</option>${Array.from({length:161},(_,i)=>1320+i).map(y=>`<option ${y===hy?'selected':''}>${y}</option>`).join('')}</select><select id="convHM"><option value="">الشهر</option>${hm.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('')}</select><select id="convHD"><option value="">اليوم</option>${Array.from({length:30},(_,i)=>`<option>${i+1}</option>`).join('')}</select></div></div></div><div class="date-result" id="convResult"></div></div>`;
-  const groups=[],grouped=new Set();pages.forEach(p=>{const g=String(p.group||'').trim();if(g&&!grouped.has(g)){grouped.add(g);groups.push(g)}});
+  const groups=orderedGroupNames(pages);
   const pageIcon=p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} سجل</span></span></button>`;
   const gateways=pages.filter(p=>!String(p.group||'').trim()).map(pageIcon).join('')+groups.map(g=>{const ps=pages.filter(p=>String(p.group||'').trim()===g),first=ps[0];return `<div class="home-group"><button class="home-group-head" data-hgroup><span class="grp-arr">⌄</span><span class="wi" style="color:${CVAR[first.accent]||CVAR.gold}">${icon(first.icon,22)}</span><b>${esc(g)}</b><small>${ps.length} صفحات</small></button><div class="home-group-menu">${ps.map(p=>`<button data-home-pg="${p.id}">${icon(p.icon,15)}<span>${esc(p.name)}</span></button>`).join('')}</div></div>`}).join('');
   $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة القيادة</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${ic('shieldk',49)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div>${bannerHTML}${converter}<div class="welcome-section-title"><h3>بوابات العمل</h3><span>اضغط المجموعة لإظهار صفحاتها</span></div><div class="welcome-pages">${gateways||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div></section>`;
@@ -1624,13 +1635,13 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const byId=id=>cols.find(c=>c.id===id),titleCol=byId(p.mobileCardTitle)||primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])],showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),tone=CVAR[p.mobileCardColor]||CVAR[p.accent]||CVAR.teal;
+  const byId=id=>cols.find(c=>c.id===id),titleCol=byId(p.mobileCardTitle)||primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),tone=CVAR[p.mobileCardColor]||CVAR[p.accent]||CVAR.teal;
   const cardFields=cardCols.filter(c=>c!==titleCol&&c!==rank&&c!==status).map(c=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join(''),showStatus=status&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
   return `<article class="mobile-record avatar-${p.mobileAvatarSide==='left'?'left':'right'}" style="--card-accent:${tone}">
     ${showStatus?`<div class="mobile-card-status">${cellHTML(p,status,r,false)}</div>`:''}
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
     <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${dept&&cardCols.includes(dept)?anyIcon(p.mobileSubIcon||'gear',15):''}${cardFields}</div></div></div>
-    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" data-vw="${r.id}">${ic('eye',20)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" data-ed="${r.id}">${ic('edit',20)}</button>`:''}${p.showLog!==false?`<button class="iconbtn act-detail" title="تفاصيل" data-log="${r.id}">${ic('file',20)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',20)}</button>`:''}</div>
+    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" data-vw="${r.id}">${ic('eye',20)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" data-ed="${r.id}">${ic('edit',20)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',20)}</button>`:''}</div>
   </article>`;
 }
 function renderTable(p){
@@ -1773,13 +1784,15 @@ function makeCase(p){
 /* ==================================================================
    10) النوافذ العامة
 ================================================================== */
+let modalScrollY=0;
 function modal(t,b,f,sz){
+  if(!document.body.classList.contains('modal-open')){modalScrollY=window.scrollY;document.body.style.top=`-${modalScrollY}px`;document.body.classList.add('modal-open');}
   $('#mdl').className='modal'+(sz?' '+sz:'');
   $('#mdl').innerHTML=`<div class="m-head"><h3>${t}</h3><button class="x" onclick="closeModal()">${ic('x',17)}</button></div>
     <div class="m-body">${b}</div>${f?`<div class="m-foot">${f}</div>`:''}`;
   $('#ov').classList.add('on');
 }
-function closeModal(){ if(FORCE_PW) return toast('أنشئ كلمة مرور جديدة أولاً','err'); $('#ov').classList.remove('on'); }
+function closeModal(){ if(FORCE_PW) return toast('أنشئ كلمة مرور جديدة أولاً','err');if(!$('#ov').classList.contains('on'))return;$('#ov').classList.remove('on');document.body.classList.remove('modal-open');document.body.style.top='';window.scrollTo(0,modalScrollY); }
 $('#ov').addEventListener('mousedown',e=>{if(e.target.id==='ov')closeModal();});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ if($('#lbx').classList.contains('on')) closeLB(); else closeModal(); }
@@ -2064,18 +2077,25 @@ function drawCM(){
 }
 function openPageOrder(){
   if(!isAdmin()) return;
-  modal('ترتيب وتجميع الصفحات','<div class="gnote">اكتب اسم المجموعة نفسه للصفحات التي تريد جمعها تحت زر واحد، أو اتركه فارغًا.</div><div id="pageOrder"></div>',
+  modal('ترتيب وتجميع الصفحات','<div class="gnote">رتّب المجموعات أولاً، ثم رتّب الصفحات داخلها. اكتب اسم المجموعة نفسه للصفحات التي تريد جمعها، أو اتركه فارغًا.</div><div class="welcome-section-title"><h3>ترتيب المجموعات</h3></div><div id="groupOrder"></div><div class="welcome-section-title"><h3>الصفحات والمجموعات</h3></div><div id="pageOrder"></div>',
     '<button class="btn primary" id="poDone">حفظ</button>','lg');
   const sync=()=>document.querySelectorAll('[data-pgroup]').forEach(x=>DB.pages[+x.dataset.pgroup].group=x.value.trim());
+  const drawGroups=()=>{
+    DB.groupOrder=orderedGroupNames(DB.pages);
+    $('#groupOrder').innerHTML=DB.groupOrder.length?DB.groupOrder.map((g,i)=>`<div class="frow"><div class="fi">${icon('folder',16)}</div><b>${esc(g)}</b><div class="fx"><button class="iconbtn" data-gu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-gd="${i}" ${i===DB.groupOrder.length-1?'disabled':''}>▼</button></div></div>`).join(''):'<p class="dim" style="font-size:12px">لا توجد مجموعات بعد.</p>';
+    document.querySelectorAll('[data-gu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gu;[DB.groupOrder[i-1],DB.groupOrder[i]]=[DB.groupOrder[i],DB.groupOrder[i-1]];drawGroups()});
+    document.querySelectorAll('[data-gd]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gd;[DB.groupOrder[i+1],DB.groupOrder[i]]=[DB.groupOrder[i],DB.groupOrder[i+1]];drawGroups()});
+  };
   const draw=()=>{
     $('#pageOrder').innerHTML=DB.pages.map((p,i)=>`<div class="frow">
       <div class="fi">${icon(p.icon,16)}</div><b style="min-width:150px">${esc(p.name)}</b><input data-pgroup="${i}" value="${esc(p.group||'')}" placeholder="اسم المجموعة" style="flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--surface)">
       <div class="fx"><button class="iconbtn" data-pu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-pd="${i}" ${i===DB.pages.length-1?'disabled':''}>▼</button></div></div>`).join('');
     document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pu;[DB.pages[i-1],DB.pages[i]]=[DB.pages[i],DB.pages[i-1]];draw();});
     document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pd;[DB.pages[i+1],DB.pages[i]]=[DB.pages[i],DB.pages[i+1]];draw();});
+    document.querySelectorAll('[data-pgroup]').forEach(x=>x.onchange=()=>{sync();drawGroups()});
   };
-  draw();
-  $('#poDone').onclick=()=>{sync();audit('ترتيب وتجميع الصفحات','تحديث القائمة');save();closeModal();render();toast('حُفظ ترتيب وتجميع الصفحات');};
+  draw();drawGroups();
+  $('#poDone').onclick=async()=>{sync();DB.groupOrder=orderedGroupNames(DB.pages);audit('ترتيب وتجميع الصفحات','تحديث القائمة والمجموعات');const btn=$('#poDone');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ';return toast('تعذّر حفظ الترتيب؛ حاول مرة أخرى','err')}closeModal();render();toast('حُفظ ترتيب المجموعات والصفحات');};
 }
 function openTickerSettings(){
   modal('إعدادات الشريط المتحرك',`<div class="grid2">
