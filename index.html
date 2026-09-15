@@ -437,9 +437,9 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .topbar{padding:17px 15px 20px;gap:7px;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 15% 0,rgba(216,181,115,.16),transparent 36%),linear-gradient(145deg,#07534f,#073b38);color:#fff;border:0;position:relative;box-shadow:0 8px 24px rgba(5,45,42,.16)}
   .mobile-brand-title{display:block;width:100%;order:-2;color:#d8b573;font-size:17px;font-weight:900;letter-spacing:.2px}.topbar>div:nth-child(3){min-width:0;width:100%;order:-1}.topbar h2{font-size:20px;justify-content:center}.topbar h2 .tag{display:none}.topbar .sub{font-size:11.5px;color:#bed1cd}.burger{position:absolute;right:14px;top:14px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14);color:#fff}
   .date-summary{background:transparent;border:0;box-shadow:none;padding:2px;color:#d5e2df}.date-summary b{display:none}.date-summary span{color:#bcd0cc;font-size:10.5px}.date-summary svg{display:none}
-  .pgtools{position:absolute;left:14px;top:14px;width:auto}.pgtools .btn{width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:0;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14);color:#fff}.pgtools .btn:first-child{display:none}.pgtools .btn svg{width:18px;height:18px}
+  .pgtools{position:absolute;left:14px;top:14px;width:auto;display:flex;gap:6px}.pgtools .btn{width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:0;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14);color:#fff}.pgtools .btn svg{width:18px;height:18px}
   .stripe{display:none}
-  .page{padding:20px 10px calc(96px + env(safe-area-inset-bottom));min-width:0;background:#eef1f0;margin-top:-13px;border-radius:24px 24px 0 0;position:relative;z-index:2}
+  .page{padding:20px 10px calc(122px + env(safe-area-inset-bottom));min-width:0;background:#eef1f0;position:relative;z-index:2}.page.record-page{margin-top:-13px;border-radius:24px 24px 0 0}.page.home-page{margin-top:0;border-radius:0}
   .welcome{padding:4px 0}.welcome-hero{padding:25px 20px;border-radius:18px;grid-template-columns:1fr auto;min-height:165px;gap:12px}.welcome-logo{width:66px;height:66px;border-radius:18px}.welcome-logo svg{width:31px;height:31px}.welcome-hero h2{font-size:20px}.welcome-hero p{font-size:12px}.welcome-date{margin-top:12px}.welcome-date span{padding:5px 8px;font-size:10.5px}.welcome-stats{margin:-13px 9px 0;gap:5px}.welcome-stat{padding:11px 8px;text-align:center}.welcome-stat b{font-size:19px}.welcome-stat span{font-size:9.5px}.welcome-section-title{margin-top:22px}.welcome-pages{grid-template-columns:1fr;gap:8px}.welcome-card{padding:12px}.welcome-card .wi{width:42px;height:42px}
   .home-banners{background:#0b403c}.home-banner{aspect-ratio:16/9;min-height:0;padding:18px;background-size:contain;background-repeat:no-repeat;background-position:center}.home-banner:before{background:linear-gradient(0deg,rgba(3,32,30,.75),transparent 52%)}.home-banner-content{max-width:92%}.home-banner b{font-size:17px}.home-banner-open{padding:6px 11px;font-size:11px}.welcome-pages{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.welcome-card,.home-group-head{min-height:120px;padding:13px 5px}.welcome-card .wi,.home-group-head .wi{width:45px;height:45px}.welcome-card b,.home-group-head b{font-size:11px}.welcome-card span span,.home-group-head small{font-size:9px}.home-group-menu{position:absolute;z-index:8;right:0;left:0;min-width:185px}.home-group-menu button{font-size:11px}.date-converter-grid{grid-template-columns:1fr}.date-swap{margin:auto;transform:rotate(90deg)}
   .tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
@@ -500,6 +500,7 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .register.view-compact tbody td.acts{display:flex;margin:0;padding:0;flex-basis:100%}.register.view-compact tbody td.acts::before{display:none}
   .tablewrap tbody tr:has([data-pick]:checked){border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.12),var(--shadow-sm)}
   .date-summary{order:2;margin:0 auto;padding:2px}.date-summary b{font-size:11.5px}.date-summary span{font-size:10.5px}
+  .topbar .ticker{position:relative;order:5;flex:0 0 calc(100% + 30px);width:calc(100% + 30px);margin:9px -15px -20px;padding:7px 0;background:rgba(2,43,40,.72);border-top:1px solid rgba(216,181,115,.24);z-index:0}
   .smart-summary{grid-template-columns:1fr 1fr;padding:12px;gap:9px}.smart-summary .result{grid-column:1/-1;display:flex;align-items:baseline;gap:8px}.smart-summary .result b{font-size:25px}.smart-summary .pair{grid-template-columns:1fr}
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
   .desk-bar>*{flex:1}.desk-bar .lbl{flex-basis:100%}.desk-bar select{min-width:100%}
@@ -1112,31 +1113,31 @@ function audit(act,detail){ DB.audit=DB.audit||[]; DB.audit.unshift({at:nowTs(),
 function setSave(t,w,busy){ $('#saveTxt').textContent=t; $('#saveDot').className='dot'+(w?' warn':(busy?' busy':'')); }
 let saveVersion=0,savedVersion=0;
 function save(){ saveVersion++;clearTimeout(saveTimer); setSave('جارٍ الحفظ…',false,true); saveTimer=setTimeout(persist,250); }
-let persisting=false, pendingAgain=false;
-async function persist(){
-  if(!DEK||!DB) return false;
-  if(persisting){ pendingAgain=true; return false; }
-  const targetVersion=saveVersion;
-  persisting=true;
-  try{
-    const remote=await vaultRead();
-    if(remote&&remote.rev>MYREV){
-      persisting=false;
-      return conflict(remote);
-    }
-    VAULT.data=await encObj(DEK,DB);
-    VAULT.rev=(VAULT.rev||0)+1; VAULT.updatedAt=nowTs();
-    await vaultWrite(VAULT); MYREV=VAULT.rev;
-    savedVersion=Math.max(savedVersion,targetVersion);
-    const sz=JSON.stringify(DB).length; $('#sizeTxt').textContent=fmtSize(sz);
-    setSave(sz>4000000?'محفوظ · اقترب حد المساحة':'محفوظ تلقائياً',sz>4000000);
-    persisting=false;
-    if(pendingAgain){ pendingAgain=false; persist(); }
-    return true;
-  }catch(e){ setSave('تعذّر الحفظ — نزّل نسخة احتياطية',true); }
-  persisting=false;
-  if(pendingAgain){ pendingAgain=false; persist(); }
-  return false;
+let persisting=false, persistChain=Promise.resolve(true);
+function persist(){
+  const run=async()=>{
+    if(!DEK||!DB) return false;
+    const targetVersion=saveVersion;
+    persisting=true;
+    try{
+      const remote=await vaultRead();
+      if(remote&&remote.rev>MYREV) return conflict(remote)||false;
+      VAULT.data=await encObj(DEK,DB);
+      VAULT.rev=(VAULT.rev||0)+1; VAULT.updatedAt=nowTs();
+      await vaultWrite(VAULT); MYREV=VAULT.rev;
+      savedVersion=Math.max(savedVersion,targetVersion);
+      const sz=JSON.stringify(DB).length; $('#sizeTxt').textContent=fmtSize(sz);
+      setSave(sz>4000000?'محفوظ · اقترب حد المساحة':'محفوظ تلقائياً',sz>4000000);
+      return true;
+    }catch(e){ setSave('تعذّر الحفظ — نزّل نسخة احتياطية',true); return false; }
+    finally{ persisting=false; }
+  };
+  persistChain=persistChain.then(run,run);
+  return persistChain;
+}
+async function commitNow(){
+  saveVersion++; clearTimeout(saveTimer); setSave('جارٍ الحفظ…',false,true);
+  return persist();
 }
 async function flushPendingSave(){
   clearTimeout(saveTimer);
@@ -1165,7 +1166,7 @@ async function syncNow(){
   catch(e){ toast('تعذّرت المزامنة','err'); }
 }
 async function syncQuietly(){
-  if(!ME||!DEK||persisting||pendingAgain||document.hidden) return;
+  if(!ME||!DEK||persisting||document.hidden) return;
   try{
     const remote=await vaultRead();
     if(!remote||remote.rev<=MYREV) return;
@@ -1453,6 +1454,7 @@ function renderNav(){
 }
 function showHome(){
   cur=null; renderNav();
+  $('#pageBody').className='page home-page';
   $('#topbar').style.setProperty('--acc',CVAR.gold);
   $('#topbar').innerHTML=`<button class="burger" id="burger"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div><h2><span class="tag"></span>الرئيسية</h2><p class="sub">اختر الصفحة التي تريد العمل عليها</p></div><div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
@@ -1549,6 +1551,7 @@ function go(id){
   if(!cur||!pg()||!can(cur,'view')){ const v=visiblePages(); if(!v.length) return; cur=v[0].id; }
   renderNav(); renderTop();
   const p=pg();
+  $('#pageBody').className='page record-page';
   $('#pageBody').style.setProperty('--acc',CVAR[p.accent]||CVAR.gold);
   if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1633,7 +1636,7 @@ function mobileCardHTML(p,r,n,cols,u){
 function renderTable(p){
   const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
   u.picked=(u.picked||[]).filter(id=>p.rows.some(r=>r.id===id));
-  const pageSize=Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
+  const pageSize=matchMedia('(max-width:600px)').matches?3:Math.max(10,Number(u.pageSize)||25), pages=Math.max(1,Math.ceil(allRows.length/pageSize));
   u.page=Math.min(Math.max(1,Number(u.page)||1),pages);
   const first=(u.page-1)*pageSize, rows=allRows.slice(first,first+pageSize);
   const seg=p.view==='letters'?`<div class="seg"><button class="on">جدول</button><button id="toLetter">خطاب</button></div>`:'';
@@ -1917,7 +1920,7 @@ function readField(c){
 function normUnique(v){
   return String(v??'').trim().toLowerCase().replace(/[٠-٩]/g,d=>'0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]).replace(/\s+/g,' ');
 }
-function saveRow(rid){
+async function saveRow(rid){
   const p=pg(), V={};
   for(const c of p.cols){ const v=readField(c); if(v!==undefined) V[c.id]=v; }
   const pc=primary(p);
@@ -1933,13 +1936,17 @@ function saveRow(rid){
       return toast(`القيمة في «${c.name}» مسجلة مسبقاً في هذه الصفحة`,'err');
     }
   }
+  const oldRows=JSON.parse(JSON.stringify(p.rows)), oldAudit=(DB.audit||[]).slice();
   if(rid){ const r=p.rows.find(x=>x.id===rid);
     if(p.logCol&&V[p.logCol]&&V[p.logCol]!==r.v[p.logCol]){ r.log=r.log||[]; r.log.unshift({at:nowTs(),tx:V[p.logCol],by:ME.name}); }
-    r.v=V; r.updated=todayISO(); audit('تعديل سجل',p.name+' · '+rowTitle(p,r)); toast('حُفظت التعديلات');
+    r.v=V; r.updated=todayISO(); audit('تعديل سجل',p.name+' · '+rowTitle(p,r));
   } else { const nr={id:uid(),v:V,log:[],created:todayISO(),updated:todayISO()};
     if(p.logCol&&V[p.logCol]) nr.log.push({at:nowTs(),tx:V[p.logCol],by:ME.name});
-    p.rows.unshift(nr); audit('إضافة سجل',p.name+' · '+rowTitle(p,nr)); toast('أُضيف السجل'); }
-  save(); closeModal(); render();
+    p.rows.unshift(nr); audit('إضافة سجل',p.name+' · '+rowTitle(p,nr)); }
+  const btn=$('#bSaveRow'); if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';}
+  const ok=await commitNow();
+  if(!ok){p.rows=oldRows;DB.audit=oldAudit;if(btn){btn.disabled=false;btn.textContent=rid?'حفظ التعديلات':'إضافة';}return toast('تعذّر حفظ التعديل. لم تُغلق النافذة حتى لا تفقد بياناتك؛ تحقق من الاتصال وحاول مجددًا','err');}
+  closeModal(); render(); toast(rid?'حُفظت التعديلات وتأكدت مزامنتها':'أُضيف السجل وتأكد حفظه');
 }
 function delRow(rid){
   const p=pg(); if(!can(p.id,'full')) return toast('ليس لديك صلاحية الحذف','err');
@@ -2005,13 +2012,13 @@ function openCols(){
     <button class="btn ghost" id="cmAdd" style="width:100%;justify-content:center;border-style:dashed">${ic('plus')} إضافة عمود</button>`,
     `<button class="btn primary" id="cmSave">حفظ الأعمدة</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'lg');
   drawCM();
-  $('#cmSave').onclick=()=>{ cmSync();
+  $('#cmSave').onclick=async()=>{ cmSync();
     const p=pg(), final=CD.filter(c=>c.name.trim()), keep=new Set(final.map(c=>c.id));
     for(const c of final.filter(c=>c.type==='select')){ const labels=(c.options||[]).map(o=>o.label.trim()).filter(Boolean); if(new Set(labels).size!==labels.length) return toast(`يوجد خيار مكرر في «${c.name}»`,'err'); c.options=(c.options||[]).filter(o=>o.label.trim()); }
     p.cols.forEach(c=>{ if(!keep.has(c.id)) p.rows.forEach(r=>{delete r.v[c.id];}); });
     if(p.chipsCol&&p.chipsCol!=='none'&&!keep.has(p.chipsCol)) p.chipsCol='';
     if(p.logCol&&!keep.has(p.logCol)) p.logCol='';
-    p.cols=final; audit('تعديل أعمدة',p.name); save(); closeModal(); render(); toast('حُدثت الأعمدة'); };
+    p.cols=final; audit('تعديل أعمدة',p.name); const btn=$('#cmSave');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ الأعمدة';return toast('تعذّر حفظ إعدادات الأعمدة؛ النافذة ما زالت مفتوحة للمحاولة مجددًا','err')}closeModal();render();toast('حُدثت الأعمدة وتأكد حفظها'); };
 }
 function cmSync(){ CD.forEach((c,i)=>{ const g=k=>document.getElementById('cm_'+k+'_'+i);
   if(g('n')) c.name=g('n').value; if(g('t')) c.type=g('t').value;
@@ -2149,7 +2156,7 @@ function openPageSet(){
     audit('حذف صفحة',p.name);
     DB.pages=DB.pages.filter(x=>x.id!==p.id); (DB.users||[]).forEach(u=>{ if(u.perms) delete u.perms[p.id]; });
     cur=null; save(); render(); toast('حُذفت الصفحة'); });
-  $('#psSave').onclick=()=>{
+  $('#psSave').onclick=async()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
     p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;p.primaryCol=$('#ps_primary').value;
     p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
@@ -2160,7 +2167,7 @@ function openPageSet(){
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
     if($('#ps_tgt')) p.targetPage=$('#ps_tgt').value;
     if($('#ps_photo')) p.showPhoto=$('#ps_photo').checked;
-    audit('إعدادات صفحة',n); save(); closeModal(); render(); toast('حُفظت الإعدادات'); };
+    audit('إعدادات صفحة',n);const btn=$('#psSave');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ الإعدادات';return toast('تعذّر حفظ إعدادات الصفحة؛ النافذة ما زالت مفتوحة للمحاولة مجددًا','err')}closeModal();render();toast('حُفظت الإعدادات وتأكدت مزامنتها'); };
 }
 const STARTERS={
   proTrack:{t:'مركز متابعة المعاملات',d:'متابعة احترافية للأولوية والتعثر والإنجاز',icon:'clipboard',acc:'blue',view:'table',
@@ -2379,7 +2386,8 @@ function openPerms(id){
     const perms={}; document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value); u.perms=perms;
     if($('#pu_act')) vu.active=$('#pu_act').checked;
     audit('تعديل صلاحيات',u.name);
-    await persist();
+    const btn=$('#puSave');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';
+    const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ';return toast('تعذّر حفظ الصلاحيات؛ حاول مرة أخرى','err')}
     if(vu.email&&u.id!==ME.id){ const rr=await SB.rpc('set_workspace_member_role',{p_email:vu.email,p_role:u.role}); if(rr.error) toast('حُفظت الصلاحيات الداخلية وتعذّر تحديث الدور السحابي','err'); }
     if(u.id===ME.id){ ME=u; renderWho(); renderSideBtns(); }
     openUsers(); render(); toast('حُفظت الصلاحيات'); };
