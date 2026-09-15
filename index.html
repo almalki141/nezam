@@ -1054,8 +1054,8 @@ function setSave(t,w,busy){ $('#saveTxt').textContent=t; $('#saveDot').className
 function save(){ clearTimeout(saveTimer); setSave('جارٍ الحفظ…',false,true); saveTimer=setTimeout(persist,250); }
 let persisting=false, pendingAgain=false;
 async function persist(){
-  if(!DEK||!DB) return;
-  if(persisting){ pendingAgain=true; return; }
+  if(!DEK||!DB) return false;
+  if(persisting){ pendingAgain=true; return false; }
   persisting=true;
   try{
     const remote=await vaultRead();
@@ -1068,9 +1068,13 @@ async function persist(){
     await vaultWrite(VAULT); MYREV=VAULT.rev;
     const sz=JSON.stringify(DB).length; $('#sizeTxt').textContent=fmtSize(sz);
     setSave(sz>4000000?'محفوظ · اقترب حد المساحة':'محفوظ تلقائياً',sz>4000000);
+    persisting=false;
+    if(pendingAgain){ pendingAgain=false; persist(); }
+    return true;
   }catch(e){ setSave('تعذّر الحفظ — نزّل نسخة احتياطية',true); }
   persisting=false;
   if(pendingAgain){ pendingAgain=false; persist(); }
+  return false;
 }
 function conflict(remote){
   setSave('تعارض في الحفظ',true);
@@ -1418,12 +1422,16 @@ function prepareWelcomeImage(file){
   });
 }
 function openWelcomeSettings(){
-  const old=DB.homeBanners||[],bannerRows=Array.from({length:5},(_,i)=>{const b=old[i]||{};return `<div class="frow banner-setting" data-brow="${i}" style="align-items:end"><div class="fld fx"><label>بنر ${i+1} — العنوان</label><input data-btitle="${i}" value="${esc(b.title||'')}"></div><div class="fld fx"><label>صورة البنر</label><input data-bimg="${i}" value="${esc(b.image||'')}" placeholder="رابط الصورة أو اختر ملفًا"><input data-bfile="${i}" type="file" accept="image/*" style="margin-top:6px"></div><div class="fld" style="width:180px"><label>يفتح صفحة</label><select data-bpage="${i}"><option value="">بدون رابط</option>${DB.pages.map(p=>`<option value="${p.id}" ${b.page===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div></div>`}).join('');
-  modal('إعدادات شاشة الترحيب',`<div class="grid2"><div class="fld"><label>عنوان الشاشة الأولى</label><input id="wt" value="${esc(DB.welcomeTitle||'')}"></div><div class="fld"><label>العنوان الفرعي</label><input id="ws" value="${esc(DB.welcomeSubtitle||'')}"></div></div><div class="gnote">البنرات المتحركة تظهر في الرئيسية فقط. حدّد العدد ثم عبّئ البنرات المطلوبة.</div><div class="fld"><label>عدد البنرات المتحركة</label><select id="bcount">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${old.length===n?'selected':''}>${n?n+' بنر':'بدون بنرات'}</option>`).join('')}</select></div><div id="bannerRows">${bannerRows}</div><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div class="fld"><label>عنوان النافذة المنبثقة</label><input id="wpt" value="${esc(DB.welcomePopupTitle||'')}"></div><div class="fld"><label>رسالة النافذة</label><textarea id="wpm">${esc(DB.welcomeMessage||'')}</textarea></div><div class="fld"><label>رابط الصورة أو اختر صورة من جهازك</label><input id="wimg" value="${esc(DB.welcomeImage||'')}" placeholder="https://..."><input id="wfile" type="file" accept="image/*" style="margin-top:7px"></div><label class="ck"><input type="checkbox" id="wpe" ${DB.welcomePopupEnabled!==false?'checked':''}> إظهار الصورة/الرسالة مرة واحدة بعد كل دخول</label>`,`<button class="btn primary" id="wsave">حفظ</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'lg');
+  if(!isAdmin()) return toast('صلاحية المدير فقط','err');
+  const old=DB.homeBanners||[],bannerRows=Array.from({length:5},(_,i)=>{const b=old[i]||{};return `<div class="frow banner-setting" data-brow="${i}" style="align-items:end"><div class="fld fx"><label>بنر ${i+1} — العنوان</label><input data-btitle="${i}" value="${esc(b.title||'')}"></div><div class="fld fx"><label>صورة البنر</label><input data-bimg="${i}" value="${esc(b.image||'')}" placeholder="رابط الصورة أو اختر ملفًا"><input data-bfile="${i}" type="file" accept="image/*" style="margin-top:6px"></div><div class="fld" style="width:180px"><label>يفتح صفحة</label><select data-bpage="${i}"><option value="">بدون رابط</option>${DB.pages.map(p=>`<option value="${p.id}" ${b.page===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div><button type="button" class="btn danger sm" data-bremove="${i}">حذف البنر</button></div>`}).join('');
+  modal('إعدادات شاشة الترحيب',`<div class="gnote"><b>صلاحية المدير كاملة:</b> يمكنك تعديل أو حذف العناوين والبنرات والصورة والرسالة.</div><div class="grid2"><div class="fld"><label>عنوان الشاشة الأولى</label><input id="wt" value="${esc(DB.welcomeTitle||'')}"></div><div class="fld"><label>العنوان الفرعي</label><input id="ws" value="${esc(DB.welcomeSubtitle||'')}"></div></div><div class="gnote">البنرات المتحركة تظهر في الرئيسية فقط. حدّد العدد ثم عبّئ البنرات المطلوبة.</div><div class="fld"><label>عدد البنرات المتحركة</label><select id="bcount">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${old.length===n?'selected':''}>${n?n+' بنر':'بدون بنرات'}</option>`).join('')}</select></div><div id="bannerRows">${bannerRows}</div><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div class="fld"><label>عنوان النافذة المنبثقة</label><input id="wpt" value="${esc(DB.welcomePopupTitle||'')}"></div><div class="fld"><label>رسالة النافذة</label><textarea id="wpm">${esc(DB.welcomeMessage||'')}</textarea></div><div class="fld"><label>رابط الصورة أو اختر صورة من جهازك</label><input id="wimg" value="${esc(DB.welcomeImage||'')}" placeholder="https://..."><input id="wfile" type="file" accept="image/*" style="margin-top:7px"><button type="button" class="btn danger sm" id="wremove" style="margin-top:7px">حذف صورة الترحيب</button></div><label class="ck"><input type="checkbox" id="wpe" ${DB.welcomePopupEnabled!==false?'checked':''}> إظهار الصورة/الرسالة مرة واحدة بعد كل دخول</label>`,`<button class="btn danger" id="wclear">حذف محتوى الترحيب</button><button class="btn primary" id="wsave">حفظ التعديلات</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'lg');
   $('#wfile').onchange=async()=>{const f=$('#wfile').files[0];if(!f)return;toast('جارٍ تجهيز الصورة…');try{$('#wimg').value=await prepareWelcomeImage(f);toast('تم ضغط الصورة وتجهيزها للحفظ')}catch(e){$('#wfile').value='';toast(e.message||'تعذرت معالجة الصورة','err')}};
   const showBannerRows=()=>document.querySelectorAll('[data-brow]').forEach((r,i)=>r.style.display=i<+$('#bcount').value?'flex':'none');$('#bcount').onchange=showBannerRows;showBannerRows();
   document.querySelectorAll('[data-bfile]').forEach(inp=>inp.onchange=async()=>{const i=inp.dataset.bfile,f=inp.files[0];if(!f)return;toast(`جارٍ تجهيز صورة البنر ${+i+1}…`);try{document.querySelector(`[data-bimg="${i}"]`).value=await prepareWelcomeImage(f);toast('تم إرفاق صورة البنر')}catch(e){inp.value='';toast(e.message||'تعذرت معالجة الصورة','err')}});
-  $('#wsave').onclick=()=>{DB.welcomeTitle=$('#wt').value.trim();DB.welcomeSubtitle=$('#ws').value.trim();DB.welcomePopupTitle=$('#wpt').value.trim();DB.welcomeMessage=$('#wpm').value.trim();DB.welcomeImage=$('#wimg').value.trim();DB.welcomePopupEnabled=$('#wpe').checked;const count=+$('#bcount').value;DB.homeBanners=Array.from({length:count},(_,i)=>({title:document.querySelector(`[data-btitle="${i}"]`).value.trim(),image:document.querySelector(`[data-bimg="${i}"]`).value.trim(),page:document.querySelector(`[data-bpage="${i}"]`).value})).filter(x=>x.title||x.image);sessionStorage.removeItem('welcome_seen');audit('تعديل','إعدادات شاشة الترحيب والبنرات');save();closeModal();showHome();toast('حُفظت شاشة الترحيب والبنرات')};
+  document.querySelectorAll('[data-bremove]').forEach(btn=>btn.onclick=()=>{const i=+btn.dataset.bremove,count=+$('#bcount').value;if(i>=count)return;for(let j=i;j<count-1;j++){document.querySelector(`[data-btitle="${j}"]`).value=document.querySelector(`[data-btitle="${j+1}"]`).value;document.querySelector(`[data-bimg="${j}"]`).value=document.querySelector(`[data-bimg="${j+1}"]`).value;document.querySelector(`[data-bpage="${j}"]`).value=document.querySelector(`[data-bpage="${j+1}"]`).value}const last=count-1;document.querySelector(`[data-btitle="${last}"]`).value='';document.querySelector(`[data-bimg="${last}"]`).value='';document.querySelector(`[data-bpage="${last}"]`).value='';$('#bcount').value=Math.max(0,count-1);showBannerRows();toast('حُذف البنر من النموذج — اضغط حفظ التعديلات')});
+  $('#wremove').onclick=()=>{$('#wimg').value='';$('#wfile').value='';toast('حُذفت الصورة من النموذج — اضغط حفظ التعديلات')};
+  $('#wclear').onclick=()=>ask('حذف جميع العناوين والبنرات والصورة والرسالة من شاشة الترحيب؟',async()=>{DB.welcomeTitle='';DB.welcomeSubtitle='';DB.welcomePopupTitle='';DB.welcomeMessage='';DB.welcomeImage='';DB.homeBanners=[];DB.welcomePopupEnabled=false;sessionStorage.removeItem('welcome_seen');audit('حذف','محتوى شاشة الترحيب');const ok=await persist();if(!ok)return toast('تعذّر الحفظ؛ لم يتم تأكيد الحذف','err');showHome();toast('حُذف محتوى شاشة الترحيب وحُفظ')});
+  $('#wsave').onclick=async()=>{DB.welcomeTitle=$('#wt').value.trim();DB.welcomeSubtitle=$('#ws').value.trim();DB.welcomePopupTitle=$('#wpt').value.trim();DB.welcomeMessage=$('#wpm').value.trim();DB.welcomeImage=$('#wimg').value.trim();DB.welcomePopupEnabled=$('#wpe').checked;const count=+$('#bcount').value;DB.homeBanners=Array.from({length:count},(_,i)=>({title:document.querySelector(`[data-btitle="${i}"]`).value.trim(),image:document.querySelector(`[data-bimg="${i}"]`).value.trim(),page:document.querySelector(`[data-bpage="${i}"]`).value})).filter(x=>x.title||x.image);sessionStorage.removeItem('welcome_seen');audit('تعديل','إعدادات شاشة الترحيب والبنرات');const ok=await persist();if(!ok)return toast('تعذّر حفظ شاشة الترحيب؛ حاول مرة أخرى','err');closeModal();showHome();toast('حُفظت تعديلات شاشة الترحيب')};
 }
 function renderTop(){
   const p=pg();
@@ -1830,9 +1838,13 @@ function saveRow(rid){
 function delRow(rid){
   const p=pg(); if(!can(p.id,'full')) return toast('ليس لديك صلاحية الحذف','err');
   const r=p.rows.find(x=>x.id===rid);
-  ask(`حذف <b>${esc(rowTitle(p,r))}</b> من ${esc(p.name)}؟`,()=>{
+  ask(`حذف <b>${esc(rowTitle(p,r))}</b> من ${esc(p.name)}؟`,async()=>{
+    const i=p.rows.indexOf(r);
     audit('حذف سجل',p.name+' · '+rowTitle(p,r));
-    p.rows=p.rows.filter(x=>x.id!==rid); save(); render(); toast('حُذف السجل'); });
+    p.rows=p.rows.filter(x=>x.id!==rid); render();
+    const ok=await persist();
+    if(!ok){p.rows.splice(i,0,r);render();return toast('تعذّر الحفظ؛ أُعيد السجل ولم يُحذف','err');}
+    toast('حُذف السجل وحُفظ نهائياً'); });
 }
 function openRecordPreview(rid){
   const p=pg(),r=p.rows.find(x=>x.id===rid); if(!r) return;
