@@ -2045,6 +2045,10 @@ function openPageSet(){
     audit('إعدادات صفحة',n); save(); closeModal(); render(); toast('حُفظت الإعدادات'); };
 }
 const STARTERS={
+  force:{t:'تشكيل وموقف القوة',d:'متابعة 500 فرد والشواغر والحالات',icon:'users',acc:'teal',view:'table',
+    cols:['الرقم التنظيمي','القسم','المسمى الوظيفي','الرتبة المطلوبة','اسم الفرد','الرقم العام','حالة الفرد','جهة التكليف','تاريخ بداية الحالة','تاريخ نهاية الحالة','ملاحظات']},
+  forceSummary:{t:'ملخص موقف الأقسام',d:'ملاك وموجود وشاغر ومجمّد',icon:'chart',acc:'gold',view:'table',
+    cols:['القسم','القوة المعتمدة','الموجود الفعلي','الشاغر','المجمّد','المكلّف داخلياً','المكلّف خارجياً','في إجازة','النقص','الزيادة','تاريخ التحديث','ملاحظات']},
   people:{t:'سجل أفراد',d:'اسم وصورة ورتبة',icon:'users',acc:'teal',view:'table',
     cols:['الاسم','الصورة','رقم الهوية','الرتبة','الرقم العام','الاختصاص','السرية','رقم الجوال','رقم أقرب قريب','ملفات الفرد']},
   track:{t:'متابعة معاملات',d:'حالة ملوّنة وسجل إجراءات',icon:'clipboard',acc:'blue',view:'table',
@@ -2062,6 +2066,9 @@ const STARTERS={
 };
 function guessCol(name,peopleId,isLetters){
   const t=name.trim(), h=(...w)=>w.some(x=>t.includes(x));
+  if(t==='حالة الفرد') return col(t,'select',{filterable:true,options:[{label:'على رأس العمل',color:'green'},{label:'شاغر',color:'red'},{label:'مجمّد',color:'slate'},{label:'مكلّف',color:'blue'},{label:'إجازة',color:'amber'}]});
+  if(t==='القسم') return col(t,'select',{filterable:true,options:[{label:'القيادة',color:'gold'},{label:'شؤون الأفراد',color:'teal'},{label:'العمليات',color:'blue'},{label:'التدريب',color:'plum'},{label:'الإمداد والتموين',color:'amber'},{label:'الاتصالات',color:'green'},{label:'الخدمات الطبية',color:'red'},{label:'الأمن والحماية',color:'slate'}]});
+  if(['القوة المعتمدة','الموجود الفعلي','الشاغر','المجمّد','المكلّف داخلياً','المكلّف خارجياً','في إجازة','النقص','الزيادة'].includes(t)) return col(t,'number');
   if(h('صيغة الخطاب','نص الخطاب','متن الخطاب')) return col(t,'longtext');
   if(h('PDF','pdf','ملفات','مستندات','نماذج')) return col(t,'files');
   if(isLetters&&h('مرفق')) return col(t,'list');
@@ -2092,7 +2099,7 @@ function buildPage(name,sub,ico,acc,view,names){
   const tgt=DB.pages.find(x=>x.logCol);
   return {id:uid(),name,sub,icon:ico,accent:acc,view,
     avatars:!!(cols.find(c=>c.type==='image'&&c.hidden))||/اسم/.test(names[0]||''),
-    showUpdated:!!st,chipsCol:'',logCol:lg?lg.id:'',peoplePage:peo?peo.id:'',targetPage:tgt?tgt.id:'',showPhoto:true,cols,rows:[]};
+    showUpdated:!!st,chipsCol:st?st.id:'',logCol:lg?lg.id:'',peoplePage:peo?peo.id:'',targetPage:tgt?tgt.id:'',showPhoto:true,cols,rows:[]};
 }
 function openNewPage(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
