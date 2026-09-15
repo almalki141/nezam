@@ -451,20 +451,21 @@ html[data-theme="dark"] .ph{background:#3A2E14}
   .seg{width:100%}.seg button{flex:1}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.chip{flex:none}
   .register{background:transparent;border:0;box-shadow:none;overflow:visible}.reg-head{padding:10px 12px;border-radius:11px;margin-bottom:9px;position:sticky;top:0;z-index:5}
-  .tablewrap{display:none}.mobile-cards{display:grid;gap:11px}
-  .mobile-record{position:relative;background:linear-gradient(145deg,var(--surface),var(--surface-2));border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:0 8px 24px rgba(5,45,42,.09)}
+  .tablewrap{display:none}.mobile-page .tablewrap{display:block}.mobile-page .mobile-cards{display:none}.mobile-cards{display:grid;gap:11px}
+  .mobile-record{position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 0%,var(--surface) 55%,var(--surface-2) 100%);border:1px solid rgba(20,81,77,.18);border-radius:20px;padding:15px;box-shadow:0 10px 28px rgba(5,45,42,.11)}
+  .mobile-record:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--pine),var(--brass),var(--pine-2))}
   .mobile-record:has([data-pick]:checked){border-color:var(--pine-2);box-shadow:0 0 0 2px rgba(20,81,77,.13),0 8px 24px rgba(5,45,42,.11)}
-  .mobile-record-head{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:11px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line-2)}
-  .mobile-record .ava{width:54px;height:54px;border-radius:50%;font-size:17px;background:linear-gradient(145deg,var(--gold-bg),var(--surface-2));border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
-  .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 6px;font-size:16px;line-height:1.45;color:var(--ink)}
-  .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}
+  .mobile-record-head{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:4px 0 13px;border-bottom:1px solid var(--line-2)}
+  .mobile-record .ava{width:64px;height:64px;border-radius:50%;font-size:17px;background:linear-gradient(145deg,var(--gold-bg),var(--surface-2));border:3px solid #fff;outline:1px solid rgba(183,132,49,.35);box-shadow:0 5px 15px rgba(0,0,0,.12)}
+  .mobile-record-title{min-width:0}.mobile-record-title h4{margin:0 0 7px;font-size:16px;line-height:1.45;color:var(--ink)}
+  .mobile-rank-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid rgba(183,132,49,.38);border-radius:8px;background:linear-gradient(135deg,#fff8e7,var(--gold-bg));color:#805b1f;font-size:11px;font-weight:900;box-shadow:inset 0 0 0 1px rgba(255,255,255,.65)}.mobile-rank-badge:before,.mobile-rank-badge:after{content:"◆";font-size:6px;color:var(--brass)}
+  .mobile-record-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:7px}.mobile-record-tags:empty{display:none}.mobile-record-tags .badge{font-size:10.5px;padding:5px 8px}
   .mobile-card-field{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line)}.mobile-card-field small{font-size:9px;color:var(--ink-3)}.mobile-card-field b{font-size:10.5px;color:var(--ink)}
   .mobile-record-sub{margin-top:6px;color:var(--ink-3);font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center}
   .mobile-record-pick{align-self:start}.mobile-record-pick input{width:21px;height:21px;accent-color:var(--pine);cursor:pointer}
   .mobile-record-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding-top:11px}
   .mobile-record-actions .iconbtn{width:100%;height:51px;padding:5px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:10px;font-weight:800;color:var(--pine)}
   .mobile-record-actions .iconbtn::after{content:attr(title)}.mobile-record-actions .iconbtn.del{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
-  .mobile-record-details{display:none;padding-top:12px;grid-template-columns:1fr 1fr;gap:7px}.mobile-details .mobile-record-details{display:grid}.mobile-record-details>div{padding:9px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface)}.mobile-record-details span{display:block;font-size:9.5px;color:var(--ink-3);font-weight:700;margin-bottom:4px}.mobile-record-details b{font-size:11.5px;color:var(--ink);overflow-wrap:anywhere}.mobile-record-details .thumb{width:36px;height:36px}
   .mobile-select-all{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:#fff}.mobile-select-all input{width:18px;height:18px;accent-color:var(--brass)}
   .tablewrap tbody{display:grid;gap:9px}
   .tablewrap tbody tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 8px;box-shadow:var(--shadow-sm);overflow:hidden}
@@ -1310,7 +1311,7 @@ const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
 const DEFAULT_AVATAR='default-soldier-avatar.png';
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'letter',mobileView:'cards',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];ui[cur].mobileView=ui[cur].mobileView||'cards';return ui[cur]; }
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'letter',mobileView:'cards',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];ui[cur].mobileView=ui[cur].mobileView==='details'?'page':(ui[cur].mobileView||'cards');return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1567,7 +1568,7 @@ function toolsHTML(p,extra){
     ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>
       ${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
     <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
-    <div class="mobile-view-toggle"><button data-mobile-view="cards" class="${u.mobileView==='cards'?'on':''}">${icon('users',14)} بطاقات</button><button data-mobile-view="details" class="${u.mobileView==='details'?'on':''}">${ic('file',14)} تفاصيل</button></div>
+    <div class="mobile-view-toggle"><button data-mobile-view="cards" class="${u.mobileView==='cards'?'on':''}">${icon('users',14)} عرض البطاقات</button><button data-mobile-view="page" class="${u.mobileView==='page'?'on':''}">${ic('file',14)} عرض الصفحة</button></div>
     <div class="spacer"></div>${extra||''}
     ${p.showImport!==false&&canImport(p)?`<button class="btn ghost" id="bImp">${ic('up')} استيراد Excel</button>`:''}
     ${p.showExport!==false&&canExport()?`<button class="btn ghost" id="bXls">${ic('xls')} تصدير Excel</button>`:''}
@@ -1599,12 +1600,11 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const title=rowTitle(p,r),status=cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),rank=cols.find(c=>c.type==='select'&&c!==status),dept=cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,detailCols=cols.filter(c=>c!==photoCol(p));
-  const cardFields=chosen.filter(c=>c!==primary(p)).map(c=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join('');
+  const title=rowTitle(p,r),rank=cols.find(c=>/رتبة/.test(c.name)),status=cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,showRank=rank&&chosen.includes(rank)&&cellText(p,rank,r);
+  const cardFields=chosen.filter(c=>c!==primary(p)&&c!==rank).map(c=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join('');
   return `<article class="mobile-record">
-    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4><div class="mobile-record-tags">${cardFields}</div></div>
+    <div class="mobile-record-head">${avaHTML(p,r,title)}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${cardFields}</div></div>
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:`<span class="dim">${n}</span>`}</div>
-    <div class="mobile-record-details">${detailCols.map(c=>`<div><span>${esc(c.name)}</span><b>${cellHTML(p,c,r,false)}</b></div>`).join('')}</div>
     <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn" title="عرض" data-vw="${r.id}">${ic('eye',18)}</button>`:''}${p.showLog!==false?`<button class="iconbtn" title="التفاصيل" data-log="${r.id}">${ic('file',18)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn" title="تعديل" data-ed="${r.id}">${ic('edit',18)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',18)}</button>`:''}</div>
   </article>`;
 }
@@ -2083,7 +2083,7 @@ function openPageSet(){
       <div class="fld full"><label>الأدوات الظاهرة في الصفحة</label><div class="cmflags">
         <label><input type="checkbox" id="ps_search" ${p.showSearch!==false?'checked':''}> البحث</label><label><input type="checkbox" id="ps_import" ${p.showImport!==false?'checked':''}> الاستيراد</label><label><input type="checkbox" id="ps_export" ${p.showExport!==false?'checked':''}> التصدير</label><label><input type="checkbox" id="ps_print" ${p.showPrint!==false?'checked':''}> الطباعة</label>
         <label><input type="checkbox" id="ps_preview" ${p.showPreview!==false?'checked':''}> المعاينة</label><label><input type="checkbox" id="ps_history" ${p.showLog!==false?'checked':''}> سجل الإجراءات</label><label><input type="checkbox" id="ps_edit" ${p.showEdit!==false?'checked':''}> التعديل</label><label><input type="checkbox" id="ps_delete" ${p.showDelete!==false?'checked':''}> الحذف</label></div></div>
-      <div class="fld full"><label>الحقول الظاهرة في بطاقة الجوال</label><div class="mobile-col-picker">${p.cols.filter(c=>c.type!=='image').map(c=>`<label><input type="checkbox" data-mobile-col="${c.id}" ${(p.mobileCardCols||[]).includes(c.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div><span class="hint">إذا لم تحدد شيئًا تختار المنظومة أهم الحقول تلقائيًا. العرض التفصيلي يُظهر جميع الحقول.</span></div>
+      <div class="fld full"><label>الحقول الظاهرة في بطاقة الجوال</label><div class="mobile-col-picker">${p.cols.filter(c=>c.type!=='image').map(c=>`<label><input type="checkbox" data-mobile-col="${c.id}" ${(p.mobileCardCols||[]).includes(c.id)?'checked':''}> ${esc(c.name)}</label>`).join('')}</div><span class="hint">إذا لم تحدد شيئًا تختار المنظومة أهم الحقول تلقائيًا. «عرض الصفحة» يعرض جميع الحقول بشكل مستقل.</span></div>
       ${p.view==='letters'?`
       <div class="fld"><label>مصدر بيانات التعبئة</label><select id="ps_peo">
         ${DB.pages.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.peoplePage===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
