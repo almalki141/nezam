@@ -2045,6 +2045,8 @@ function openPageSet(){
     audit('إعدادات صفحة',n); save(); closeModal(); render(); toast('حُفظت الإعدادات'); };
 }
 const STARTERS={
+  proTrack:{t:'مركز متابعة المعاملات',d:'متابعة احترافية للأولوية والتعثر والإنجاز',icon:'clipboard',acc:'blue',view:'table',
+    cols:['عنوان المعاملة','رقم المعاملة','اتجاه المعاملة','نوع المعاملة','درجة الأولوية','الجهة الواردة منها','الجهة المحالة إليها','المسؤول عن المتابعة','اسم صاحب المعاملة','تاريخ الورود','تاريخ الإحالة','تاريخ الاستحقاق','آخر إجراء','حالة المعاملة','نسبة الإنجاز','عدد أيام التأخير','ملاحظات','صور المعاملة','مرفقات PDF']},
   force:{t:'تشكيل وموقف القوة',d:'متابعة 500 فرد والشواغر والحالات',icon:'users',acc:'teal',view:'table',
     cols:['الرقم التنظيمي','القسم','المسمى الوظيفي','الرتبة المطلوبة','اسم الفرد','الرقم العام','حالة الفرد','جهة التكليف','تاريخ بداية الحالة','تاريخ نهاية الحالة','ملاحظات']},
   forceSummary:{t:'ملخص موقف الأقسام',d:'ملاك وموجود وشاغر ومجمّد',icon:'chart',acc:'gold',view:'table',
@@ -2066,9 +2068,13 @@ const STARTERS={
 };
 function guessCol(name,peopleId,isLetters){
   const t=name.trim(), h=(...w)=>w.some(x=>t.includes(x));
+  if(t==='اتجاه المعاملة') return col(t,'select',{filterable:true,options:[{label:'وارد',color:'blue'},{label:'صادر',color:'green'},{label:'داخلي',color:'plum'}]});
+  if(t==='نوع المعاملة') return col(t,'select',{filterable:true,options:[{label:'أمر',color:'red'},{label:'تعميم',color:'amber'},{label:'طلب',color:'blue'},{label:'خطاب',color:'teal'},{label:'إفادة',color:'green'},{label:'أخرى',color:'slate'}]});
+  if(t==='درجة الأولوية') return col(t,'select',{filterable:true,options:[{label:'عاجلة جداً',color:'red'},{label:'عاجلة',color:'amber'},{label:'مهمة',color:'blue'},{label:'عادية',color:'slate'}]});
+  if(t==='حالة المعاملة') return col(t,'select',{filterable:true,options:[{label:'جديدة',color:'blue'},{label:'قيد الإجراء',color:'amber'},{label:'بانتظار رد',color:'plum'},{label:'متعثرة',color:'red'},{label:'مكتملة',color:'green'},{label:'مغلقة',color:'slate'}]});
   if(t==='حالة الفرد') return col(t,'select',{filterable:true,options:[{label:'على رأس العمل',color:'green'},{label:'شاغر',color:'red'},{label:'مجمّد',color:'slate'},{label:'مكلّف',color:'blue'},{label:'إجازة',color:'amber'}]});
   if(t==='القسم') return col(t,'select',{filterable:true,options:[{label:'القيادة',color:'gold'},{label:'شؤون الأفراد',color:'teal'},{label:'العمليات',color:'blue'},{label:'التدريب',color:'plum'},{label:'الإمداد والتموين',color:'amber'},{label:'الاتصالات',color:'green'},{label:'الخدمات الطبية',color:'red'},{label:'الأمن والحماية',color:'slate'}]});
-  if(['القوة المعتمدة','الموجود الفعلي','الشاغر','المجمّد','المكلّف داخلياً','المكلّف خارجياً','في إجازة','النقص','الزيادة'].includes(t)) return col(t,'number');
+  if(['القوة المعتمدة','الموجود الفعلي','الشاغر','المجمّد','المكلّف داخلياً','المكلّف خارجياً','في إجازة','النقص','الزيادة','نسبة الإنجاز','عدد أيام التأخير'].includes(t)) return col(t,'number');
   if(h('صيغة الخطاب','نص الخطاب','متن الخطاب')) return col(t,'longtext');
   if(h('PDF','pdf','ملفات','مستندات','نماذج')) return col(t,'files');
   if(isLetters&&h('مرفق')) return col(t,'list');
@@ -2083,7 +2089,7 @@ function guessCol(name,peopleId,isLetters){
   if(h('حالة','الوضع')) return col(t,'select',{filterable:true,options:statusOpts()});
   if(h('التصنيف','النوع','الفئة','القسم')) return col(t,'select',{filterable:true,
     options:[{label:'تصنيف أول',color:'green'},{label:'تصنيف ثانٍ',color:'blue'},{label:'تصنيف ثالث',color:'amber'}]});
-  if(peopleId&&h('اسم الفرد','المستلم','المرشح','المرشَّح','السائق','الموظف','المسؤول','المنسوب','المستفيد'))
+  if(peopleId&&h('اسم الفرد','صاحب المعاملة','المستلم','المرشح','المرشَّح','السائق','الموظف','المسؤول','المنسوب','المستفيد'))
     return col(t,'link',{link:peopleId});
   if(h('ملاحظات','آخر إجراء','الإجراء','التفاصيل','الوصف','البيان','السبب')) return col(t,'longtext');
   if(h('رقم','الهوية','اللوحة','التسلسلي','الكود','العام')) return col(t,'code');
