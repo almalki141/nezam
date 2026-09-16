@@ -14,7 +14,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__noSupabase=1"></script>
 <style>
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/plex-arabic-400.woff2') format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/plex-arabic-600.woff2') format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/plex-latin-400.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/plex-latin-600.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{
+  --ui-font:'IBM Plex Sans Arabic',Arial,Tahoma,sans-serif;
   --bg:#EDF0EE; --surface:#FFFFFF; --surface-2:#F6F8F6; --paper:#FBF8F1;
   --ink:#0F2320; --ink-2:#4A5C58; --ink-3:#7E8F8B;
   --line:#DCE3E0; --line-2:#EAEFEC;
@@ -44,7 +49,7 @@ html[data-theme="dark"]{
   --shadow:0 2px 4px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Tahoma,'Segoe UI',sans-serif;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui-font);
   font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -272,12 +277,12 @@ td.acts,th.acts{width:112px;white-space:nowrap;text-align:left}
   box-shadow:0 1px 2px rgba(14,58,56,.08),0 18px 44px rgba(14,58,56,.13);
   font-family:'Amiri',Georgia,serif;font-size:17px;line-height:2.05;color:#17211F}
 html[data-theme="dark"] .sheet{color:#DDE7E4}
-.sheet .lh{display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--brass);padding-bottom:11px;margin-bottom:20px;font-family:Arial,Tahoma,sans-serif}
+.sheet .lh{display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--brass);padding-bottom:11px;margin-bottom:20px;font-family:var(--ui-font)}
 .sheet .lh .u{font-size:14px;font-weight:800;color:var(--pine-2)}
 .sheet .lh .d{font-size:12px;color:var(--ink-3);font-weight:600;margin-inline-start:auto}
 .sheet .lh img{width:46px;height:46px;border-radius:7px;object-fit:cover;border:1px solid var(--line)}
 .sheet .body{white-space:pre-wrap;word-wrap:break-word}
-.sheet .attsec{margin-top:24px;padding-top:13px;border-top:1px dashed var(--line);font-family:Arial,Tahoma,sans-serif;font-size:13.5px;line-height:1.9}
+.sheet .attsec{margin-top:24px;padding-top:13px;border-top:1px dashed var(--line);font-family:var(--ui-font);font-size:13.5px;line-height:1.9}
 .sheet .attsec h5{margin:0 0 7px;font-size:13px;font-weight:800;color:var(--pine-2)}
 .ph{background:#F5E7C6;border-bottom:1px dashed #B08640;border-radius:2px;padding:0 2px}
 html[data-theme="dark"] .ph{background:#3A2E14}
@@ -398,7 +403,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 @media print{
   body{background:#fff}
   .app,.toasts,.overlay,.lbx,.gate{display:none!important}
-  #printRoot{display:block!important;font-family:Arial,Tahoma,sans-serif;color:#000}
+  #printRoot{display:block!important;font-family:var(--ui-font);color:#000}
   #printRoot .sheet{box-shadow:none;border:none;max-width:none;padding:0;background:#fff;color:#000}
   #printRoot table{width:100%;border-collapse:collapse;font-size:11px}
   #printRoot th{background:#0E3A38!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px;border:1px solid #0E3A38;text-align:right}
@@ -572,6 +577,19 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .mobile-record-title{padding-inline-end:32px}.mobile-record.no-avatar .mobile-record-title{padding-inline:0 32px}.mobile-record.avatar-left .mobile-record-title{padding-inline:32px 0}
 }
 @media (max-width:360px){.mobile-brand-title{font-size:14px;padding-inline:40px}.welcome-card,.home-group-head{padding:10px 8px;gap:6px}.welcome-card .wi,.home-group-head .wi{width:32px;height:32px}.welcome-card b,.home-group-head b{font-size:11px}.mobile-record-title h4{font-size:14px}}
+@media(max-width:600px){
+  .mobile-record.no-avatar .mobile-record-head{min-height:0;padding:3px 0 10px;display:block}
+  .mobile-record.no-avatar .mobile-record-title{padding:0}
+  .mobile-record.no-avatar .mobile-record-title h4{padding-inline-end:32px;font-size:16px;font-weight:600;line-height:1.55}
+  .mobile-record-pick{left:8px;right:auto;top:9px}
+  .mobile-record-id{display:flex;align-items:center;gap:6px;width:fit-content;max-width:100%;direction:rtl;margin:0;padding:3px 0;min-height:32px;font-size:13px;font-weight:400;color:var(--ink-2);border:0;background:transparent}
+  .mobile-record-id>span{direction:ltr;unicode-bidi:isolate;overflow-wrap:anywhere}.mobile-record-id svg{width:13px;height:13px;color:var(--ink-3);flex:none}
+  .mobile-record-badges{justify-content:space-between;align-items:center;gap:8px;margin-top:3px}
+  .mobile-rank-badge,.mobile-card-status .badge{font-size:12px;font-weight:400;white-space:normal;overflow-wrap:anywhere;padding:3px 10px;border-radius:7px;line-height:1.6;max-width:100%}.mobile-rank-badge{max-width:48%}.mobile-card-status{max-width:52%;margin-inline-start:auto}
+  .mobile-record-tags{display:flex;flex-direction:column;align-items:stretch;gap:4px;margin-top:8px;max-height:none}.mobile-record-tags:empty{display:none}
+  .mobile-card-field{display:flex;align-items:baseline;justify-content:space-between;gap:12px;width:100%;padding:0;min-width:0}.mobile-card-field small{font-size:11px;font-weight:400;color:var(--ink-2);flex:none;max-width:45%;overflow-wrap:anywhere}.mobile-card-field b{font-size:13px;font-weight:400;color:var(--field-color);max-width:55%;white-space:normal;overflow-wrap:anywhere;direction:inherit;text-align:left}
+  .mobile-record-actions .iconbtn{min-height:44px;height:44px;font-size:12px;font-weight:400}.mobile-record-actions .act-more{flex:0 0 44px;color:var(--ink-2);border-inline-start:1px solid var(--line-2)}.mobile-record-actions .act-more::after{display:none}
+}
 </style>
 </head>
 <body>
@@ -1721,13 +1739,24 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع|سجين/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&rank!==titleCol&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showPhoto=false,identifier=cardCols.find(c=>c!==titleCol&&/رقم/.test(c.name))||((p.mobileCardCols||[]).length?null:cols.find(c=>c!==titleCol&&/الرقم العسكري|رقم المعاملة|الرقم العام|رقم الهوية/.test(c.name)));
-  const fieldColors=['#1767aa','#17795e','#70418f','#b2740b','#a3231c'],cardFields=[...new Set([...cardCols,...(p.mobileCardSub&&dept?[dept]:[])])].filter(c=>c!==titleCol&&c!==rank&&c!==status&&c!==identifier&&cellText(p,c,r)).slice(0,2).map((c,i)=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field" style="--field-color:${fieldColors[(p.cols.indexOf(c)+i)%fieldColors.length]}"><b>${esc(cellText(p,c,r))}</b></span>`).join(''),showStatus=status&&status!==titleCol&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
-  return `<article class="mobile-record ${showPhoto?'':'no-avatar'} avatar-${p.mobileAvatarSide==='left'?'left':'right'}">
+  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r);
+  const rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع|سجين/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name));
+  const dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean);
+  const cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),identifier=cardCols.find(c=>c!==titleCol&&/رقم/.test(c.name))||((p.mobileCardCols||[]).length?null:cols.find(c=>c!==titleCol&&/الرقم العسكري|رقم المعاملة|الرقم العام|رقم الهوية/.test(c.name)));
+  const showRank=rank&&rank!==titleCol&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showStatus=status&&status!==titleCol&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
+  const optionColor=c=>{const o=(c.options||[]).find(o=>o.label===cellText(p,c,r));return CVAR[o?.color]?o.color:'slate'};
+  const cardFields=[...new Set([...cardCols,...(p.mobileCardSub&&dept?[dept]:[])])].filter(c=>c!==titleCol&&c!==rank&&c!==status&&c!==identifier&&cellText(p,c,r)).slice(0,2).map(c=>`<span class="mobile-card-field" style="--field-color:${CVAR[optionColor(c)]}"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r))}</b></span>`).join('');
+  return `<article class="mobile-record no-avatar">
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
-    <div class="mobile-record-head">${showPhoto?avaHTML(p,r,title):''}<div class="mobile-record-title"><h4>${esc(title)}</h4>${identifier&&cellText(p,identifier,r)?`<div class="mobile-record-id">${esc(cellText(p,identifier,r))}</div>`:''}<div class="mobile-record-badges">${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}${showStatus?`<span class="mobile-card-status">${cellHTML(p,status,r,false)}</span>`:''}</div><div class="mobile-record-tags">${cardFields}</div></div></div>
-    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" aria-label="عرض السجل" data-vw="${r.id}">${ic('eye',18)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" aria-label="تعديل السجل" data-ed="${r.id}">${ic('edit',18)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" aria-label="حذف السجل" data-dl="${r.id}">${ic('trash',18)}</button>`:''}</div>
+    <div class="mobile-record-head"><div class="mobile-record-title"><h4>${esc(title)}</h4>${identifier&&cellText(p,identifier,r)?`<button type="button" class="mobile-record-id" data-copy-number="${r.id}" data-copy-col="${identifier.id}" title="نسخ ${esc(identifier.name)}" aria-label="نسخ ${esc(identifier.name)}"><span>${esc(cellText(p,identifier,r))}</span>${ic('clipboard',13)}</button>`:''}<div class="mobile-record-badges">${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}${showStatus?`<span class="mobile-card-status"><span class="badge b-${optionColor(status)}">${esc(cellText(p,status,r))}</span></span>`:''}</div><div class="mobile-record-tags">${cardFields}</div></div></div>
+    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" aria-label="عرض السجل" data-vw="${r.id}">${ic('eye',18)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" aria-label="تعديل السجل" data-ed="${r.id}">${ic('edit',18)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn act-more" title="خيارات السجل" aria-label="خيارات السجل" data-card-menu="${r.id}">${ic('more',18)}</button>`:''}</div>
   </article>`;
+}
+function openCardActions(rid){
+  const p=pg(),r=p?.rows.find(r=>r.id===rid);
+  if(!r||!can(p.id,'full')||p.showDelete===false)return;
+  modal('خيارات السجل',`<p style="margin:0 0 14px;overflow-wrap:anywhere">${esc(rowTitle(p,r))}</p><button type="button" class="btn danger" id="cardMenuDelete" style="width:100%;justify-content:center;min-height:44px">${ic('trash',18)} حذف السجل</button>`,`<button class="btn ghost" onclick="closeModal()">إغلاق</button>`,'sm');
+  $('#cardMenuDelete').onclick=()=>delRow(rid);
 }
 function renderTable(p){
   const u=U(), ch=chipsCol(p), allRows=rowsOf(p), cols=vis(p), pcol=primary(p);
@@ -1772,6 +1801,8 @@ function renderTable(p){
   document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>openRow(b.dataset.ed));
   document.querySelectorAll('[data-vw]').forEach(b=>b.onclick=()=>openRecordPreview(b.dataset.vw));
   document.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>delRow(b.dataset.dl));
+  document.querySelectorAll('[data-card-menu]').forEach(b=>b.onclick=()=>openCardActions(b.dataset.cardMenu));
+  document.querySelectorAll('[data-copy-number]').forEach(b=>b.onclick=async()=>{const r=p.rows.find(r=>r.id===b.dataset.copyNumber),c=p.cols.find(c=>c.id===b.dataset.copyCol);if(!r||!c)return;try{await navigator.clipboard.writeText(cellText(p,c,r));toast('نُسخ '+c.name)}catch(e){toast('تعذّر النسخ؛ يمكنك قراءة الرقم في عرض السجل','err')}});
   document.querySelectorAll('[data-log]').forEach(b=>b.onclick=()=>openLog(b.dataset.log));
   document.querySelectorAll('[data-pick]').forEach(b=>b.onchange=()=>{u.picked=b.checked?uniq([...u.picked,b.dataset.pick]):u.picked.filter(id=>id!==b.dataset.pick);renderTable(p)});
   if($('#pickAll')) $('#pickAll').onchange=e=>{const ids=rows.map(r=>r.id);u.picked=e.target.checked?uniq([...u.picked,...ids]):u.picked.filter(id=>!ids.includes(id));renderTable(p)};
@@ -2227,8 +2258,8 @@ function openPageSet(){
       <div class="fld full"><div class="gnote"><b>رتّب البطاقة بسهولة:</b> اختر المعلومة المناسبة لكل موضع. تعرض البطاقة أهم المعلومات فقط لتبقى صغيرة وواضحة.</div></div>
       <div class="fld full"><div class="card-layout-settings">
         <div class="card-slot featured"><b>عنوان البطاقة</b><span>يتبع «العمود الرئيسي» الذي اخترته تلقائيًا</span><strong id="ps_card_title_label" style="font-size:13px;color:var(--pine)">${esc(primary(p).name)}</strong></div>
-        <div class="card-slot"><b>بجوار الرتبة</b><span>شارة الحالة تحت العنوان والرقم</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
-        <div class="card-slot"><b>المنتصف الأول</b><span>الرتبة</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
+        <div class="card-slot"><b>الحالة يسارًا</b><span>شارة صغيرة مقابل الرتبة</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
+        <div class="card-slot"><b>الرتبة يمينًا</b><span>في سطر مستقل تحت الاسم والرقم</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
         <div class="card-slot"><b>المعلومة الأساسية</b><span>معلومة إضافية واحدة</span><select id="ps_card_mid1">${cardOpts((p.mobileCardMiddle||[])[0])}</select></div>
         <div class="card-slot"><b>أسفل المحتوى</b><span>الوحدة أو القسم</span><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
       </div></div>
