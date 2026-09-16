@@ -591,6 +591,16 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .mobile-record-actions .iconbtn{min-height:44px;height:44px;font-size:12px;font-weight:400}.mobile-record-actions .act-more{flex:0 0 44px;color:var(--ink-2);border-inline-start:1px solid var(--line-2)}.mobile-record-actions .act-more::after{display:none}
 }
 </style>
+<style>
+:root{--shell-bg:var(--pine);--shell-ink:#fff;--side-muted:#a6bcb6}
+html[data-ui-theme="navy"]{--bg:#EEF1F6;--surface:#fff;--surface-2:#F4F6FA;--paper:#FBFCFE;--ink:#192D41;--ink-2:#526579;--ink-3:#63778C;--line:#DCE3EC;--line-2:#E8EDF3;--pine:#18334E;--pine-2:#244B6D;--pine-3:#102638;--brass:#6B7D95;--brass-2:#B9C6D5;--side-muted:#B7C8D8}
+html[data-ui-theme="pearl"]{--bg:#F6F7F5;--surface:#fff;--surface-2:#FAFBF9;--paper:#FCFCFA;--ink:#243A34;--ink-2:#596B64;--ink-3:#677970;--line:#E2E7E2;--line-2:#EDF0EB;--pine:#24594D;--pine-2:#317461;--pine-3:#193F36;--brass:#8C7949;--brass-2:#D3C393;--shell-bg:#fff;--shell-ink:#24594D}
+.side .brand p,.side .who span,.side .nav-label,.side .savepill{color:var(--side-muted)}
+html[data-ui-theme="navy"] .welcome-hero,html[data-ui-theme="pearl"] .welcome-hero{background:linear-gradient(145deg,var(--pine-2),var(--pine-3))}
+html[data-ui-theme="navy"] .home-group-menu,html[data-ui-theme="pearl"] .home-group-menu{background:var(--surface)}
+.appearance-options{display:grid;gap:9px}.appearance-choice{display:flex;align-items:center;gap:12px;min-height:70px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}.appearance-choice:has(input:checked){border-color:var(--pine);box-shadow:0 0 0 1px var(--pine)}.appearance-choice input{width:20px;height:20px;flex:none;accent-color:var(--pine)}.appearance-choice b{display:block;font-size:14px;font-weight:600}.appearance-choice small{display:block;color:var(--ink-2);font-size:12px}.appearance-swatches{display:flex;gap:4px;margin-inline-start:auto;flex:none}.appearance-swatches i{width:18px;height:24px;border-radius:4px;border:1px solid rgba(0,0,0,.1)}.appearance-preview{padding:14px;margin-top:15px;border-radius:12px;background:var(--preview-bg);color:var(--preview-ink);border:1px solid var(--line)}.appearance-preview header{padding:10px;background:var(--preview-primary);color:#fff;border-radius:8px;font-size:13px}.appearance-preview article{background:#fff;padding:12px;margin-top:10px;border-radius:8px}.appearance-preview b{font-size:15px;font-weight:600}.appearance-preview small{display:block;color:#52655f;font-size:12px;margin-top:3px}.appearance-preview .badge{margin-top:7px}
+@media(max-width:600px){.mobile-brand-title{background:var(--shell-bg);color:var(--shell-ink);border-bottom:1px solid var(--line)}.topbar .burger{color:var(--shell-ink)}html[data-ui-theme="navy"] .welcome-hero,html[data-ui-theme="pearl"] .welcome-hero{background:var(--surface)}.appearance-swatches i{width:14px}}
+</style>
 </head>
 <body>
 
@@ -1499,10 +1509,43 @@ function renderWho(){
     <button class="out" id="btnOut" title="خروج">${ic('out',16)}</button>`;
   $('#btnOut').onclick=()=>{ audit('خروج',''); persist().then(logout); };
 }
+const APP_THEMES={
+  green:{name:'الأخضر الحكومي',hint:'أخضر داكن، لؤلؤي، ولمسة ذهبية',primary:'#0E3A38',bg:'#EDF0EE',ink:'#0F2320',accent:'#D8B573',shell:'#0E3A38'},
+  navy:{name:'الكحلي المؤسسي',hint:'كحلي عميق، أبيض، ولمسة فضية',primary:'#18334E',bg:'#EEF1F6',ink:'#192D41',accent:'#B9C6D5',shell:'#18334E'},
+  pearl:{name:'اللؤلؤي',hint:'واجهة فاتحة جدًا مع أخضر هادئ',primary:'#24594D',bg:'#F6F7F5',ink:'#243A34',accent:'#D3C393',shell:'#FFFFFF'}
+};
+function appearanceTheme(key){const id=key||DB?.appearance?.theme;return Object.hasOwn(APP_THEMES,id)?APP_THEMES[id]:APP_THEMES.green}
+function applyAppearance(){
+  const key=Object.hasOwn(APP_THEMES,DB?.appearance?.theme)?DB.appearance.theme:'green';
+  document.documentElement.setAttribute('data-ui-theme',key);
+  document.documentElement.setAttribute('data-theme','light');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',APP_THEMES[key].shell);
+  const label=$('#activeThemeName');if(label)label.textContent=APP_THEMES[key].name;
+}
+function openAppearanceSettings(){
+  if(!isAdmin())return toast('تغيير الثيم متاح للمدير فقط','err');
+  const current=Object.hasOwn(APP_THEMES,DB?.appearance?.theme)?DB.appearance.theme:'green';
+  modal('مظهر المنظومة',`<div class="gnote">اختر الثيم وشاهد المعاينة. عند التطبيق يصبح المظهر موحّدًا لجميع المستخدمين. ألوان الحالات والخط والبيانات لا تتغير.</div><div class="appearance-options">${Object.entries(APP_THEMES).map(([key,t])=>`<label class="appearance-choice"><input type="radio" name="appTheme" value="${key}" ${key===current?'checked':''}><span><b>${t.name}</b><small>${t.hint}</small></span><span class="appearance-swatches" aria-hidden="true"><i style="background:${t.primary}"></i><i style="background:${t.bg}"></i><i style="background:${t.accent}"></i></span></label>`).join('')}</div><div class="appearance-preview" id="appearancePreview"><header>منظومة الشؤون الإدارية</header><article><b>اسم السجل</b><small>54120 · رقيب أول</small><span class="badge b-green">على رأس العمل</span></article></div>`,`<button class="btn primary" id="appearanceApply">تطبيق على الجميع</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
+  const paint=()=>{const key=$('input[name="appTheme"]:checked')?.value,t=appearanceTheme(key),box=$('#appearancePreview');box.style.setProperty('--preview-bg',t.bg);box.style.setProperty('--preview-ink',t.ink);box.style.setProperty('--preview-primary',t.primary)};
+  document.querySelectorAll('input[name="appTheme"]').forEach(x=>x.onchange=paint);paint();
+  $('#appearanceApply').onclick=async()=>{
+    if(!isAdmin())return toast('تغيير الثيم متاح للمدير فقط','err');
+    const key=$('input[name="appTheme"]:checked')?.value;
+    if(!Object.hasOwn(APP_THEMES,key))return;
+    const btn=$('#appearanceApply');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ التطبيق…';
+    if(!(await flushPendingSave())){btn.disabled=false;btn.textContent='تطبيق على الجميع';return toast('تعذّر حفظ التعديلات السابقة؛ حاول مجددًا','err')}
+    const oldAppearance=DB.appearance,entry={at:nowTs(),by:ME.name,act:'تغيير الثيم',detail:APP_THEMES[key].name};
+    DB.appearance={...(oldAppearance||{}),theme:key};DB.audit=DB.audit||[];DB.audit.unshift(entry);
+    const ok=await commitNow();
+    if(!ok){if(oldAppearance===undefined)delete DB.appearance;else DB.appearance=oldAppearance;DB.audit=DB.audit.filter(x=>x!==entry);applyAppearance();btn.disabled=false;btn.textContent='تطبيق على الجميع';return toast('تعذّر حفظ الثيم؛ لم يتم تأكيد تطبيقه على الجميع','err')}
+    closeModal();renderSideBtns();render();toast('حُفظ '+APP_THEMES[key].name+' للجميع — يصل عبر المزامنة أو الدخول');
+  };
+}
 function renderSideBtns(){
   const b=[];
   b.push(`<button class="sbtn" id="btnPw">${ic('lock',13)} كلمة المرور</button>`);
   if(isAdmin()){
+    b.push(`<button class="sbtn wide" id="btnAppearance">${ic('gear',13)} مظهر المنظومة — لجميع المستخدمين</button>`);
     b.push(`<button class="sbtn" id="btnWelcome">${ic('edit',13)} شاشة الترحيب</button>`);
     b.push(`<button class="sbtn" id="btnTicker">${ic('edit',13)} الشريط المتحرك</button>`);
     b.push(`<button class="sbtn" id="btnUsers">${ic('shieldk',13)} المستخدمون</button>`);
@@ -1510,15 +1553,14 @@ function renderSideBtns(){
     b.push(`<button class="sbtn" id="btnBackup">${ic('dn',13)} نسخة احتياطية</button>`);
     b.push(`<button class="sbtn" id="btnRestore">${ic('up',13)} استعادة</button>`);
   }
-  b.push(`<button class="sbtn wide" id="btnTheme">الوضع الليلي / النهاري</button>`);
+  if(!isAdmin())b.push(`<span class="sbtn wide">الثيم المعتمد: <span id="activeThemeName">${esc(appearanceTheme().name)}</span></span>`);
   b.push(`<button class="sbtn wide" id="btnLock">${ic('lock',13)} قفل الجلسة الآن</button>`);
   $('#sideBtns').innerHTML=b.join('');
   $('#sideRefreshIcon').innerHTML=ic('sync',14);
   $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث المنظومة…';try{if(!(await flushPendingSave()))throw new Error('save');const kept=await keepSessionForRefresh();if(!kept)throw new Error('resume');const u=new URL(location.href);u.searchParams.set('_refresh',Date.now());location.replace(u.href);}catch(e){btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة';toast('تعذّر تحديث المنظومة، حاول مرة أخرى','err')}};
   $('#btnPw').onclick=openChangePw;
   $('#btnLock').onclick=lockSession;
-  $('#btnTheme').onclick=()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
-    document.documentElement.setAttribute('data-theme',d?'light':'dark');};
+  if($('#btnAppearance'))$('#btnAppearance').onclick=openAppearanceSettings;
   $('#sideToolsToggle').onclick=()=>{$('#side').querySelector('.side-foot').classList.toggle('tools-open');};
   if(isAdmin()){ $('#btnWelcome').onclick=openWelcomeSettings; $('#btnTicker').onclick=openTickerSettings; $('#btnUsers').onclick=openUsers; $('#btnAudit').onclick=openAudit;
     $('#btnBackup').onclick=openBackup; $('#btnRestore').onclick=openRestore; }
@@ -1551,6 +1593,7 @@ function renderNav(){
   renderMobileNav();
 }
 function showHome(){
+  applyAppearance();
   clearInterval(window.homeBannerTimer);
   cur=null;$('#side').classList.remove('open');$('#scrim').classList.remove('on');renderNav();
   $('#pageBody').className='page home-page';
@@ -1619,6 +1662,7 @@ function openWelcomeSettings(){
   $('#wsave').onclick=async()=>{DB.welcomeTitle=$('#wt').value.trim();DB.welcomeSubtitle=$('#ws').value.trim();DB.welcomePopupTitle=$('#wpt').value.trim();DB.welcomeMessage=$('#wpm').value.trim();DB.welcomeImage=$('#wimg').value.trim();DB.welcomePopupEnabled=$('#wpe').checked;const count=+$('#bcount').value;DB.homeBanners=Array.from({length:count},(_,i)=>({title:document.querySelector(`[data-btitle="${i}"]`).value.trim(),image:document.querySelector(`[data-bimg="${i}"]`).value.trim(),page:document.querySelector(`[data-bpage="${i}"]`).value})).filter(x=>x.title||x.image);sessionStorage.removeItem('welcome_seen');audit('تعديل','إعدادات شاشة الترحيب والبنرات');const ok=await persist();if(!ok)return toast('تعذّر حفظ شاشة الترحيب؛ حاول مرة أخرى','err');closeModal();showHome();toast('حُفظت تعديلات شاشة الترحيب')};
 }
 function renderTop(){
+  applyAppearance();
   const p=pg();
   $('#topbar').style.setProperty('--acc',CVAR[p.accent]||CVAR.gold);
   $('#topbar').innerHTML=`
