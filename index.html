@@ -11,7 +11,7 @@
 <title>منظومة الشؤون الإدارية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__noSupabase=1"></script>
 <style>
 :root{
@@ -44,7 +44,7 @@ html[data-theme="dark"]{
   --shadow:0 2px 4px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Noto Sans Arabic','Tajawal','Segoe UI',Tahoma,Arial,sans-serif;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Tahoma,'Segoe UI',sans-serif;
   font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
@@ -272,12 +272,12 @@ td.acts,th.acts{width:112px;white-space:nowrap;text-align:left}
   box-shadow:0 1px 2px rgba(14,58,56,.08),0 18px 44px rgba(14,58,56,.13);
   font-family:'Amiri',Georgia,serif;font-size:17px;line-height:2.05;color:#17211F}
 html[data-theme="dark"] .sheet{color:#DDE7E4}
-.sheet .lh{display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--brass);padding-bottom:11px;margin-bottom:20px;font-family:'Tajawal',sans-serif}
+.sheet .lh{display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--brass);padding-bottom:11px;margin-bottom:20px;font-family:Arial,Tahoma,sans-serif}
 .sheet .lh .u{font-size:14px;font-weight:800;color:var(--pine-2)}
 .sheet .lh .d{font-size:12px;color:var(--ink-3);font-weight:600;margin-inline-start:auto}
 .sheet .lh img{width:46px;height:46px;border-radius:7px;object-fit:cover;border:1px solid var(--line)}
 .sheet .body{white-space:pre-wrap;word-wrap:break-word}
-.sheet .attsec{margin-top:24px;padding-top:13px;border-top:1px dashed var(--line);font-family:'Tajawal',sans-serif;font-size:13.5px;line-height:1.9}
+.sheet .attsec{margin-top:24px;padding-top:13px;border-top:1px dashed var(--line);font-family:Arial,Tahoma,sans-serif;font-size:13.5px;line-height:1.9}
 .sheet .attsec h5{margin:0 0 7px;font-size:13px;font-weight:800;color:var(--pine-2)}
 .ph{background:#F5E7C6;border-bottom:1px dashed #B08640;border-radius:2px;padding:0 2px}
 html[data-theme="dark"] .ph{background:#3A2E14}
@@ -398,7 +398,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 @media print{
   body{background:#fff}
   .app,.toasts,.overlay,.lbx,.gate{display:none!important}
-  #printRoot{display:block!important;font-family:'Tajawal',sans-serif;color:#000}
+  #printRoot{display:block!important;font-family:Arial,Tahoma,sans-serif;color:#000}
   #printRoot .sheet{box-shadow:none;border:none;max-width:none;padding:0;background:#fff;color:#000}
   #printRoot table{width:100%;border-collapse:collapse;font-size:11px}
   #printRoot th{background:#0E3A38!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px;border:1px solid #0E3A38;text-align:right}
@@ -1721,7 +1721,7 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع|سجين/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&rank!==titleCol&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showPhoto=p.mobileCardPhoto!==false,identifier=cardCols.find(c=>c!==titleCol&&/رقم/.test(c.name))||((p.mobileCardCols||[]).length?null:cols.find(c=>c!==titleCol&&/الرقم العسكري|رقم المعاملة|الرقم العام|رقم الهوية/.test(c.name)));
+  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع|سجين/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&rank!==titleCol&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showPhoto=false,identifier=cardCols.find(c=>c!==titleCol&&/رقم/.test(c.name))||((p.mobileCardCols||[]).length?null:cols.find(c=>c!==titleCol&&/الرقم العسكري|رقم المعاملة|الرقم العام|رقم الهوية/.test(c.name)));
   const fieldColors=['#1767aa','#17795e','#70418f','#b2740b','#a3231c'],cardFields=[...new Set([...cardCols,...(p.mobileCardSub&&dept?[dept]:[])])].filter(c=>c!==titleCol&&c!==rank&&c!==status&&c!==identifier&&cellText(p,c,r)).slice(0,2).map((c,i)=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field" style="--field-color:${fieldColors[(p.cols.indexOf(c)+i)%fieldColors.length]}"><b>${esc(cellText(p,c,r))}</b></span>`).join(''),showStatus=status&&status!==titleCol&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
   return `<article class="mobile-record ${showPhoto?'':'no-avatar'} avatar-${p.mobileAvatarSide==='left'?'left':'right'}">
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
@@ -2225,9 +2225,7 @@ function openPageSet(){
       </div></details>
       <details class="settings-section"><summary>٣ · بطاقة الجوال</summary><div class="settings-content grid2">
       <div class="fld full"><div class="gnote"><b>رتّب البطاقة بسهولة:</b> اختر المعلومة المناسبة لكل موضع. تعرض البطاقة أهم المعلومات فقط لتبقى صغيرة وواضحة.</div></div>
-      <div class="fld full"><label style="font-weight:700;font-size:13px;display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)"><input type="checkbox" id="ps_card_photo" ${p.mobileCardPhoto!==false?'checked':''} style="width:20px;height:20px"> إظهار الصورة في بطاقة الجوال</label></div>
       <div class="fld full"><div class="card-layout-settings">
-        <div class="card-slot"><b>صورة البطاقة</b><span>التحديد في الجهة المقابلة للصورة</span><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>الصورة يمينًا</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>الصورة يسارًا</option></select></div>
         <div class="card-slot featured"><b>عنوان البطاقة</b><span>يتبع «العمود الرئيسي» الذي اخترته تلقائيًا</span><strong id="ps_card_title_label" style="font-size:13px;color:var(--pine)">${esc(primary(p).name)}</strong></div>
         <div class="card-slot"><b>بجوار الرتبة</b><span>شارة الحالة تحت العنوان والرقم</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
         <div class="card-slot"><b>المنتصف الأول</b><span>الرتبة</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
@@ -2272,7 +2270,7 @@ function openPageSet(){
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
     p.mobileCardCols=[];
-    p.mobileCardTitle=p.primaryCol;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value].filter(Boolean);p.mobileAvatarSide=$('#ps_card_avatar').value;p.mobileCardPhoto=$('#ps_card_photo').checked;
+    p.mobileCardTitle=p.primaryCol;p.mobileCardRank=$('#ps_card_rank').value;p.mobileCardStatus=$('#ps_card_status').value;p.mobileCardSub=$('#ps_card_sub').value;p.mobileCardMiddle=[$('#ps_card_mid1').value].filter(Boolean);
     if($('#ps_peo')) p.peoplePage=$('#ps_peo').value;
     if($('#ps_tgt')) p.targetPage=$('#ps_tgt').value;
     if($('#ps_photo')) p.showPhoto=$('#ps_photo').checked;
