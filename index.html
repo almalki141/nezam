@@ -409,6 +409,10 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   #printRoot .pmeta{font-size:11px;color:#555;margin:0 0 13px;border-bottom:2px solid #B08640;padding-bottom:8px}
   @page{size:A4 landscape;margin:12mm}
 }
+.toolbar-controls{display:contents}.mobile-record-count{display:none}
+.home-announcements{margin-top:16px;border:1px solid var(--gold-br);border-radius:13px;background:var(--paper);overflow:hidden}
+.home-announcements>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;color:var(--pine);font-size:13px}
+.home-announcements>summary::-webkit-details-marker{display:none}.home-announcements>summary>svg{color:var(--brass);flex:none}.home-announcements summary b,.home-announcements summary small{display:block}.home-announcements summary small{font-size:11px;color:var(--ink-3);margin-top:2px}.announcement-arrow{margin-inline-start:auto}.home-announcements[open] .announcement-arrow{transform:rotate(180deg)}.home-announcements .home-banners{margin:0;border-radius:0;box-shadow:none}.announcement-empty{padding:0 16px 14px;margin:0;color:var(--ink-3);font-size:12px}
 @media (max-width:1080px){.split{grid-template-columns:1fr}.tpl-list{max-height:none;flex-direction:row;overflow-x:auto}.tpl{min-width:215px}}
 @media (max-width:900px){
   .side{position:fixed;right:-274px;transition:right .2s ease;box-shadow:0 0 40px rgba(0,0,0,.3)}
@@ -536,6 +540,38 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .m-head h3{font-size:15px;line-height:1.55}.m-body{padding:13px 12px 24px}.m-foot{gap:7px;padding-inline:12px}
   #groupOrder .frow{grid-template-columns:36px minmax(0,1fr) auto}
 }
+/* الواجهة الرسمية المعتمدة للجوال: ثلاثة عناصر تنقل وأدوات مدمجة */
+@media (max-width:600px){
+  body{background:var(--bg)}
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr);position:relative;padding:0;gap:0;background:var(--bg);box-shadow:none;text-align:center}
+  .mobile-brand-title{order:0;padding:17px 46px;background:var(--pine);color:#fff;font-size:16px;font-weight:700;letter-spacing:0;line-height:1.5}
+  .burger{top:10px;right:8px;width:38px;height:38px;background:transparent;border:0;border-radius:8px;color:#fff}
+  .topbar>div.page-heading{order:1;width:100%;padding:12px 14px 5px;min-width:0;color:var(--ink)}.topbar h2{font-size:17px;font-weight:800;line-height:1.5;overflow-wrap:anywhere;letter-spacing:0;color:var(--ink)}.topbar .sub{display:none}.mobile-record-count{display:block;font-size:12px;color:var(--ink-2);margin-top:3px}
+  .topbar .date-summary,.topbar .pgtools,.topbar .stripe,.topbar .ticker{display:none}
+  .page,.page.record-page,.page.home-page{padding:10px 12px calc(88px + env(safe-area-inset-bottom));margin-top:0;border-radius:0;background:var(--bg)}
+  .tools{display:flex;flex-direction:column;gap:9px;margin-bottom:10px;align-items:stretch}.tools .search{width:100%;max-width:none;min-width:0;flex:none}.search input{height:44px;border-radius:10px;font-size:15px;padding-inline:36px 12px}.search svg{right:auto;left:12px}.search input{padding-inline:12px 36px}
+  .toolbar-controls{display:flex;gap:7px;align-items:flex-start;position:relative;width:100%}.view-switch{display:none!important}.mobile-view-toggle{order:1;display:flex;flex:1;width:auto;min-width:0;height:42px;margin:0;grid-column:auto;border-radius:9px;padding:3px;background:var(--surface-2);box-shadow:none}.mobile-view-toggle button{min-height:34px;font-size:12px;border-radius:7px;font-weight:700}.mobile-view-toggle button.on{box-shadow:none;background:var(--pine)}
+  .filter-suite{order:2;position:static;grid-column:auto;flex:none}.filter-suite-toggle{width:44px;height:42px;min-height:42px;padding:0;justify-content:center;border-radius:9px;position:relative}.filter-suite-label{display:none}.filter-suite-toggle>b{position:absolute;top:-5px;right:-4px;min-width:17px;height:17px;font-size:9px}.filter-suite-toggle>svg{width:19px;height:19px;color:var(--pine)}
+  .filter-suite-panel{position:absolute;top:calc(100% + 7px);right:0;left:0;width:100%;max-height:60dvh;overflow:auto;z-index:22;margin:0;padding:10px;box-shadow:0 6px 20px rgba(14,58,56,.12);background:var(--surface);grid-template-columns:1fr;border-radius:11px}.filter-suite-panel select{min-height:44px;font-size:16px}.filter-suite-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.filter-suite-actions #clearFilters{grid-column:1/-1}
+  .file-tools{order:3;position:static;grid-column:auto;width:44px;flex:none;padding:0}.file-tools-toggle{width:44px;height:42px;padding:0;border-radius:9px;color:var(--pine)}.file-tools-panel{display:none;position:absolute;top:calc(100% + 7px);right:0;left:0;width:100%;max-height:65dvh;overflow:auto;z-index:23;margin:0;padding:6px;border-radius:11px;background:var(--surface);box-shadow:0 6px 20px rgba(14,58,56,.12)}.file-tools.open .file-tools-panel{display:flex;flex-direction:column;gap:1px}.file-tools .file-tools-panel .btn{flex:none;flex-direction:row;justify-content:flex-start;gap:10px;width:100%;min-height:44px;padding:10px 12px;background:transparent;box-shadow:none;border-radius:7px;font-size:13px;color:var(--ink)}.file-tools .file-tools-panel .btn.primary{background:var(--surface-2);color:var(--pine);font-weight:800}.file-tools-panel .seg{width:100%;padding:5px}.mobile-update-note{margin:5px 6px;padding:9px;border-top:1px solid var(--line);color:var(--ink-3);font-size:11px;line-height:1.7}.tools .spacer{display:none}
+  .dist{display:none}.chips{gap:6px;margin:0 0 10px;padding:0 0 2px;overflow-x:auto}.chip{padding:7px 11px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);font-size:11px;font-weight:500;min-height:34px}.chip.on{color:#fff;border-color:transparent;box-shadow:none}.chip b{font-size:9px;padding:0 3px}
+  .mobile-cards{gap:10px}.mobile-record{padding:10px 12px 0;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:0 2px 6px rgba(14,58,56,.035)}.mobile-record:has([data-pick]:checked){box-shadow:0 0 0 1px var(--pine-2);border-color:var(--pine-2)}
+  .mobile-record-head{grid-template-columns:54px minmax(0,1fr);gap:10px;align-items:center;padding:2px 0 9px;border:0;min-height:98px}.mobile-record .ava{width:54px;height:54px;border:0;outline:0;box-shadow:none;background:var(--surface-2)}.mobile-record-title{padding-inline-end:17px}.mobile-record-title h4{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;max-width:100%;background:transparent;border-radius:0;padding:0;margin:0;white-space:normal;overflow:hidden;text-overflow:ellipsis;font-size:15px;line-height:1.45;font-weight:800;color:var(--ink)}
+  .mobile-record-id{color:var(--ink-2);font-size:12px;line-height:1.5;margin-top:2px;direction:ltr;text-align:right;overflow-wrap:anywhere}.mobile-record-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}.mobile-record-badges:empty{display:none}.mobile-rank-badge{padding:3px 9px;background:var(--gold-bg);font-size:10px;font-weight:700;color:var(--gold);line-height:1.5}.mobile-card-status{position:static;z-index:auto;display:inline-flex}.mobile-card-status .badge{padding:3px 9px;font-size:10px;border-radius:16px;font-weight:500;line-height:1.5}.mobile-record .badge .pip{display:none}
+  .mobile-record-tags{margin-top:4px;gap:5px;max-height:32px}.mobile-record-tags .badge{border:0;padding:2px 7px;background:transparent;font-size:11px;font-weight:500}.mobile-card-field{border:0;padding:2px 0;background:transparent;border-radius:0}.mobile-card-field b{font-size:11px;font-weight:500;max-width:170px}.mobile-record-pick{right:auto;left:8px;top:8px;width:28px;height:28px;display:grid;place-items:center}.mobile-record-pick input{width:20px;height:20px;margin:0}
+  .mobile-record.no-avatar .mobile-record-head{grid-template-columns:1fr;padding-inline:0}.mobile-record.no-avatar .mobile-record-title{padding-inline:0 22px}.mobile-record.avatar-left .mobile-record-head{grid-template-columns:minmax(0,1fr) 54px}.mobile-record.avatar-left.no-avatar .mobile-record-head{grid-template-columns:1fr}.mobile-record.avatar-left .mobile-record-pick{left:auto;right:8px}.mobile-record.avatar-left .mobile-record-title{padding-inline:22px 0}
+  .mobile-record-actions{display:flex;gap:0;padding:2px 0;border-top:1px solid var(--line-2);min-height:44px}.mobile-record-actions:empty{display:none}.mobile-record-actions .iconbtn{flex:1;width:auto;height:40px;min-height:40px;padding:4px 7px;flex-direction:row;gap:7px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:11.5px;font-weight:500;color:var(--pine)}.mobile-record-actions .iconbtn+.iconbtn{border-inline-start:1px solid var(--line-2)}.mobile-record-actions .act-edit{color:var(--blue)}.mobile-record-actions .iconbtn.del{flex:0 0 44px;background:transparent;color:var(--red)}.mobile-record-actions .iconbtn.del::after{display:none}.mobile-record-actions .iconbtn svg{width:18px;height:18px}.mobile-record-actions .iconbtn:active{background:var(--surface-2)}
+  .mobile-mode-page .tablewrap tbody tr{border-radius:12px;box-shadow:0 2px 6px rgba(14,58,56,.035);padding:44px 12px 8px}.mobile-mode-page .tablewrap tbody td{font-size:13px;grid-template-columns:minmax(85px,35%) minmax(0,1fr);gap:8px;padding:9px 7px}.mobile-mode-page .tablewrap tbody td::before{font-size:11px;color:var(--ink-2)}.tablewrap tbody td.num{background:var(--surface-2);color:var(--ink-2);font-size:11px;top:10px}.tablewrap tbody td.acts .iconbtn{background:transparent;border:0;border-radius:0}.mobile-mode-cards .reg-head:has(#bulkDelete){border-radius:10px;flex-wrap:wrap;gap:7px}.mobile-mode-cards .reg-head:has(#bulkDelete)>.mobile-select-all{display:flex;color:var(--ink-2)}
+  .welcome{padding:0}.welcome-hero{display:grid;grid-template-columns:42px minmax(0,1fr);gap:12px;min-height:0;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:none;color:var(--ink)}.welcome-hero:after,.welcome-logo:after{display:none}.welcome-logo{grid-column:1;grid-row:1;align-self:start;width:42px;height:48px;background:transparent;border-radius:0;color:var(--brass);box-shadow:none}.welcome-logo svg{width:40px;height:44px;stroke-width:1.6}.welcome-copy{grid-column:2;grid-row:1;display:flex;flex-direction:column;min-width:0}.welcome-hero h2{order:1;font-size:16px;line-height:1.65;letter-spacing:0;margin:0;font-weight:800}.welcome-kicker{order:2;display:block;color:var(--ink-2);font-size:12px;font-weight:500;margin:1px 0 0}.welcome-kicker:before{display:none}.welcome-hero p{display:none}.welcome-date{order:3;margin-top:8px}.welcome-date span{padding:0;background:transparent;border:0;color:var(--ink-2);font-size:11px}.welcome-date span:first-child{display:none}
+  .welcome-stats{gap:0;margin:9px 0 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}.welcome-stat{padding:11px 4px;text-align:center;background:transparent;border:0;border-radius:0;box-shadow:none}.welcome-stat+.welcome-stat{border-inline-start:1px solid var(--line-2)}.welcome-stat b{font-size:21px;font-weight:800}.welcome-stat span{font-size:10px;font-weight:500;color:var(--ink-2)}.welcome-section-title{margin:19px 2px 9px}.welcome-section-title h3{font-size:17px}
+  .welcome-pages{gap:8px}.welcome-card,.home-group-head{flex-direction:row;align-items:center;text-align:right;gap:9px;min-height:84px;padding:12px 10px;border-radius:11px;background:var(--surface);box-shadow:none;border:1px solid var(--line)}.welcome-card .wi,.home-group-head .wi{width:37px;height:37px;border:0;border-radius:50%;background:var(--surface-2);color:var(--pine)!important}.welcome-card>span:last-child,.home-group-head>span:last-child{min-width:0}.welcome-card b,.home-group-head b{font-size:12px;line-height:1.6;font-weight:700;overflow-wrap:anywhere}.welcome-card span span,.home-group-head small{display:block;font-size:10px;font-weight:400;line-height:1.6;color:var(--ink-2)}.home-group-head .grp-arr{font-size:11px;top:4px;left:5px}.home-group.open{grid-column:1/-1}.home-group-menu{position:static;min-width:0;box-shadow:none;margin-top:5px;border-radius:10px}.home-group-menu button{min-height:44px;font-size:12px}.welcome-card:hover,.home-group-head:hover{transform:none;box-shadow:none}
+  .home-announcements{margin-top:12px;border-radius:10px}.home-announcements>summary{padding:12px;font-size:12px}.home-announcements summary small{font-size:10px}.home-banner{aspect-ratio:2/1;padding:14px}.date-converter{margin-top:9px;border-radius:10px;box-shadow:none}.date-converter-head{padding:11px 0}.date-converter-head i{background:transparent;width:24px;height:24px}.date-converter-head b{font-size:12px}.date-converter-head span{display:none}
+  .mobile-nav{right:0;left:0;bottom:0;height:calc(60px + env(safe-area-inset-bottom));padding:6px 10px calc(6px + env(safe-area-inset-bottom));grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-radius:0;border:0;border-top:1px solid var(--line);background:var(--surface);box-shadow:0 -2px 8px rgba(14,58,56,.04);backdrop-filter:none;-webkit-backdrop-filter:none}.mobile-nav button{font-size:10.5px;font-weight:500;gap:3px;border-radius:0;position:relative}.mobile-nav button+button{border-inline-start:1px solid var(--line-2)}.mobile-nav button.on:after{content:'';position:absolute;bottom:0;right:22%;left:22%;height:2px;border-radius:2px;background:var(--brass)}.mobile-nav button svg{width:21px;height:21px}.toasts{bottom:calc(72px + env(safe-area-inset-bottom))}
+  .side{background:var(--pine);box-shadow:-8px 0 24px rgba(14,58,56,.22)}.brand .crest{background:transparent;color:var(--brass-2);box-shadow:none}.nav-item,.nav-group,.nav-add,.side-refresh,.side-tools-toggle{border-radius:9px}.nav-item.on::before{display:none}.side-refresh{background:var(--brass-2);box-shadow:none}
+  .m-head,.m-foot{box-shadow:none}.m-head h3{font-weight:700}.m-foot .btn{border-radius:9px}
+  .mobile-record-title{padding-inline-end:32px}.mobile-record.no-avatar .mobile-record-title{padding-inline:0 32px}.mobile-record.avatar-left .mobile-record-title{padding-inline:32px 0}
+}
+@media (max-width:360px){.mobile-brand-title{font-size:14px;padding-inline:40px}.welcome-card,.home-group-head{padding:10px 8px;gap:6px}.welcome-card .wi,.home-group-head .wi{width:32px;height:32px}.welcome-card b,.home-group-head b{font-size:11px}.mobile-record-title h4{font-size:14px}}
 </style>
 </head>
 <body>
@@ -582,10 +618,8 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   </main>
   <nav class="mobile-nav" id="mobileNav" aria-label="التنقل السريع">
     <button id="mobHome"><span id="mobHomeIcon"></span><span>الرئيسية</span></button>
-    <button id="mobPages"><span id="mobPagesIcon"></span><span>الصفحات</span></button>
-    <button class="mobile-add" id="mobAdd"><span id="mobAddIcon"></span><span>إضافة</span></button>
     <button id="mobRefresh"><span id="mobRefreshIcon"></span><span>تحديث</span></button>
-    <button id="mobMore"><span id="mobMoreIcon"></span><span>المزيد</span></button>
+    <button id="mobMore"><span id="mobMoreIcon"></span><span>إعدادات</span></button>
   </nav>
 </div>
 <div class="overlay" id="ov"><div class="modal" id="mdl"></div></div>
@@ -1249,6 +1283,9 @@ const ICONS={
 };
 const icon=(k,s)=>`<svg width="${s||18}" height="${s||18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]||ICONS.file}</svg>`;
 const SVG={
+ home:'<path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-8h6v8"/>',
+ filter:'<path d="M3 4h18l-7 8v7l-4 2v-9Z"/>',
+ more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -1474,11 +1511,10 @@ function renderSideBtns(){
 }
 function renderMobileNav(){
   const nav=$('#mobileNav');if(!nav||!ME)return;
-  $('#mobHomeIcon').innerHTML=ic('shieldk',20);$('#mobPagesIcon').innerHTML=icon('folder',20);$('#mobAddIcon').innerHTML=ic('plus',22);$('#mobRefreshIcon').innerHTML=ic('sync',20);$('#mobMoreIcon').innerHTML=ic('gear',20);
-  $('#mobHome').classList.toggle('on',!cur);$('#mobPages').classList.toggle('on',!!cur);$('#mobAdd').hidden=cur?!can(cur,'edit'):!isAdmin();
+  $('#mobHomeIcon').innerHTML=ic('home',20);$('#mobRefreshIcon').innerHTML=ic('sync',20);$('#mobMoreIcon').innerHTML=ic('gear',20);
+  $('#mobHome').classList.toggle('on',!cur);$('#mobHome').setAttribute('aria-current',!cur?'page':'false');
   const openSide=tools=>{$('#side').classList.add('open');$('#scrim').classList.add('on');$('#side').querySelector('.side-foot').classList.toggle('tools-open',!!tools)};
-  $('#mobHome').onclick=showHome;$('#mobPages').onclick=()=>openSide(false);$('#mobMore').onclick=()=>openSide(true);
-  $('#mobAdd').onclick=()=>cur?openRow():openNewPage();
+  $('#mobHome').onclick=showHome;$('#mobMore').onclick=()=>openSide(true);
   $('#mobRefresh').onclick=()=>$('#sideRefresh').click();
 }
 function orderedGroupNames(pages){
@@ -1497,31 +1533,33 @@ function renderNav(){
   renderMobileNav();
 }
 function showHome(){
+  clearInterval(window.homeBannerTimer);
   cur=null;$('#side').classList.remove('open');$('#scrim').classList.remove('on');renderNav();
   $('#pageBody').className='page home-page';
   $('#topbar').style.setProperty('--acc',CVAR.gold);
-  $('#topbar').innerHTML=`<button class="burger" id="burger"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="mobile-brand-title">منظومة الشؤون الإدارية</div><div><h2><span class="tag"></span>الرئيسية</h2><p class="sub">مساحة عملك اليومية</p></div><div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>`;
+  $('#topbar').innerHTML=`<button class="burger" id="burger" aria-label="فتح قائمة الصفحات"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="mobile-brand-title">منظومة الشؤون الإدارية</div><div class="page-heading"><h2><span class="tag"></span>الرئيسية</h2><p class="sub">مساحة عملك اليومية</p></div><div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
   const pages=visiblePages();
   const total=pages.reduce((n,p)=>n+p.rows.length,0), populated=pages.filter(p=>p.rows.length).length;
   const banners=(DB.homeBanners||[]).filter(x=>x&&(x.title||x.image));
   const bannerHTML=banners.length?`<div class="home-banners">${banners.map((b,i)=>`<div class="home-banner ${i?'':'on'}" data-bi="${i}" style="${b.image?`background-image:url('${esc(b.image)}')`:''}"><span class="home-banner-content"><b>${esc(b.title||'إعلان المنظومة')}</b><span>${esc(b.text||'')}</span>${b.page?`<button class="home-banner-open" data-home-pg="${esc(b.page)}">فتح الصفحة ←</button>`:''}</span></div>`).join('')}<div class="banner-dots">${banners.map((_,i)=>`<button class="${i?'':'on'}" data-bdot="${i}"></button>`).join('')}</div></div>`:'';
+  const announcements=`<details class="home-announcements" ${innerWidth>600&&banners.length?'open':''}><summary>${icon('clipboard',20)}<span><b>إعلانات المنظومة</b><small>${banners.length?banners.length+' إعلان':'لا توجد إعلانات حاليًا'}</small></span><span class="announcement-arrow">⌄</span></summary>${bannerHTML||'<p class="announcement-empty">لا توجد إعلانات حاليًا.</p>'}</details>`;
   const hm=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
   const hy=(hijriNums(new Date())||{y:1448}).y;
   const converter=`<details class="date-converter" ${innerWidth>600?'open':''}><summary class="date-converter-head"><i>${ic('calendar',18)}</i><div><b>محول التاريخ</b><span>تقويم أم القرى السعودي</span></div></summary><div class="date-converter-body"><div class="date-converter-grid"><div class="fld" style="margin:0"><label>التقويم الميلادي</label><input type="date" id="convG" min="1900-04-30" max="2077-11-16"></div><button class="date-swap" id="convSwap">⇄</button><div class="fld" style="margin:0"><label>التاريخ الهجري</label><div class="hijri-selects"><select id="convHY"><option value="">السنة</option>${Array.from({length:161},(_,i)=>1320+i).map(y=>`<option ${y===hy?'selected':''}>${y}</option>`).join('')}</select><select id="convHM"><option value="">الشهر</option>${hm.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('')}</select><select id="convHD"><option value="">اليوم</option>${Array.from({length:30},(_,i)=>`<option>${i+1}</option>`).join('')}</select></div></div></div><div class="date-result" id="convResult"></div></div></details>`;
   const groups=orderedGroupNames(pages);
   const pageIcon=p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} سجل</span></span></button>`;
-  const gateways=pages.filter(p=>!String(p.group||'').trim()).map(pageIcon).join('')+groups.map(g=>{const ps=pages.filter(p=>String(p.group||'').trim()===g),first=ps[0];return `<div class="home-group"><button class="home-group-head" data-hgroup><span class="grp-arr">⌄</span><span class="wi" style="color:${CVAR[first.accent]||CVAR.gold}">${icon(first.icon,22)}</span><b>${esc(g)}</b><small>${ps.length} صفحات</small></button><div class="home-group-menu">${ps.map(p=>`<button data-home-pg="${p.id}">${icon(p.icon,15)}<span>${esc(p.name)}</span></button>`).join('')}</div></div>`}).join('');
-  $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة القيادة</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${ic('shieldk',42)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div><div class="welcome-section-title"><h3>صفحات العمل</h3><span>وصول سريع إلى مهامك</span></div><div class="welcome-pages">${gateways||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div>${bannerHTML}${converter}</section>`;
+  const gateways=pages.filter(p=>!String(p.group||'').trim()).map(pageIcon).join('')+groups.map(g=>{const ps=pages.filter(p=>String(p.group||'').trim()===g),first=ps[0];return `<div class="home-group"><button class="home-group-head" data-hgroup aria-expanded="false"><span class="grp-arr">⌄</span><span class="wi" style="color:${CVAR[first.accent]||CVAR.gold}">${icon(first.icon,22)}</span><span><b>${esc(g)}</b><small>${ps.length} صفحات</small></span></button><div class="home-group-menu">${ps.map(p=>`<button data-home-pg="${p.id}">${icon(p.icon,15)}<span>${esc(p.name)}</span></button>`).join('')}</div></div>`}).join('');
+  $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة العمل</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${icon('shield',42)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div><div class="welcome-section-title"><h3>صفحات العمل</h3><span>وصول سريع إلى مهامك</span></div><div class="welcome-pages">${gateways||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div>${announcements}${converter}</section>`;
   document.querySelectorAll('[data-home-pg]').forEach(b=>b.onclick=()=>go(b.dataset.homePg));
-  document.querySelectorAll('[data-hgroup]').forEach(b=>b.onclick=()=>b.closest('.home-group').classList.toggle('open'));
+  document.querySelectorAll('[data-hgroup]').forEach(b=>b.onclick=()=>{const open=b.closest('.home-group').classList.toggle('open');b.setAttribute('aria-expanded',String(open))});
   let convFrom='g';const showConv=(msg)=>{$('#convResult').textContent=msg;$('#convResult').style.display='block'};
   const validDays=()=>{const y=$('#convHY').value,m=$('#convHM').value,old=$('#convHD').value,max=y&&m&&hijriToGregorian(`30/${m}/${y}`)?30:29;$('#convHD').innerHTML='<option value="">اليوم</option>'+Array.from({length:max},(_,i)=>`<option ${old==i+1?'selected':''}>${i+1}</option>`).join('')};
   const fromG=()=>{const d=toDate($('#convG').value),h=d&&hijriNums(d);if(!h)return showConv('اختر تاريخًا ميلاديًا صحيحًا');$('#convHY').value=h.y;$('#convHM').value=h.m;$('#convHD').value=h.d;showConv(`الموافق هجريًا: ${h.d} ${hm[h.m-1]} ${h.y} هـ`)};
   const fromH=()=>{const y=$('#convHY').value,m=$('#convHM').value,d=$('#convHD').value;if(!y||!m||!d)return showConv('اختر السنة والشهر واليوم الهجري');const gd=hijriToGregorian(`${d}/${m}/${y}`);if(!gd)return showConv('التاريخ المحدد غير موجود في تقويم أم القرى');$('#convG').value=localISO(gd);showConv(`الموافق ميلاديًا: ${fmtG(gd)} م`)};
   $('#convG').onchange=()=>{convFrom='g';fromG()};['#convHY','#convHM'].forEach(s=>$(s).onchange=()=>{convFrom='h';validDays();if($('#convHY').value&&$('#convHM').value&&$('#convHD').value)fromH()});$('#convHD').onchange=()=>{convFrom='h';if($('#convHY').value&&$('#convHM').value&&$('#convHD').value)fromH()};
   $('#convSwap').onclick=()=>convFrom==='g'?fromG():fromH();
-  if(banners.length>1){let active=0;const activate=i=>{active=i;document.querySelectorAll('[data-bi]').forEach((x,n)=>x.classList.toggle('on',n===i));document.querySelectorAll('[data-bdot]').forEach((x,n)=>x.classList.toggle('on',n===i))};document.querySelectorAll('[data-bdot]').forEach(x=>x.onclick=e=>{e.stopPropagation();activate(+x.dataset.bdot)});clearInterval(window.homeBannerTimer);window.homeBannerTimer=setInterval(()=>{if(!cur)activate((active+1)%banners.length)},5000)}
+  if(banners.length>1){let active=0;const activate=i=>{active=i;document.querySelectorAll('[data-bi]').forEach((x,n)=>x.classList.toggle('on',n===i));document.querySelectorAll('[data-bdot]').forEach((x,n)=>x.classList.toggle('on',n===i))};document.querySelectorAll('[data-bdot]').forEach(x=>x.onclick=e=>{e.stopPropagation();activate(+x.dataset.bdot)});window.homeBannerTimer=setInterval(()=>{if(!cur&&!document.hidden&&document.querySelector('.home-announcements')?.open)activate((active+1)%banners.length)},5000)}
 }
 function showWelcomePopup(){
   if(sessionStorage.getItem('welcome_seen')) return;
@@ -1566,9 +1604,9 @@ function renderTop(){
   const p=pg();
   $('#topbar').style.setProperty('--acc',CVAR[p.accent]||CVAR.gold);
   $('#topbar').innerHTML=`
-    <button class="burger" id="burger"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <button class="burger" id="burger" aria-label="فتح قائمة الصفحات"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <div class="mobile-brand-title">منظومة الشؤون الإدارية</div>
-    <div><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p></div>
+    <div class="page-heading"><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p><span class="mobile-record-count">${p.rows.length} سجل</span></div>
     <div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>
     ${isAdmin()?`<div class="pgtools">
       <button class="btn ghost sm" id="btnCols">${ic('cols')} الأعمدة</button>
@@ -1628,28 +1666,33 @@ function summaryHTML(p){
   return `<div class="smart-summary"><div class="result"><b>${matches}</b><span>سجل مطابق من ${p.rows.length}</span></div>${u.summary.map(block).join('')}</div>`;
 }
 function toolsHTML(p,extra){
-  const u=U(), ch=chipsCol(p), fl=vis(p).filter(c=>c.filterable&&(!ch||c.id!==ch.id)),sortCols=vis(p).filter(c=>!['image','gallery','files','list','longtext'].includes(c.type)),activeFilters=Object.values(u.f||{}).filter(Boolean).length+(u.sort.k?1:0);
+  const u=U(),mobile=matchMedia('(max-width:600px)').matches,ch=chipsCol(p),fl=vis(p).filter(c=>c.filterable&&(!ch||c.id!==ch.id)),sortCols=vis(p).filter(c=>!['image','gallery','files','list','longtext'].includes(c.type)),activeFilters=Object.values(u.f||{}).filter(Boolean).length+(u.sort.k?1:0),hasFiles=(p.showImport!==false&&canImport(p))||(p.showExport!==false&&canExport())||(p.showPrint!==false&&canExport()),hasMenu=hasFiles||(mobile&&(isAdmin()||can(p.id,'edit')||can(p.id,'full')||extra));
   return `<div class="tools">
-    ${p.showSearch!==false?`<div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" placeholder="ابحث في ${esc(p.name)}…"></div>`:''}
-    ${(fl.length||sortCols.length)?`<div class="filter-suite ${u.filtersOpen?'open':''}"><button type="button" class="filter-suite-toggle" id="filtersToggle">${ic('cols',15)} الفرز والتصفية ${activeFilters?`<b>${activeFilters}</b>`:''}<span>⌄</span></button><div class="filter-suite-panel">
+    ${p.showSearch!==false?`<div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" aria-label="البحث في السجلات" placeholder="${mobile?'ابحث بالاسم أو الرقم':'ابحث في '+esc(p.name)+'…'}"></div>`:''}
+    <div class="toolbar-controls">
+    ${(fl.length||sortCols.length)?`<div class="filter-suite ${u.filtersOpen?'open':''}"><button type="button" class="filter-suite-toggle" id="filtersToggle" title="الفرز والتصفية" aria-label="الفرز والتصفية" aria-expanded="${!!u.filtersOpen}">${ic('filter',18)}<span class="filter-suite-label">الفرز والتصفية</span>${activeFilters?`<b>${activeFilters}</b>`:''}</button><div class="filter-suite-panel">
       ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
       <select id="sortCol"><option value="">بدون فرز</option>${sortCols.map(c=>`<option value="${c.id}" ${u.sort.k===c.id?'selected':''}>فرز حسب ${esc(c.name)}</option>`).join('')}${p.showUpdated?`<option value="__u" ${u.sort.k==='__u'?'selected':''}>فرز حسب آخر تحديث</option>`:''}</select>
       <div class="filter-suite-actions"><button type="button" class="btn ghost sm sort-direction ${u.sort.d>0?'on':''}" id="sortAsc">تصاعدي ↑</button><button type="button" class="btn ghost sm sort-direction ${u.sort.d<0?'on':''}" id="sortDesc">تنازلي ↓</button><button type="button" class="btn ghost sm" id="clearFilters">مسح الفرز والتصفية</button></div></div></div>`:''}
     <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
-    <div class="mobile-view-toggle"><button data-mobile-view="cards" class="${u.mobileView==='cards'?'on':''}">${icon('users',14)} عرض البطاقات</button><button data-mobile-view="page" class="${u.mobileView==='page'?'on':''}">${ic('file',14)} عرض الصفحة</button></div>
-    <div class="spacer"></div>${extra||''}
-    ${(p.showImport!==false&&canImport(p))||(p.showExport!==false&&canExport())||(p.showPrint!==false&&canExport())?`<div class="file-tools"><button type="button" class="file-tools-toggle" id="fileToolsToggle">${icon('folder',17)} أدوات الملفات <span class="arr">⌄</span></button><div class="file-tools-panel">
+    <div class="mobile-view-toggle"><button data-mobile-view="cards" class="${u.mobileView==='cards'?'on':''}" aria-pressed="${u.mobileView==='cards'}">بطاقات</button><button data-mobile-view="page" class="${u.mobileView==='page'?'on':''}" aria-pressed="${u.mobileView==='page'}">تفصيلي</button></div>
+    ${hasMenu?`<div class="file-tools"><button type="button" class="file-tools-toggle" id="fileToolsToggle" title="أدوات الصفحة" aria-label="أدوات الصفحة" aria-expanded="false">${ic('more',20)}</button><div class="file-tools-panel">
+      ${mobile&&can(p.id,'edit')?`<button class="btn primary" id="bAdd">${ic('plus')} إضافة سجل</button>`:''}
+      ${mobile&&isAdmin()?`<button class="btn ghost" id="bMobileCols">${ic('cols')} إعدادات الأعمدة</button><button class="btn ghost" id="bMobilePageSet">${ic('gear')} إعدادات الصفحة</button>`:''}
+      ${mobile&&can(p.id,'full')?`<button class="btn ghost" id="bSelectVisible">${ic('cols')} تحديد السجلات الظاهرة</button>`:''}
       ${p.showImport!==false&&canImport(p)?`<button class="btn ghost" id="bImp">${ic('up')} استيراد</button>`:''}
       ${p.showExport!==false&&canExport()?`<button class="btn ghost" id="bXls">${ic('dn')} تصدير</button>`:''}
-      ${p.showPrint!==false&&canExport()?`<button class="btn ghost" id="bPrn">${ic('print')} طباعة</button>`:''}</div></div>`:''}
-    ${can(p.id,'edit')?`<button class="btn primary" id="bAdd">${ic('plus')} إضافة سجل</button>`:''}
+      ${p.showPrint!==false&&canExport()?`<button class="btn ghost" id="bPrn">${ic('print')} طباعة</button>`:''}
+      ${mobile?extra||'':''}${mobile&&DB.tickerEnabled!==false&&DB.ticker?`<p class="mobile-update-note">${esc(DB.ticker)}</p>`:''}</div></div>`:''}
+    </div><div class="spacer"></div>${mobile?'':extra||''}
+    ${!mobile&&can(p.id,'edit')?`<button class="btn primary" id="bAdd">${ic('plus')} إضافة سجل</button>`:''}
   </div>`;
 }
 function bindTools(p){
   const u=U(), qi=$('#q'); if(qi) qi.oninput=e=>{
     u.q=e.target.value; u.page=1; clearTimeout(searchTimer); searchTimer=setTimeout(refreshBody,320);
   };
-  const fst=$('#filtersToggle');if(fst)fst.onclick=()=>{u.filtersOpen=!u.filtersOpen;fst.parentElement.classList.toggle('open',u.filtersOpen)};
+  const fst=$('#filtersToggle');if(fst)fst.onclick=()=>{u.filtersOpen=!u.filtersOpen;fst.parentElement.classList.toggle('open',u.filtersOpen);fst.setAttribute('aria-expanded',String(u.filtersOpen));$('#fileToolsToggle')?.parentElement.classList.remove('open');$('#fileToolsToggle')?.setAttribute('aria-expanded','false')};
   document.querySelectorAll('[data-f]').forEach(s=>s.onchange=()=>{u.f[s.dataset.f]=s.value;u.page=1;refreshBody();});
   if($('#sortCol'))$('#sortCol').onchange=e=>{u.sort={k:e.target.value,d:u.sort.d||1};u.page=1;refreshBody()};
   if($('#sortAsc'))$('#sortAsc').onclick=()=>{u.sort.d=1;u.page=1;refreshBody()};
@@ -1657,7 +1700,10 @@ function bindTools(p){
   if($('#clearFilters'))$('#clearFilters').onclick=()=>{u.f={};u.sort={k:null,d:1};u.page=1;refreshBody()};
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{u.display=b.dataset.view;refreshBody();});
   document.querySelectorAll('[data-mobile-view]').forEach(b=>b.onclick=()=>{u.mobileView=b.dataset.mobileView;refreshBody();});
-  const ft=$('#fileToolsToggle');if(ft)ft.onclick=()=>ft.parentElement.classList.toggle('open');
+  const ft=$('#fileToolsToggle');if(ft)ft.onclick=()=>{const open=ft.parentElement.classList.toggle('open');ft.setAttribute('aria-expanded',String(open));u.filtersOpen=false;fst?.parentElement.classList.remove('open');fst?.setAttribute('aria-expanded','false')};
+  if($('#bMobileCols'))$('#bMobileCols').onclick=openCols;
+  if($('#bMobilePageSet'))$('#bMobilePageSet').onclick=openPageSet;
+  if($('#bSelectVisible'))$('#bSelectVisible').onclick=()=>{const pageSize=20,first=(u.page-1)*pageSize;u.picked=uniq([...u.picked,...rowsOf(p).slice(first,first+pageSize).map(r=>r.id)]);renderTable(p)};
   document.querySelectorAll('[data-sc]').forEach(s=>s.onchange=()=>{const x=u.summary[+s.dataset.sc];x.c=s.value;x.v='';refreshBody();});
   document.querySelectorAll('[data-sv]').forEach(s=>s.onchange=()=>{u.summary[+s.dataset.sv].v=s.value;refreshBody();});
   const a=$('#bAdd'); if(a) a.onclick=()=>openRow();
@@ -1675,13 +1721,12 @@ function empty(h,t,id,btn){
     ${id?`<button class="btn primary" id="${id}">${esc(btn)}</button>`:''}</div>`;
 }
 function mobileCardHTML(p,r,n,cols,u){
-  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showPhoto=p.mobileCardPhoto!==false;
-  const fieldColors=['#1767aa','#17795e','#70418f','#b2740b','#a3231c'],cardFields=cardCols.filter(c=>c!==titleCol&&c!==rank&&c!==status).map((c,i)=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field" style="--field-color:${fieldColors[(p.cols.indexOf(c)+i)%fieldColors.length]}"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r)||'—')}</b></span>`).join(''),showStatus=status&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
+  const byId=id=>p.cols.find(c=>c.id===id),titleCol=primary(p),title=cellText(p,titleCol,r)||rowTitle(p,r),rank=byId(p.mobileCardRank)||cols.find(c=>/رتبة/.test(c.name)),status=byId(p.mobileCardStatus)||cols.find(c=>c.type==='select'&&/حالة|وضع|سجين/.test(c.name))||cols.find(c=>c.type==='select'&&/أولوية/.test(c.name)),dept=byId(p.mobileCardSub)||cols.find(c=>c!==status&&c!==rank&&c.filterable&&!['image','gallery','files'].includes(c.type)),auto=[rank,status,dept].filter(Boolean),chosen=(p.mobileCardCols||[]).length?cols.filter(c=>p.mobileCardCols.includes(c.id)):auto,middle=(p.mobileCardMiddle||[]).map(byId).filter(Boolean),cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),showRank=rank&&rank!==titleCol&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showPhoto=p.mobileCardPhoto!==false,identifier=cardCols.find(c=>c!==titleCol&&/رقم/.test(c.name))||((p.mobileCardCols||[]).length?null:cols.find(c=>c!==titleCol&&/الرقم العسكري|رقم المعاملة|الرقم العام|رقم الهوية/.test(c.name)));
+  const fieldColors=['#1767aa','#17795e','#70418f','#b2740b','#a3231c'],cardFields=[...new Set([...cardCols,...(p.mobileCardSub&&dept?[dept]:[])])].filter(c=>c!==titleCol&&c!==rank&&c!==status&&c!==identifier&&cellText(p,c,r)).slice(0,2).map((c,i)=>c.type==='select'?cellHTML(p,c,r,false):`<span class="mobile-card-field" style="--field-color:${fieldColors[(p.cols.indexOf(c)+i)%fieldColors.length]}"><b>${esc(cellText(p,c,r))}</b></span>`).join(''),showStatus=status&&status!==titleCol&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
   return `<article class="mobile-record ${showPhoto?'':'no-avatar'} avatar-${p.mobileAvatarSide==='left'?'left':'right'}">
-    ${showStatus?`<div class="mobile-card-status">${cellHTML(p,status,r,false)}</div>`:''}
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
-    <div class="mobile-record-head">${showPhoto?avaHTML(p,r,title):''}<div class="mobile-record-title"><h4>${esc(title)}</h4>${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}<div class="mobile-record-tags">${cardFields}</div></div></div>
-    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" data-vw="${r.id}">${ic('eye',20)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" data-ed="${r.id}">${ic('edit',20)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash',20)}</button>`:''}</div>
+    <div class="mobile-record-head">${showPhoto?avaHTML(p,r,title):''}<div class="mobile-record-title"><h4>${esc(title)}</h4>${identifier&&cellText(p,identifier,r)?`<div class="mobile-record-id">${esc(cellText(p,identifier,r))}</div>`:''}<div class="mobile-record-badges">${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}${showStatus?`<span class="mobile-card-status">${cellHTML(p,status,r,false)}</span>`:''}</div><div class="mobile-record-tags">${cardFields}</div></div></div>
+    <div class="mobile-record-actions">${p.showPreview!==false?`<button class="iconbtn act-view" title="عرض" aria-label="عرض السجل" data-vw="${r.id}">${ic('eye',18)}</button>`:''}${p.showEdit!==false&&can(p.id,'edit')?`<button class="iconbtn act-edit" title="تعديل" aria-label="تعديل السجل" data-ed="${r.id}">${ic('edit',18)}</button>`:''}${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" aria-label="حذف السجل" data-dl="${r.id}">${ic('trash',18)}</button>`:''}</div>
   </article>`;
 }
 function renderTable(p){
@@ -1716,7 +1761,7 @@ function renderTable(p){
           ${p.showDelete!==false&&can(p.id,'full')?`<button class="iconbtn del" title="حذف" data-dl="${r.id}">${ic('trash')}</button>`:''}
         </td></tr>`).join('')}</tbody></table></div>`;
   const pager=allRows.length>pageSize?`<div class="pager"><button class="btn ghost sm" id="pgPrev" ${u.page===1?'disabled':''}>السابق</button><span class="pginfo">صفحة ${u.page} من ${pages}</span><button class="btn ghost sm" id="pgNext" ${u.page===pages?'disabled':''}>التالي</button></div>`:'';
-  const mobileCards=isMobile&&u.mobileView==='cards'&&rows.length?`<div class="mobile-cards">${rows.map((r,i)=>mobileCardHTML(p,r,first+i+1,cols,u)).join('')}</div>`:'';
+  const mobileCards=isMobile&&u.mobileView==='cards'?rows.length?`<div class="mobile-cards">${rows.map((r,i)=>mobileCardHTML(p,r,first+i+1,cols,u)).join('')}</div>`:!p.rows.length?empty('الصفحة فارغة',can(p.id,'edit')?'أضف سجلًا من أدوات الصفحة أو استورد ملفًا.':'لا توجد سجلات.',can(p.id,'edit')?'bAdd2':'','إضافة سجل'):empty('لا نتائج مطابقة','غيّر كلمة البحث أو أعد ضبط عوامل التصفية.') :'';
   $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register mobile-mode-${u.mobileView} view-${u.mobileView==='page'?'detail':(u.display==='compact'?'compact':'detail')}">
     <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')?`<label class="mobile-select-all"><input type="checkbox" id="mobileSelectAll" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}> الكل</label>`:''}${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${mobileCards}${pager}</div>`;
   bindTools(p); bindCells();
@@ -2081,7 +2126,7 @@ function cmSync(){ CD.forEach((c,i)=>{ const g=k=>document.getElementById('cm_'+
   (c.options||[]).forEach((o,j)=>{ const ol=document.getElementById(`cm_ol_${i}_${j}`); if(ol) o.label=ol.value;
     const oc=document.getElementById(`cm_oc_${i}_${j}`); if(oc) o.color=oc.value; }); }); }
 function drawCM(){
-  const pid=(CD.find(c=>!c.hidden&&!['image','gallery','files'].includes(c.type))||CD[0]||{}).id;
+  const pid=primary(pg()).id;
   $('#cmBox').innerHTML=CD.map((c,i)=>`<details class="cmrow" ${i===0?'open':''}><summary class="cm-summary"><span>${esc(c.name||'عمود جديد')}</span><small>${esc(((TYPES.find(x=>x[0]===c.type)||[])[1])||c.type)}</small></summary><div class="cm-editor">
     <div class="cmtop">
       <div class="cmmove"><button data-up="${i}" ${i===0?'disabled':''}>▲</button><button data-dn="${i}" ${i===CD.length-1?'disabled':''}>▼</button></div>
@@ -2182,9 +2227,9 @@ function openPageSet(){
       <div class="fld full"><div class="gnote"><b>رتّب البطاقة بسهولة:</b> اختر المعلومة المناسبة لكل موضع. تعرض البطاقة أهم المعلومات فقط لتبقى صغيرة وواضحة.</div></div>
       <div class="fld full"><label style="font-weight:700;font-size:13px;display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)"><input type="checkbox" id="ps_card_photo" ${p.mobileCardPhoto!==false?'checked':''} style="width:20px;height:20px"> إظهار الصورة في بطاقة الجوال</label></div>
       <div class="fld full"><div class="card-layout-settings">
-        <div class="card-slot"><b>أعلى اليمين</b><span>الصورة والتحديد</span><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>الصورة يمينًا</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>الصورة يسارًا</option></select></div>
+        <div class="card-slot"><b>صورة البطاقة</b><span>التحديد في الجهة المقابلة للصورة</span><select id="ps_card_avatar"><option value="right" ${p.mobileAvatarSide!=='left'?'selected':''}>الصورة يمينًا</option><option value="left" ${p.mobileAvatarSide==='left'?'selected':''}>الصورة يسارًا</option></select></div>
         <div class="card-slot featured"><b>عنوان البطاقة</b><span>يتبع «العمود الرئيسي» الذي اخترته تلقائيًا</span><strong id="ps_card_title_label" style="font-size:13px;color:var(--pine)">${esc(primary(p).name)}</strong></div>
-        <div class="card-slot"><b>أعلى اليسار</b><span>شارة الحالة</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
+        <div class="card-slot"><b>بجوار الرتبة</b><span>شارة الحالة تحت العنوان والرقم</span><select id="ps_card_status">${cardOpts(p.mobileCardStatus)}</select></div>
         <div class="card-slot"><b>المنتصف الأول</b><span>الرتبة</span><select id="ps_card_rank">${cardOpts(p.mobileCardRank)}</select></div>
         <div class="card-slot"><b>المعلومة الأساسية</b><span>معلومة إضافية واحدة</span><select id="ps_card_mid1">${cardOpts((p.mobileCardMiddle||[])[0])}</select></div>
         <div class="card-slot"><b>أسفل المحتوى</b><span>الوحدة أو القسم</span><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
