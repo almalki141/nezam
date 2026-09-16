@@ -601,6 +601,10 @@ html[data-ui-theme="navy"] .home-group-menu,html[data-ui-theme="pearl"] .home-gr
 .appearance-options{display:grid;gap:9px}.appearance-choice{display:flex;align-items:center;gap:12px;min-height:70px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}.appearance-choice:has(input:checked){border-color:var(--pine);box-shadow:0 0 0 1px var(--pine)}.appearance-choice input{width:20px;height:20px;flex:none;accent-color:var(--pine)}.appearance-choice b{display:block;font-size:14px;font-weight:600}.appearance-choice small{display:block;color:var(--ink-2);font-size:12px}.appearance-swatches{display:flex;gap:4px;margin-inline-start:auto;flex:none}.appearance-swatches i{width:18px;height:24px;border-radius:4px;border:1px solid rgba(0,0,0,.1)}.appearance-preview{padding:14px;margin-top:15px;border-radius:12px;background:var(--preview-bg);color:var(--preview-ink);border:1px solid var(--line)}.appearance-preview header{padding:10px;background:var(--preview-primary);color:#fff;border-radius:8px;font-size:13px}.appearance-preview article{background:#fff;padding:12px;margin-top:10px;border-radius:8px}.appearance-preview b{font-size:15px;font-weight:600}.appearance-preview small{display:block;color:#52655f;font-size:12px;margin-top:3px}.appearance-preview .badge{margin-top:7px}
 @media(max-width:600px){.mobile-brand-title{background:var(--shell-bg);color:var(--shell-ink);border-bottom:1px solid var(--line)}.topbar .burger{color:var(--shell-ink)}html[data-ui-theme="navy"] .welcome-hero,html[data-ui-theme="pearl"] .welcome-hero{background:var(--surface)}.appearance-swatches i{width:14px}}
 </style>
+<style>
+.excel-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}.excel-search{flex:1;min-width:180px}.excel-caption{margin:0 0 16px;color:var(--ink-2);font-size:13px}.excel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}.excel-card{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:16px;min-width:0}.excel-card-head{display:flex;gap:12px;align-items:flex-start}.excel-file-icon{display:grid;place-items:center;background:var(--surface-2);color:var(--pine);border-radius:9px;width:44px;height:44px;flex:none}.excel-card h3{margin:0;font-size:15px;font-weight:600;overflow-wrap:anywhere}.excel-card small{display:block;color:var(--ink-2);font-size:12px;margin-top:5px;overflow-wrap:anywhere}.excel-description{color:var(--ink-2);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.excel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2)}.excel-actions .btn{min-height:44px}.excel-actions .excel-download{flex:1}.excel-pagination{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px}.excel-upload input[type=file]{width:100%;max-width:100%;padding:12px;background:var(--surface-2);border:1px dashed var(--line);border-radius:10px;font-size:13px}.excel-upload .hint{display:block;margin-top:8px;line-height:1.8}.excel-empty{grid-column:1/-1;text-align:center;padding:32px 16px;background:var(--surface);border:1px dashed var(--line);border-radius:12px;color:var(--ink-2)}
+@media(max-width:600px){.excel-toolbar{gap:8px}.excel-search{flex-basis:100%;font-size:16px;min-width:0}.excel-toolbar .btn{flex:1;min-height:44px}.excel-grid{grid-template-columns:minmax(0,1fr)}.excel-card{padding:14px}.excel-upload input,.excel-upload textarea{font-size:16px}.excel-pagination .btn{min-height:44px}}
+</style>
 </head>
 <body>
 
@@ -1204,9 +1208,11 @@ function enterApp(){
 const LEVELS=['none','view','edit','full'];
 const LEVEL_AR={none:'لا صلاحية',view:'اطّلاع فقط',edit:'إضافة وتعديل',full:'تحكم كامل (مع الحذف)'};
 const isAdmin=()=>!!(ME&&ME.role==='admin');
-function can(pageId,lvl){ if(isAdmin()) return true; if(!ME) return false;
+const EXCEL_LIBRARY_ID='__excel_library__';
+function excelLibraryPage(){return {id:EXCEL_LIBRARY_ID,name:'نماذج Excel',sub:'ملفات جاهزة للتنزيل لجميع مستخدمي المنظومة',icon:'file',accent:'green',kind:'excelLibrary',cols:[],rows:Array.isArray(DB.excelTemplates)?DB.excelTemplates:[]}}
+function can(pageId,lvl){ if(!ME) return false; if(pageId===EXCEL_LIBRARY_ID)return isAdmin()||lvl==='view'; if(isAdmin()) return true;
   const p=(ME.perms||{})[pageId]||'none'; return LEVELS.indexOf(p)>=LEVELS.indexOf(lvl); }
-const visiblePages=()=>DB.pages.filter(p=>can(p.id,'view'));
+const visiblePages=()=>[...DB.pages.filter(p=>can(p.id,'view')),...(ME?[excelLibraryPage()]:[])];
 const canExport=()=>isAdmin()||(ME&&ME.canExport!==false);
 const canImport=p=>isAdmin()||(ME&&ME.canImport!==false&&can(p.id,'full'));
 function audit(act,detail){ DB.audit=DB.audit||[]; DB.audit.unshift({at:nowTs(),by:ME?ME.name:'—',act,detail:detail||''});
@@ -1428,7 +1434,7 @@ $('#lbx').onclick=e=>{ if(e.target.id==='lbx') closeLB(); };
 /* ==================================================================
    8) وصول للبيانات
 ================================================================== */
-const pg=id=>DB.pages.find(p=>p.id===(id||cur));
+const pg=id=>(id||cur)===EXCEL_LIBRARY_ID?excelLibraryPage():DB.pages.find(p=>p.id===(id||cur));
 const vis=p=>p.cols.filter(c=>!c.hidden);
 const primary=p=>p.cols.find(c=>c.id===p.primaryCol&&!['image','gallery','files'].includes(c.type))||vis(p).find(c=>!['image','gallery','files'].includes(c.type))||vis(p)[0]||p.cols[0];
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
@@ -1601,7 +1607,7 @@ function showHome(){
   $('#topbar').innerHTML=`<button class="burger" id="burger" aria-label="فتح قائمة الصفحات"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="mobile-brand-title">منظومة الشؤون الإدارية</div><div class="page-heading"><h2><span class="tag"></span>الرئيسية</h2><p class="sub">مساحة عملك اليومية</p></div><div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
   const pages=visiblePages();
-  const total=pages.reduce((n,p)=>n+p.rows.length,0), populated=pages.filter(p=>p.rows.length).length;
+  const total=pages.filter(p=>p.kind!=='excelLibrary').reduce((n,p)=>n+p.rows.length,0), populated=pages.filter(p=>p.rows.length).length;
   const banners=(DB.homeBanners||[]).filter(x=>x&&(x.title||x.image));
   const bannerHTML=banners.length?`<div class="home-banners">${banners.map((b,i)=>`<div class="home-banner ${i?'':'on'}" data-bi="${i}" style="${b.image?`background-image:url('${esc(b.image)}')`:''}"><span class="home-banner-content"><b>${esc(b.title||'إعلان المنظومة')}</b><span>${esc(b.text||'')}</span>${b.page?`<button class="home-banner-open" data-home-pg="${esc(b.page)}">فتح الصفحة ←</button>`:''}</span></div>`).join('')}<div class="banner-dots">${banners.map((_,i)=>`<button class="${i?'':'on'}" data-bdot="${i}"></button>`).join('')}</div></div>`:'';
   const announcements=`<details class="home-announcements" ${innerWidth>600&&banners.length?'open':''}><summary>${icon('clipboard',20)}<span><b>إعلانات المنظومة</b><small>${banners.length?banners.length+' إعلان':'لا توجد إعلانات حاليًا'}</small></span><span class="announcement-arrow">⌄</span></summary>${bannerHTML||'<p class="announcement-empty">لا توجد إعلانات حاليًا.</p>'}</details>`;
@@ -1609,7 +1615,7 @@ function showHome(){
   const hy=(hijriNums(new Date())||{y:1448}).y;
   const converter=`<details class="date-converter" ${innerWidth>600?'open':''}><summary class="date-converter-head"><i>${ic('calendar',18)}</i><div><b>محول التاريخ</b><span>تقويم أم القرى السعودي</span></div></summary><div class="date-converter-body"><div class="date-converter-grid"><div class="fld" style="margin:0"><label>التقويم الميلادي</label><input type="date" id="convG" min="1900-04-30" max="2077-11-16"></div><button class="date-swap" id="convSwap">⇄</button><div class="fld" style="margin:0"><label>التاريخ الهجري</label><div class="hijri-selects"><select id="convHY"><option value="">السنة</option>${Array.from({length:161},(_,i)=>1320+i).map(y=>`<option ${y===hy?'selected':''}>${y}</option>`).join('')}</select><select id="convHM"><option value="">الشهر</option>${hm.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('')}</select><select id="convHD"><option value="">اليوم</option>${Array.from({length:30},(_,i)=>`<option>${i+1}</option>`).join('')}</select></div></div></div><div class="date-result" id="convResult"></div></div></details>`;
   const groups=orderedGroupNames(pages);
-  const pageIcon=p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} سجل</span></span></button>`;
+  const pageIcon=p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} ${p.kind==='excelLibrary'?'ملف':'سجل'}</span></span></button>`;
   const gateways=pages.filter(p=>!String(p.group||'').trim()).map(pageIcon).join('')+groups.map(g=>{const ps=pages.filter(p=>String(p.group||'').trim()===g),first=ps[0];return `<div class="home-group"><button class="home-group-head" data-hgroup aria-expanded="false"><span class="grp-arr">⌄</span><span class="wi" style="color:${CVAR[first.accent]||CVAR.gold}">${icon(first.icon,22)}</span><span><b>${esc(g)}</b><small>${ps.length} صفحات</small></span></button><div class="home-group-menu">${ps.map(p=>`<button data-home-pg="${p.id}">${icon(p.icon,15)}<span>${esc(p.name)}</span></button>`).join('')}</div></div>`}).join('');
   $('#pageBody').innerHTML=`<section class="welcome"><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">لوحة العمل</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div></div><div class="welcome-logo">${icon('shield',42)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div><div class="welcome-section-title"><h3>صفحات العمل</h3><span>وصول سريع إلى مهامك</span></div><div class="welcome-pages">${gateways||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div>${announcements}${converter}</section>`;
   document.querySelectorAll('[data-home-pg]').forEach(b=>b.onclick=()=>go(b.dataset.homePg));
@@ -1668,16 +1674,17 @@ function renderTop(){
   $('#topbar').innerHTML=`
     <button class="burger" id="burger" aria-label="فتح قائمة الصفحات"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <div class="mobile-brand-title">منظومة الشؤون الإدارية</div>
-    <div class="page-heading"><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p><span class="mobile-record-count">${p.rows.length} سجل</span></div>
+    <div class="page-heading"><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p><span class="mobile-record-count">${p.rows.length} ${p.kind==='excelLibrary'?'ملف':'سجل'}</span></div>
     <div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>
-    ${isAdmin()?`<div class="pgtools">
+    ${isAdmin()&&p.kind!=='excelLibrary'?`<div class="pgtools">
       <button class="btn ghost sm" id="btnCols">${ic('cols')} الأعمدة</button>
       <button class="btn ghost sm" id="btnPageSet">${ic('gear')} إعدادات الصفحة</button></div>`:''}
     <div class="stripe" id="stripe">${stripeHTML(p)}</div>${DB.tickerEnabled!==false&&DB.ticker?`<div class="ticker"><span style="animation-duration:${Math.max(8,Math.min(60,+(DB.tickerSpeed||22)))}s">${esc(DB.ticker)}</span></div>`:''}`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
-  if(isAdmin()){ $('#btnCols').onclick=openCols; $('#btnPageSet').onclick=openPageSet; }
+  if(isAdmin()&&p.kind!=='excelLibrary'){ $('#btnCols').onclick=openCols; $('#btnPageSet').onclick=openPageSet; }
 }
 function stripeHTML(p){
+  if(p.kind==='excelLibrary')return `<div class="cell"><span class="n">${p.rows.length}</span><span class="t">ملفات متاحة للتنزيل</span></div>`;
   const cell=(n,t,c)=>`<div class="cell"><span class="n" ${c?`style="color:${c}"`:''}>${n}</span><span class="t">${esc(t)}</span></div>`;
   const rows=rowsOf(p); let h=cell(rows.length,(rows.length===p.rows.length?'إجمالي السجلات':'نتيجة التصفية من '+p.rows.length));
   const ch=chipsCol(p);
@@ -1697,10 +1704,86 @@ function go(id){
   const p=pg();
   $('#pageBody').className='page record-page';
   $('#pageBody').style.setProperty('--acc',CVAR[p.accent]||CVAR.gold);
-  if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
+  if(p.kind==='excelLibrary')renderExcelLibrary();else if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 const render=()=>cur?go():showHome();
+
+/* مكتبة مشتركة: الملفات خارج الخزنة، ولا تُعدّل ملفات Excel الأصلية. */
+const EXCEL_MAX_SIZE=20*1024*1024;
+function validateExcelFile(file){
+  if(!file||!/\.(xlsx|xls)$/i.test(file.name||''))return 'اختر ملف Excel بصيغة .xlsx أو .xls فقط';
+  if(!file.size)return 'الملف فارغ؛ اختر ملفًا صالحًا';
+  if(file.size>EXCEL_MAX_SIZE)return 'الحد الأقصى للملف 20 م.ب';
+  return '';
+}
+function excelLibraryRows(){return Array.isArray(DB.excelTemplates)?DB.excelTemplates:[]}
+function renderExcelLibrary(){
+  if(!ME||!can(EXCEL_LIBRARY_ID,'view'))return;
+  const u=U(),q=String(u.q||'').trim().toLocaleLowerCase('ar'),rows=excelLibraryRows().filter(r=>[r.title,r.description,r.file?.n].join(' ').toLocaleLowerCase('ar').includes(q));
+  const pages=Math.max(1,Math.ceil(rows.length/20));u.page=Math.min(pages,Math.max(1,u.page||1));
+  const shown=rows.slice((u.page-1)*20,u.page*20),trash=DB.excelTemplateTrash||[];
+  $('#pageBody').className='page excel-library-page';
+  $('#pageBody').innerHTML=`<div class="excel-toolbar"><input class="excel-search" id="excelSearch" type="search" aria-label="البحث في نماذج Excel" placeholder="ابحث عن اسم الملف أو وصفه" value="${esc(u.q||'')}">${isAdmin()?`<button class="btn primary" id="excelAdd">${ic('plus')} رفع ملف Excel</button>${trash.length?`<button class="btn ghost" id="excelTrash">المحذوفات (${trash.length})</button>`:''}`:''}</div><p class="excel-caption">تنزيل النسخة الأصلية من الملف. ${isAdmin()?'الرفع وإدارة الملفات متاحان لك بصفتك مدير النظام.':'الملفات متاحة لجميع مستخدمي المنظومة.'}</p><div class="excel-grid">${shown.map(r=>`<article class="excel-card"><div class="excel-card-head"><span class="excel-file-icon">${ic('file',23)}</span><div><h3>${esc(r.title||r.file?.n||'ملف Excel')}</h3><small>${esc(r.file?.n||'')} · ${fmtSize(r.file?.s||0)}</small><small>آخر تحديث: ${esc(fmtG(String(r.updated||r.created||'').slice(0,10)))}</small></div></div>${r.description?`<p class="excel-description">${esc(r.description)}</p>`:''}<div class="excel-actions"><button class="btn primary excel-download" data-excel-download="${esc(r.id)}">${ic('dn')} تنزيل${esc((r.file?.n||'').split('.').pop()? ' · '+r.file.n.split('.').pop().toUpperCase():'')}</button>${isAdmin()?`<button class="btn ghost" data-excel-edit="${esc(r.id)}" aria-label="تعديل الملف">${ic('edit')}</button><button class="btn danger" data-excel-delete="${esc(r.id)}" aria-label="حذف الملف من المكتبة">${ic('trash')}</button>`:''}</div></article>`).join('')||`<div class="excel-empty">${q?'لا توجد ملفات تطابق البحث.':isAdmin()?'ارفع أول ملف Excel ليظهر لجميع المستخدمين.':'لم تُضف ملفات Excel بعد.'}</div>`}</div>${pages>1?`<nav class="excel-pagination" aria-label="صفحات الملفات"><button class="btn ghost" id="excelPrev" ${u.page===1?'disabled':''}>السابق</button><span>${u.page} / ${pages}</span><button class="btn ghost" id="excelNext" ${u.page===pages?'disabled':''}>التالي</button></nav>`:''}`;
+  $('#excelSearch').oninput=e=>{u.q=e.target.value;u.page=1;renderExcelLibrary();const input=$('#excelSearch');input.focus()};
+  if($('#excelAdd'))$('#excelAdd').onclick=()=>openExcelTemplate();
+  if($('#excelTrash'))$('#excelTrash').onclick=openExcelTrash;
+  if($('#excelPrev'))$('#excelPrev').onclick=()=>{u.page--;renderExcelLibrary();window.scrollTo({top:0,behavior:'smooth'})};
+  if($('#excelNext'))$('#excelNext').onclick=()=>{u.page++;renderExcelLibrary();window.scrollTo({top:0,behavior:'smooth'})};
+  document.querySelectorAll('[data-excel-download]').forEach(b=>b.onclick=async()=>{const row=excelLibraryRows().find(r=>r.id===b.dataset.excelDownload);if(!ME||!row?.file)return;b.disabled=true;await downloadFile(row.file);if(b.isConnected)b.disabled=false});
+  document.querySelectorAll('[data-excel-edit]').forEach(b=>b.onclick=()=>openExcelTemplate(b.dataset.excelEdit));
+  document.querySelectorAll('[data-excel-delete]').forEach(b=>b.onclick=()=>deleteExcelTemplate(b.dataset.excelDelete));
+}
+async function saveExcelLibraryChange(transform,detail){
+  if(!isAdmin())return false;
+  if(!(await flushPendingSave())){toast('تعذّر حفظ التعديلات السابقة؛ حاول مجددًا','err');return false}
+  if(!isAdmin())return false;
+  const oldRows=DB.excelTemplates,oldTrash=DB.excelTemplateTrash,next=transform(excelLibraryRows(),DB.excelTemplateTrash||[]);
+  if(!next){toast('تغيّر الملف من جهاز آخر؛ أغلق النافذة وأعد المحاولة','err');return false}
+  const target=DB,oldAudit=DB.audit,entry={at:nowTs(),by:ME.name,act:'نماذج Excel',detail};
+  DB.excelTemplates=next.rows;DB.excelTemplateTrash=next.trash;DB.audit=[entry,...(oldAudit||[])].slice(0,800);
+  const ok=await commitNow();
+  if(!ok){if(DB===target){if(oldRows===undefined)delete DB.excelTemplates;else DB.excelTemplates=oldRows;if(oldTrash===undefined)delete DB.excelTemplateTrash;else DB.excelTemplateTrash=oldTrash;if(oldAudit===undefined)delete DB.audit;else DB.audit=oldAudit}toast('تعذّر الحفظ؛ لم يتم تأكيد التغيير','err');return false}
+  return true;
+}
+function openExcelTemplate(id){
+  if(!isAdmin())return toast('إدارة الملفات متاحة للمدير فقط','err');
+  const existing=id?excelLibraryRows().find(r=>r.id===id):null;if(id&&!existing)return;
+  const snapshot=existing?JSON.stringify(existing):null;
+  let uploaded=null,uploadedSource=null;
+  modal(existing?'تعديل ملف Excel':'رفع ملف Excel',`<div class="excel-upload"><div class="fld"><label for="excelTitle">اسم النموذج *</label><input id="excelTitle" maxlength="150" value="${esc(existing?.title||'')}" placeholder="مثال: نموذج متابعة الأفراد"></div><div class="fld"><label for="excelDescription">وصف مختصر (اختياري)</label><textarea id="excelDescription" maxlength="1000" rows="3" placeholder="وضّح استخدام الملف">${esc(existing?.description||'')}</textarea></div><div class="fld"><label for="excelFile">${existing?'استبدال الملف (اختياري)':'ملف Excel *'}</label><input id="excelFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"><span class="hint">xlsx أو xls · حتى 20 م.ب لكل ملف. يُحفظ الملف كما رفعته دون تغيير محتواه.${existing?`<br>الملف الحالي: ${esc(existing.file.n)}`:''}</span></div><p id="excelUploadStatus" class="hint" role="status" aria-live="polite"></p></div>`,`<button class="btn primary" id="excelSave">${existing?'حفظ التعديل':'رفع وحفظ'}</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
+  $('#excelFile').onchange=()=>{const f=$('#excelFile').files[0];if(f&&!$('#excelTitle').value.trim())$('#excelTitle').value=f.name.replace(/\.(xlsx|xls)$/i,'').slice(0,150)};
+  $('#excelSave').onclick=async()=>{
+    if(!isAdmin())return;
+    const title=$('#excelTitle').value.trim(),description=$('#excelDescription').value.trim(),file=$('#excelFile').files[0],btn=$('#excelSave'),status=$('#excelUploadStatus');
+    if(!title)return toast('اكتب اسم النموذج','err');
+    if(!existing&&!file)return toast('اختر ملف Excel','err');
+    if(file){const error=validateExcelFile(file);if(error)return toast(error,'err')}
+    btn.disabled=true;btn.textContent='جارٍ الحفظ…';
+    try{
+      if(file&&uploadedSource!==file){status.textContent='جارٍ رفع الملف؛ انتظر حتى تظهر رسالة نجاح الحفظ.';if(!SB_SESSION)await cloudSession();if(!SB_SESSION)throw new Error('سجّل الدخول من جديد');const wid=await workspaceId();if(!wid)throw new Error('لم يتم العثور على مساحة المنظومة');const ext=file.name.split('.').pop().toLowerCase(),path=`${wid}/excel-${uid()}.${ext}`;await uploadStoredFile(path,file);uploaded={n:file.name,t:file.type||'application/octet-stream',s:file.size,path};uploadedSource=file}
+      const now=nowTs(),row={...(existing||{}),id:existing?.id||uid(),title,description,file:file?uploaded:existing.file,created:existing?.created||now,updated:now};
+      status.textContent='جارٍ حفظ النموذج في المكتبة…';
+      const ok=await saveExcelLibraryChange((rows,trash)=>{if(existing&&JSON.stringify(rows.find(r=>r.id===id))!==snapshot)return null;return {rows:existing?rows.map(r=>r.id===id?row:r):[row,...rows],trash}},(existing?'تعديل: ':'إضافة: ')+title);
+      if(!ok){status.textContent='لم يُؤكد الحفظ؛ يمكنك إعادة المحاولة دون إعادة رفع الملف.';return}
+      if(btn.isConnected)closeModal();render();toast(existing?'حُفظ تعديل الملف':'رُفع الملف وأصبح متاحًا للمستخدمين');
+    }catch(e){status.textContent='تعذّر رفع الملف. تحقق من الاتصال ثم حاول مجددًا.';toast('تعذّر رفع ملف Excel: '+(e.message||'تحقق من الاتصال'),'err')}
+    finally{btn.disabled=false;btn.textContent=existing?'حفظ التعديل':'رفع وحفظ'}
+  };
+}
+function deleteExcelTemplate(id){
+  if(!isAdmin())return;
+  const row=excelLibraryRows().find(r=>r.id===id);if(!row)return;
+  const snapshot=JSON.stringify(row);
+  modal('حذف من مكتبة Excel',`<p>هل تريد حذف «${esc(row.title)}»؟</p><p class="hint">سيختفي من تنزيلات المستخدمين. يمكنك استعادته من المحذوفات؛ لن يُحذف الملف الأصلي نهائيًا.</p>`,`<button class="btn danger" id="excelConfirmDelete">حذف من المكتبة</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
+  $('#excelConfirmDelete').onclick=async()=>{const btn=$('#excelConfirmDelete');btn.disabled=true;const ok=await saveExcelLibraryChange((rows,trash)=>{const current=rows.find(r=>r.id===id);if(JSON.stringify(current)!==snapshot)return null;return {rows:rows.filter(r=>r.id!==id),trash:[{...current,deleted:nowTs()},...trash]}},'حذف: '+row.title);if(ok){if(btn.isConnected)closeModal();render();toast('نُقل الملف إلى المحذوفات')}else btn.disabled=false};
+}
+function openExcelTrash(){
+  if(!isAdmin())return;
+  const trash=DB.excelTemplateTrash||[];
+  modal('محذوفات نماذج Excel',trash.length?trash.map(r=>`<article class="excel-card"><h3>${esc(r.title)}</h3><small>${esc(r.file.n)}</small><div class="excel-actions"><button class="btn ghost" data-excel-restore="${esc(r.id)}">استعادة للمكتبة</button></div></article>`).join(''):'<p>لا توجد ملفات محذوفة.</p>',`<button class="btn ghost" onclick="closeModal()">إغلاق</button>`);
+  document.querySelectorAll('[data-excel-restore]').forEach(btn=>btn.onclick=async()=>{btn.disabled=true;const id=btn.dataset.excelRestore,ok=await saveExcelLibraryChange((rows,deleted)=>{const row=deleted.find(r=>r.id===id);if(!row||rows.some(r=>r.id===id))return null;const {deleted:removed,...restored}=row;return {rows:[restored,...rows],trash:deleted.filter(r=>r.id!==id)}},'استعادة ملف Excel');if(ok){render();openExcelTrash();toast('استُعيد الملف للمستخدمين')}else btn.disabled=false});
+}
 
 function rowsOf(p){
   const u=U(), q=(u.q||'').trim().toLowerCase(), ch=chipsCol(p);
@@ -2180,6 +2263,7 @@ function openLog(rid){
 let CD=[];
 function openCols(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
+  if(pg()?.kind==='excelLibrary')return openExcelTemplate();
   CD=JSON.parse(JSON.stringify(pg().cols));
   modal('التحكم بأعمدة — '+esc(pg().name),`<div class="gnote"><b>${CD.length} عمودًا</b> — اضغط اسم أي عمود لفتح إعداداته، ويمكنك تحريكه أو تغيير نوعه أو إخفاءه.</div><div id="cmBox"></div>
     <button class="btn ghost" id="cmAdd" style="width:100%;justify-content:center;border-style:dashed">${ic('plus')} إضافة عمود</button>`,
@@ -2267,6 +2351,7 @@ function openTickerSettings(){
 }
 function openPageSet(){
   if(!isAdmin()) return toast('صلاحية المدير فقط','err');
+  if(pg()?.kind==='excelLibrary')return openExcelTemplate();
   const p=pg(), i=DB.pages.indexOf(p);
   const sels=p.cols.filter(c=>c.type==='select'), txts=p.cols.filter(c=>['text','longtext'].includes(c.type));
   const cardCols=p.cols.filter(c=>!['image','gallery','files'].includes(c.type)),cardOpts=(selected,auto=true)=>`${auto?'<option value="">تلقائي</option>':''}${cardCols.map(c=>`<option value="${c.id}" ${selected===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}`;
