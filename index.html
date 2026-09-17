@@ -2801,15 +2801,25 @@ function showImport(){
 /* ==================================================================
    14) تصدير / طباعة / نسخ احتياطي
 ================================================================== */
-function exportCSV(p){
+async function exportCSV(p){
   if(!canExport()) return toast('ليس لديك صلاحية التصدير','err');
   const cols=vis(p), head=['م',...cols.map(c=>c.name)]; if(p.showUpdated) head.push('آخر تحديث');
   const rows=rowsOf(p).map((r,i)=>{const a=[i+1,...cols.map(c=>
       c.type==='image'?(r.v[c.id]?'يوجد صورة':''):c.type==='gallery'?((r.v[c.id]||[]).length?((r.v[c.id]||[]).length+' صور'):''):cellText(p,c,r))];
     if(p.showUpdated) a.push(fmtDate(r.updated)); return a;});
-  const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
-  download(p.name+'.csv','\uFEFF'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n'),'text/csv;charset=utf-8');
-  audit('تصدير',p.name); toast('نُزّل الملف — يفتح في Excel مباشرة');
+  try{
+    if(!(await ensureXLSX())) throw new Error('xlsx engine unavailable');
+    const ws=XLSX.utils.aoa_to_sheet([head,...rows]);
+    ws['!cols']=head.map((h,i)=>({wch:Math.min(34,Math.max(12,...[h,...rows.slice(0,80).map(r=>String(r[i]??''))].map(v=>String(v).length+2)))}));
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'البيانات');
+    const out=XLSX.write(wb,{bookType:'xlsx',type:'array',compression:true});
+    saveBlob(p.name+'.xlsx',new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+    audit('تصدير Excel',p.name); toast('نُزّل ملف Excel بصيغة XLSX');
+  }catch(e){
+    const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+    download(p.name+'.csv','\uFEFF'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n'),'text/csv;charset=utf-8');
+    audit('تصدير CSV احتياطي',p.name); toast('تعذّر تشغيل محرّك Excel؛ نُزّل CSV احتياطيًا','err');
+  }
 }
 function printTable(p){
   if(!canExport()) return toast('ليس لديك صلاحية الطباعة','err');
