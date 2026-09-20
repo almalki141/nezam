@@ -312,6 +312,9 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--pine-2);box-shadow:0 0 0 3px rgba(20,81,77,.1)}
 .fld .hint{font-size:11.5px;color:var(--ink-3)}
 .fld input.bad{border-color:var(--red);box-shadow:0 0 0 3px rgba(163,35,28,.09)}
+.choice-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.choice-item{min-height:43px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer}.choice-item:has(input:checked){border-color:var(--choice-color,var(--pine));box-shadow:inset 0 0 0 1px var(--choice-color,var(--pine))}.choice-item input{width:18px!important;height:18px;flex:none;accent-color:var(--choice-color,var(--pine))}.choice-badges{display:flex;flex-wrap:wrap;gap:4px}
+@media(max-width:600px){.choice-group{grid-template-columns:1fr}.choice-item{min-height:47px;font-size:14px}}
 .page-lock-prompt{text-align:center}.page-lock-mark{width:62px;height:62px;margin:0 auto 10px;border-radius:18px;display:grid;place-items:center;color:var(--pine);background:var(--mint);border:1px solid var(--line)}
 .page-lock-prompt h4{font-size:17px;margin:0 0 6px}.page-lock-prompt>p{margin:0 0 15px;color:var(--ink-2);line-height:1.8}.page-lock-prompt .fld{text-align:right;margin-top:15px}.page-lock-prompt .gnote{text-align:right;margin-top:14px}
 .lock-choice-note{padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:12px;line-height:1.8;color:var(--ink-2)}
@@ -1322,7 +1325,7 @@ setInterval(syncQuietly,30000);
 const COLORS=[['slate','رمادي'],['green','أخضر'],['red','أحمر'],['blue','أزرق'],['amber','برتقالي'],['plum','بنفسجي'],['gold','ذهبي']];
 const CVAR={slate:'var(--slate)',green:'var(--green)',red:'var(--red)',blue:'var(--blue)',amber:'var(--amber)',plum:'var(--plum)',gold:'var(--brass)',teal:'var(--pine-2)'};
 const TYPES=[['text','نص'],['longtext','نص طويل'],['code','رقم / كود'],['number','عدد'],['phone','رقم جوال'],['date','تاريخ ميلادي'],['hijri','تاريخ هجري'],
-             ['select','قائمة خيارات ملوّنة'],['link','ربط بسجل من صفحة أخرى'],['list','قائمة بنود نصية'],
+             ['select','اختيار واحد ملوّن'],['multiselect','مجموعة خيارات (اختيار متعدد)'],['link','ربط بسجل من صفحة أخرى'],['list','قائمة بنود نصية'],
              ['image','صورة واحدة'],['gallery','صور متعددة'],['files','ملفات (PDF وصور)']];
 const ICONS={
  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/>',
@@ -1482,6 +1485,7 @@ function cellText(p,c,r){ const v=r.v[c.id];
   if(c.type==='gallery') return (Array.isArray(v)?v:[]).length?((v||[]).length+' صور'):'';
   if(c.type==='files') return (Array.isArray(v)?v:[]).map(f=>f.n).join(' · ');
   if(c.type==='list') return (Array.isArray(v)?v:[]).join(' · ');
+  if(c.type==='multiselect') return (Array.isArray(v)?v:[]).join(' · ');
   if(c.type==='link'){ const t=linkPage(c),o=t&&t.rows.find(x=>x.id===v); return o?rowTitle(t,o):''; }
   if(c.type==='date') return v?fmtG(v):'';
   if(c.type==='hijri') return v?String(v).replace(/\s*هـ\s*$/,'')+' هـ':'';
@@ -1498,6 +1502,7 @@ function cellHTML(p,c,r,isP){
   if(c.type==='select'){ if(!txt) return '<span class="dim">—</span>';
     const o=(c.options||[]).find(x=>x.label===txt);
     return `<span class="badge b-${o?o.color:'slate'}"><span class="pip"></span>${esc(txt)}</span>`; }
+  if(c.type==='multiselect'){const a=Array.isArray(v)?v:[];return a.length?`<span class="choice-badges">${a.map(value=>{const o=(c.options||[]).find(x=>x.label===value);return `<span class="badge b-${o?.color||'slate'}"><span class="pip"></span>${esc(value)}</span>`}).join('')}</span>`:'<span class="dim">—</span>'}
   if(c.type==='link'){ if(!txt) return '<span class="dim">—</span>';
     const t=linkPage(c),o=t.rows.find(x=>x.id===v);
     if(o&&(t.avatars||photoCol(t))) return `<div class="person">${avaHTML(t,o,txt)}<div><b>${esc(txt)}</b><span>${esc(subLine(t,o))}</span></div></div>`;
@@ -1841,7 +1846,7 @@ function rowsOf(p){
   const u=U(), q=(u.q||'').trim().toLowerCase(), ch=chipsCol(p);
   let r=p.rows.filter(row=>{
     if(ch&&u.chip&&row.v[ch.id]!==u.chip) return false;
-    for(const k in u.f){ if(u.f[k]){ const c=p.cols.find(x=>x.id===k); if(c&&cellText(p,c,row)!==u.f[k]) return false; } }
+    for(const k in u.f){ if(u.f[k]){ const c=p.cols.find(x=>x.id===k);if(c&&c.type==='multiselect'){if(!(Array.isArray(row.v[k])&&row.v[k].includes(u.f[k])))return false}else if(c&&cellText(p,c,row)!==u.f[k]) return false; } }
     if(!q) return true;
     return vis(p).map(c=>cellText(p,c,row)).join(' ').toLowerCase().includes(q);
   });
@@ -1855,10 +1860,10 @@ function rowsOf(p){
 function summaryHTML(p){
   const u=U(); u.summary=u.summary||[{c:'',v:''},{c:'',v:''}];
   const cols=vis(p).filter(c=>!['image','gallery','files','longtext','list'].includes(c.type));
-  const preferred=cols.filter(c=>c.filterable||c.type==='select');
+  const preferred=cols.filter(c=>c.filterable||['select','multiselect'].includes(c.type));
   u.summary.forEach((s,i)=>{ if(s.c&&!cols.some(c=>c.id===s.c)){s.c='';s.v='';} if(!s.c&&preferred[i]) s.c=preferred[i].id; });
-  const matches=p.rows.filter(r=>u.summary.every(s=>!s.v||cellText(p,p.cols.find(c=>c.id===s.c),r)===s.v)).length;
-  const block=(s,i)=>{ const c=p.cols.find(x=>x.id===s.c), vals=c?uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')):[];
+  const matches=p.rows.filter(r=>u.summary.every(s=>{if(!s.v)return true;const c=p.cols.find(c=>c.id===s.c);return c?.type==='multiselect'?(Array.isArray(r.v[c.id])&&r.v[c.id].includes(s.v)):cellText(p,c,r)===s.v})).length;
+  const block=(s,i)=>{ const c=p.cols.find(x=>x.id===s.c), vals=c?uniq(c.type==='multiselect'?p.rows.flatMap(r=>Array.isArray(r.v[c.id])?r.v[c.id]:[]):p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')):[];
     return `<div><label>الشرط ${i+1}</label><div class="pair"><select data-sc="${i}"><option value="">اختر العمود</option>${cols.map(x=>`<option value="${x.id}" ${s.c===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><select data-sv="${i}" ${c?'':'disabled'}><option value="">كل القيم</option>${vals.map(v=>`<option ${s.v===v?'selected':''}>${esc(v)}</option>`).join('')}</select></div></div>`; };
   return `<div class="smart-summary"><div class="result"><b>${matches}</b><span>سجل مطابق من ${p.rows.length}</span></div>${u.summary.map(block).join('')}</div>`;
 }
@@ -1868,7 +1873,7 @@ function toolsHTML(p,extra){
     ${p.showSearch!==false?`<div class="search">${ic('search',16)}<input id="q" value="${esc(u.q)}" aria-label="البحث في السجلات" placeholder="${mobile?'ابحث بالاسم أو الرقم':'ابحث في '+esc(p.name)+'…'}"></div>`:''}
     <div class="toolbar-controls">
     ${(fl.length||sortCols.length)?`<div class="filter-suite ${u.filtersOpen?'open':''}"><button type="button" class="filter-suite-toggle" id="filtersToggle" title="الفرز والتصفية" aria-label="الفرز والتصفية" aria-expanded="${!!u.filtersOpen}">${ic('filter',18)}<span class="filter-suite-label">الفرز والتصفية</span>${activeFilters?`<b>${activeFilters}</b>`:''}</button><div class="filter-suite-panel">
-      ${fl.map(c=>`<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>${uniq(p.rows.map(r=>cellText(p,c,r))).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`).join('')}
+      ${fl.map(c=>{const vals=c.type==='multiselect'?p.rows.flatMap(r=>Array.isArray(r.v[c.id])?r.v[c.id]:[]):p.rows.map(r=>cellText(p,c,r));return `<select class="filter" data-f="${c.id}"><option value="">كل ${esc(c.name)}</option>${uniq(vals).filter(Boolean).sort((a,b)=>a.localeCompare(b,'ar')).map(v=>`<option ${u.f[c.id]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`}).join('')}
       <select id="sortCol"><option value="">بدون فرز</option>${sortCols.map(c=>`<option value="${c.id}" ${u.sort.k===c.id?'selected':''}>فرز حسب ${esc(c.name)}</option>`).join('')}${p.showUpdated?`<option value="__u" ${u.sort.k==='__u'?'selected':''}>فرز حسب آخر تحديث</option>`:''}</select>
       <div class="filter-suite-actions"><button type="button" class="btn ghost sm sort-direction ${u.sort.d>0?'on':''}" id="sortAsc">تصاعدي ↑</button><button type="button" class="btn ghost sm sort-direction ${u.sort.d<0?'on':''}" id="sortDesc">تنازلي ↓</button><button type="button" class="btn ghost sm" id="clearFilters">مسح الفرز والتصفية</button></div></div></div>`:''}
     <div class="view-switch"><button data-view="detail" class="${u.display!=='compact'?'on':''}">تفصيلي</button><button data-view="compact" class="${u.display==='compact'?'on':''}">مختصر</button></div>
@@ -1924,7 +1929,7 @@ function mobileCardHTML(p,r,n,cols,u){
   const cardCols=[...new Set([...middle,...chosen,...(p.mobileCardSub&&dept?[dept]:[])])].slice(0,3),identifier=cardCols.find(c=>c!==titleCol&&/رقم/.test(c.name))||((p.mobileCardCols||[]).length?null:cols.find(c=>c!==titleCol&&/الرقم العسكري|رقم المعاملة|الرقم العام|رقم الهوية/.test(c.name)));
   const showRank=rank&&rank!==titleCol&&(p.mobileCardRank||chosen.includes(rank))&&cellText(p,rank,r),showStatus=status&&status!==titleCol&&(p.mobileCardStatus||chosen.includes(status))&&cellText(p,status,r);
   const optionColor=c=>{const o=(c.options||[]).find(o=>o.label===cellText(p,c,r));return CVAR[o?.color]?o.color:'slate'};
-  const cardFields=[...new Set([...cardCols,...(p.mobileCardSub&&dept?[dept]:[])])].filter(c=>c!==titleCol&&c!==rank&&c!==status&&c!==identifier&&cellText(p,c,r)).slice(0,2).map(c=>`<span class="mobile-card-field" style="--field-color:${CVAR[optionColor(c)]}"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r))}</b></span>`).join('');
+  const cardFields=[...new Set([...cardCols,...(p.mobileCardSub&&dept?[dept]:[])])].filter(c=>c!==titleCol&&c!==rank&&c!==status&&c!==identifier&&cellText(p,c,r)).slice(0,2).map(c=>c.type==='multiselect'?`<span class="mobile-card-field" style="--field-color:${CVAR.slate}"><small>${esc(c.name)}</small>${cellHTML(p,c,r)}</span>`:`<span class="mobile-card-field" style="--field-color:${CVAR[optionColor(c)]}"><small>${esc(c.name)}</small><b>${esc(cellText(p,c,r))}</b></span>`).join('');
   return `<article class="mobile-record no-avatar">
     ${can(p.id,'full')?`<label class="mobile-record-pick" title="تحديد"><input type="checkbox" data-pick="${r.id}" ${u.picked.includes(r.id)?'checked':''}></label>`:''}
     <div class="mobile-record-head"><div class="mobile-record-title"><h4>${esc(title)}</h4>${identifier&&cellText(p,identifier,r)?`<button type="button" class="mobile-record-id" data-copy-number="${r.id}" data-copy-col="${identifier.id}" title="نسخ ${esc(identifier.name)}" aria-label="نسخ ${esc(identifier.name)}"><span>${esc(cellText(p,identifier,r))}</span>${ic('clipboard',13)}</button>`:''}<div class="mobile-record-badges">${showRank?`<span class="mobile-rank-badge">${esc(cellText(p,rank,r))}</span>`:''}${showStatus?`<span class="mobile-card-status"><span class="badge b-${optionColor(status)}">${esc(cellText(p,status,r))}</span></span>`:''}</div><div class="mobile-record-tags">${cardFields}</div></div></div>
@@ -2127,6 +2132,7 @@ function fieldHTML(p,c,v){
   if(c.type==='list') return `<div class="fld full">${L}<textarea id="${id}" style="min-height:90px" placeholder="بند في كل سطر">${esc((v||[]).join('\n'))}</textarea><span class="hint">كل بند في سطر مستقل.</span></div>`;
   if(c.type==='select') return `<div class="fld">${L}<select id="${id}"><option value="">—</option>
     ${(c.options||[]).map(o=>`<option ${v===o.label?'selected':''}>${esc(o.label)}</option>`).join('')}</select></div>`;
+  if(c.type==='multiselect'){const chosen=Array.isArray(v)?v:[];return `<div class="fld full">${L}<div class="choice-group" id="${id}">${(c.options||[]).map((o,i)=>`<label class="choice-item" style="--choice-color:${CVAR[o.color]||CVAR.slate}"><input type="checkbox" value="${esc(o.label)}" ${chosen.includes(o.label)?'checked':''}><span>${esc(o.label)}</span></label>`).join('')||'<span class="hint">أضف خيارات لهذا العمود من إعدادات الأعمدة.</span>'}</div><span class="hint">يمكن تحديد أكثر من خيار.</span></div>`}
   if(c.type==='link'){ const t=linkPage(c);
     return `<div class="fld">${L}<select id="${id}"><option value="">— غير محدد —</option>
       ${t.rows.map(r=>`<option value="${r.id}" ${v===r.id?'selected':''}>${esc(rowTitle(t,r))}</option>`).join('')}</select></div>`; }
@@ -2221,6 +2227,7 @@ function readField(c){
   if(c.type==='gallery') return GALB[c.id]||[];
   if(c.type==='files') return FILB[c.id]||[];
   if(c.type==='hijri'){ const y=document.getElementById('hy_'+c.id),m=document.getElementById('hm_'+c.id),d=document.getElementById('hd_'+c.id); return y&&y.value&&m.value&&d.value?`${y.value}/${m.value.padStart(2,'0')}/${d.value.padStart(2,'0')}`:''; }
+  if(c.type==='multiselect')return [...document.querySelectorAll(`#f_${c.id} input:checked`)].map(x=>x.value);
   const e=document.getElementById('f_'+c.id); if(!e) return undefined;
   if(c.type==='list') return e.value.split('\n').map(s=>s.trim()).filter(Boolean);
   return e.value.trim();
@@ -2295,7 +2302,7 @@ function openLog(rid){
     `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
        ${photoCol(p)&&r.v[photoCol(p).id]?`<div class="ava" style="width:44px;height:44px"><img src="${r.v[photoCol(p).id]}"></div>`:''}
        <b style="font-size:15px">${esc(rowTitle(p,r))}</b>
-       ${vis(p).filter(c=>c.type==='select').map(c=>cellHTML(p,c,r)).join(' ')}</div>
+       ${vis(p).filter(c=>['select','multiselect'].includes(c.type)).map(c=>cellHTML(p,c,r)).join(' ')}</div>
      <div style="font-size:13px;color:var(--ink-2);margin-bottom:14px">فُتح في ${fmtDate(r.created)} · آخر تحديث ${fmtDate(r.updated)}</div>
      ${imgs.length?`<div class="gal" style="margin-bottom:15px;flex-wrap:wrap">${imgs.map((s,i)=>`<img class="thumb" style="width:52px;height:52px" src="${s}" data-lg="${i}">`).join('')}</div>`:''}
      ${lg.length?`<ul class="timeline">${lg.map(e=>`<li><div class="tm">${fmtDate(e.at)}${e.by?' · '+esc(e.by):''}</div><div>${esc(e.tx)}</div></li>`).join('')}</ul>`
@@ -2323,7 +2330,7 @@ function openCols(){
   drawCM();
   $('#cmSave').onclick=async()=>{ cmSync();
     const p=pg(), final=CD.filter(c=>c.name.trim()), keep=new Set(final.map(c=>c.id));
-    for(const c of final.filter(c=>c.type==='select')){ const labels=(c.options||[]).map(o=>o.label.trim()).filter(Boolean); if(new Set(labels).size!==labels.length) return toast(`يوجد خيار مكرر في «${c.name}»`,'err'); c.options=(c.options||[]).filter(o=>o.label.trim()); }
+    for(const c of final.filter(c=>['select','multiselect'].includes(c.type))){ const labels=(c.options||[]).map(o=>o.label.trim()).filter(Boolean); if(new Set(labels).size!==labels.length) return toast(`يوجد خيار مكرر في «${c.name}»`,'err'); c.options=(c.options||[]).filter(o=>o.label.trim()); }
     p.cols.forEach(c=>{ if(!keep.has(c.id)) p.rows.forEach(r=>{delete r.v[c.id];}); });
     if(p.chipsCol&&p.chipsCol!=='none'&&!keep.has(p.chipsCol)) p.chipsCol='';
     if(p.logCol&&!keep.has(p.logCol)) p.logCol='';
@@ -2346,7 +2353,7 @@ function drawCM(){
       <button class="iconbtn del" data-rm="${i}">${ic('trash')}</button></div>
     ${c.type==='link'?`<div class="cmopts"><label style="font-size:12px;font-weight:700;color:var(--ink-2)">الصفحة المرتبطة</label>
       <select id="cm_l_${i}" style="margin-top:5px">${DB.pages.filter(x=>x.id!==cur).map(x=>`<option value="${x.id}" ${c.link===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>`:''}
-    ${c.type==='select'?`<div class="cmopts">
+    ${['select','multiselect'].includes(c.type)?`<div class="cmopts"><div class="hint" style="margin-bottom:7px">${c.type==='multiselect'?'يمكن للمستخدم تحديد أكثر من خيار.':'يختار المستخدم خيارًا واحدًا فقط.'}</div>
       ${(c.options||[]).map((o,j)=>`<div class="cmopt"><input id="cm_ol_${i}_${j}" value="${esc(o.label)}">
         <select id="cm_oc_${i}_${j}" data-color="${i}_${j}" style="border-inline-start:8px solid ${CVAR[o.color]||CVAR.slate}">${COLORS.map(([v,l])=>`<option value="${v}" ${o.color===v?'selected':''}>${l}</option>`).join('')}</select>
         <button class="iconbtn del" data-ro="${i}_${j}">${ic('trash',13)}</button></div>`).join('')}
@@ -2367,7 +2374,7 @@ function drawCM(){
   B('[data-ro]',b=>b.onclick=()=>R(()=>{const [i,j]=b.dataset.ro.split('_').map(Number);CD[i].options.splice(j,1);}));
   B('[data-color]',s=>s.onchange=()=>R(()=>{}));
   B('[data-ty]',s=>s.onchange=()=>R(()=>{const i=+s.dataset.ty,c=CD[i];
-    if(c.type==='select'&&!(c.options||[]).length) c.options=statusOpts();
+    if(['select','multiselect'].includes(c.type)&&!(c.options||[]).length) c.options=statusOpts();
     if(c.type==='link'&&!c.link){const o=DB.pages.find(x=>x.id!==cur);c.link=o?o.id:'';} }));
   $('#cmAdd').onclick=()=>R(()=>CD.push(col('عمود جديد','text')));
 }
@@ -2853,6 +2860,7 @@ function showImport(){
       Object.entries(map).forEach(([i,cid])=>{
         const c=p.cols.find(x=>x.id===cid); let val=String(r[+i]??'').trim();
         if(c.type==='list') V[cid]=val?val.split(/[،,;|]/).map(s=>s.trim()).filter(Boolean):[];
+        else if(c.type==='multiselect'){const values=val?val.split(/[،,;|]/).map(s=>s.trim()).filter(Boolean):[];V[cid]=values.filter(v=>(c.options||[]).some(o=>o.label===v))}
         else if(c.type==='select'){ const o=(c.options||[]).find(o=>o.label===val); V[cid]=o?o.label:val; }
         else if(c.type==='link'){ const t=linkPage(c); const m=t.rows.find(x=>rowTitle(t,x)===val); V[cid]=m?m.id:''; }
         else if(c.type==='date'){ const d=new Date(val); V[cid]=isNaN(d)?'':d.toISOString().slice(0,10); }
