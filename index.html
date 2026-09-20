@@ -312,6 +312,9 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--pine-2);box-shadow:0 0 0 3px rgba(20,81,77,.1)}
 .fld .hint{font-size:11.5px;color:var(--ink-3)}
 .fld input.bad{border-color:var(--red);box-shadow:0 0 0 3px rgba(163,35,28,.09)}
+.page-lock-prompt{text-align:center}.page-lock-mark{width:62px;height:62px;margin:0 auto 10px;border-radius:18px;display:grid;place-items:center;color:var(--pine);background:var(--mint);border:1px solid var(--line)}
+.page-lock-prompt h4{font-size:17px;margin:0 0 6px}.page-lock-prompt>p{margin:0 0 15px;color:var(--ink-2);line-height:1.8}.page-lock-prompt .fld{text-align:right;margin-top:15px}.page-lock-prompt .gnote{text-align:right;margin-top:14px}
+.lock-choice-note{padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:12px;line-height:1.8;color:var(--ink-2)}
 .phlist{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .phchip{font-size:11.5px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:3px 8px;
   color:var(--ink-2);font-weight:600;font-family:monospace;direction:ltr}
@@ -751,6 +754,7 @@ let INVITE_TOKEN=new URLSearchParams(location.search).get('invite')||'';
 let VAULT=null, DEK=null, ME=null, DB=null, MYREV=0, FORCE_PW=false;
 let WORKSPACE_ID=null;
 let cur=null, ui={}, saveTimer=null, idleTimer=null, searchTimer=null;
+let unlockedPageId=null, pageUnlockCancel=null, pageUnlockBusy=false;
 const IDLE_MIN=15;
 
 function resumeDb(){
@@ -768,6 +772,28 @@ const NOSTORE=false;
 let MEMV=null, SB_SESSION=null;
 function localGet(k){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; } }
 function localSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function b64url(buf){return ab2b64(buf).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function urlb64(s){s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return b642ab(s)}
+async function pagePinDigest(pin,salt){
+  if(!SUB)throw new Error('crypto');
+  const key=await SUB.importKey('raw',TE.encode(String(pin)),'PBKDF2',false,['deriveBits']);
+  return ab2b64(await SUB.deriveBits({name:'PBKDF2',salt:new Uint8Array(b642ab(salt)),iterations:150000,hash:'SHA-256'},key,256));
+}
+async function makePagePin(pin){const salt=ab2b64(rnd(16));return {salt,hash:await pagePinDigest(pin,salt)}}
+async function verifyPagePin(pin,rec){if(!rec?.salt||!rec?.hash)return false;const got=await pagePinDigest(pin,rec.salt);let diff=got.length^rec.hash.length;for(let i=0;i<Math.max(got.length,rec.hash.length);i++)diff|=(got.charCodeAt(i)||0)^(rec.hash.charCodeAt(i)||0);return diff===0}
+function pageCredentialKey(p){return `${VKEY}_page_bio_${WORKSPACE_ID||'local'}_${ME?.id||'user'}_${p.id}`}
+function platformAuthAvailable(){return !!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext)}
+async function usePageBiometric(p){
+  if(!platformAuthAvailable())throw new Error('unsupported');
+  const key=pageCredentialKey(p),saved=localGet(key);
+  if(saved?.id){
+    await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(saved.id)}],userVerification:'required',timeout:60000}});
+    return true;
+  }
+  const cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'منظومة الشؤون الإدارية'},user:{id:rnd(32),name:String(ME?.email||ME?.name||'user'),displayName:String(ME?.name||'مستخدم المنظومة')},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none'}});
+  if(!cred)throw new Error('cancelled');
+  localSet(key,{id:b64url(cred.rawId),at:Date.now()});return true;
+}
 async function cloudSession(){
   if(!SB) return null;
   const {data,error}=await SB.auth.getSession();
@@ -1601,7 +1627,7 @@ function renderNav(){
 function showHome(){
   applyAppearance();
   clearInterval(window.homeBannerTimer);
-  cur=null;$('#side').classList.remove('open');$('#scrim').classList.remove('on');renderNav();
+  cur=null;unlockedPageId=null;$('#side').classList.remove('open');$('#scrim').classList.remove('on');renderNav();
   $('#pageBody').className='page home-page';
   $('#topbar').style.setProperty('--acc',CVAR.gold);
   $('#topbar').innerHTML=`<button class="burger" id="burger" aria-label="فتح قائمة الصفحات"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="mobile-brand-title">منظومة الشؤون الإدارية</div><div class="page-heading"><h2><span class="tag"></span>الرئيسية</h2><p class="sub">مساحة عملك اليومية</p></div><div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>`;
@@ -1694,12 +1720,38 @@ function stripeHTML(p){
     vis(p).filter(c=>c.filterable).slice(0,im?1:2).forEach(c=>h+=cell(uniq(rows.map(r=>cellText(p,c,r))).length,'عدد قيم '+c.name)); }
   return h;
 }
-function go(id){
-  const changed=!!(id&&id!==cur);
-  if(id) cur=id;
+async function requestPageUnlock(p){
+  if(!p||!p.lockMode||p.lockMode==='none'||unlockedPageId===p.id)return true;
+  if(pageUnlockBusy)return false;pageUnlockBusy=true;
+  try{
+    if(p.lockMode==='biometric'){
+      const enrolled=!!localGet(pageCredentialKey(p));
+      const ok=await new Promise(resolve=>{
+        pageUnlockCancel=resolve;
+        modal('صفحة محمية',`<div class="page-lock-prompt"><div class="page-lock-mark">${ic('shield',28)}</div><h4>${esc(p.name)}</h4><p>${enrolled?'استخدم بصمة الوجه أو الإصبع أو قفل الجهاز للمتابعة.':'سجّل هذا الجهاز أول مرة، ثم استخدم بصمته لفتح الصفحة لاحقًا.'}</p><div class="gnote">هذا القفل حماية إضافية ولا يغيّر صلاحيات مشاهدة الصفحة.</div></div>`,`<button class="btn primary" id="pageBioOpen">${enrolled?'فتح ببصمة الجهاز':'تسجيل هذا الجهاز وفتح الصفحة'}</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
+        $('#pageBioOpen').onclick=async()=>{const b=$('#pageBioOpen');b.disabled=true;b.innerHTML='<span class="spin"></span> بانتظار الجهاز…';try{await usePageBiometric(p);pageUnlockCancel=null;closeModal();resolve(true)}catch(e){b.disabled=false;b.textContent=enrolled?'فتح ببصمة الجهاز':'تسجيل هذا الجهاز وفتح الصفحة';toast(e?.message==='unsupported'?'البصمة غير متاحة في هذا المتصفح أو الاتصال غير آمن':'لم يتم التحقق من بصمة الجهاز','err')}};
+      });
+      if(ok)unlockedPageId=p.id;return ok;
+    }
+    let attempts=0;
+    const ok=await new Promise(resolve=>{
+      pageUnlockCancel=resolve;
+      modal('أدخل الرقم السري',`<div class="page-lock-prompt"><div class="page-lock-mark">${ic('lock',28)}</div><h4>${esc(p.name)}</h4><p>هذه الصفحة محمية. أدخل رقمها السري للمتابعة.</p><div class="fld"><label>الرقم السري</label><input id="pagePinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" placeholder="••••"><span class="hint" id="pagePinHint"></span></div></div>`,`<button class="btn primary" id="pagePinOpen">فتح الصفحة</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
+      const submit=async()=>{const input=$('#pagePinInput'),b=$('#pagePinOpen');if(!input.value)return input.focus();b.disabled=true;const valid=await verifyPagePin(input.value,p.lockPin).catch(()=>false);if(valid){pageUnlockCancel=null;closeModal();return resolve(true)}attempts++;input.value='';input.focus();$('#pagePinHint').textContent=attempts>=5?'محاولات كثيرة؛ انتظر 30 ثانية.':'الرقم السري غير صحيح';$('#pagePinHint').style.color='var(--danger)';if(attempts>=5){b.disabled=true;setTimeout(()=>{attempts=0;if(b.isConnected){b.disabled=false;$('#pagePinHint').textContent='يمكنك المحاولة الآن'}},30000)}else b.disabled=false};
+      $('#pagePinOpen').onclick=submit;$('#pagePinInput').onkeydown=e=>{if(e.key==='Enter')submit()};setTimeout(()=>$('#pagePinInput')?.focus(),50);
+    });
+    if(ok)unlockedPageId=p.id;return ok;
+  }finally{pageUnlockBusy=false}
+}
+async function go(id){
+  let target=id?DB.pages.find(x=>x.id===id):pg();
+  if(!target||!can(target.id,'view')){const v=visiblePages();if(!v.length)return;target=v[0]}
+  const changed=target.id!==cur;
+  if(changed)unlockedPageId=null;
+  if(!(await requestPageUnlock(target)))return;
+  cur=target.id;
   if(changed&&cur) U().display=matchMedia('(max-width:600px)').matches?'detail':'compact';
   $('#side').classList.remove('open'); $('#scrim').classList.remove('on');
-  if(!cur||!pg()||!can(cur,'view')){ const v=visiblePages(); if(!v.length) return; cur=v[0].id; }
   renderNav(); renderTop();
   const p=pg();
   $('#pageBody').className='page record-page';
@@ -2035,7 +2087,7 @@ function modal(t,b,f,sz){
     <div class="m-body">${b}</div>${f?`<div class="m-foot">${f}</div>`:''}`;
   $('#ov').classList.add('on');
 }
-function closeModal(){ if(FORCE_PW) return toast('أنشئ كلمة مرور جديدة أولاً','err');if(!$('#ov').classList.contains('on'))return;$('#ov').classList.remove('on');document.body.classList.remove('modal-open');document.body.style.top='';window.scrollTo(0,modalScrollY); }
+function closeModal(){ if(FORCE_PW) return toast('أنشئ كلمة مرور جديدة أولاً','err');if(!$('#ov').classList.contains('on'))return;if(pageUnlockCancel){const done=pageUnlockCancel;pageUnlockCancel=null;done(false)}$('#ov').classList.remove('on');document.body.classList.remove('modal-open');document.body.style.top='';window.scrollTo(0,modalScrollY); }
 $('#ov').addEventListener('mousedown',e=>{if(e.target.id==='ov')closeModal();});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ if($('#lbx').classList.contains('on')) closeLB(); else closeModal(); }
@@ -2393,7 +2445,17 @@ function openPageSet(){
         <div class="card-slot"><b>أسفل المحتوى</b><span>الوحدة أو القسم</span><select id="ps_card_sub">${cardOpts(p.mobileCardSub)}</select></div>
       </div></div>
       </div></details>
-      <details class="settings-section"><summary>٤ · خيارات متقدمة</summary><div class="settings-content grid2">
+      <details class="settings-section"><summary>٤ · قفل الصفحة</summary><div class="settings-content grid2">
+      <div class="fld full"><label>طريقة حماية الصفحة</label><select id="ps_lock_mode">
+        <option value="none" ${!p.lockMode||p.lockMode==='none'?'selected':''}>بدون قفل</option>
+        <option value="pin" ${p.lockMode==='pin'?'selected':''}>رقم سري للصفحة</option>
+        <option value="biometric" ${p.lockMode==='biometric'?'selected':''}>بصمة الوجه أو الإصبع / قفل الجهاز</option>
+      </select></div>
+      <div class="fld" id="ps_pin_wrap"><label>${p.lockPin?'رقم سري جديد (اختياري)':'الرقم السري'} </label><input id="ps_lock_pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="new-password" placeholder="من 4 إلى 12 رقمًا"><span class="hint">${p.lockPin?'اتركه فارغًا للاحتفاظ بالرقم الحالي.':'لا يُحفظ الرقم نفسه داخل المنظومة.'}</span></div>
+      <div class="fld" id="ps_pin_confirm_wrap"><label>تأكيد الرقم السري</label><input id="ps_lock_pin_confirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="new-password" placeholder="أعد كتابة الرقم"></div>
+      <div class="fld full"><div class="lock-choice-note" id="ps_lock_note"></div></div>
+      </div></details>
+      <details class="settings-section"><summary>٥ · خيارات متقدمة</summary><div class="settings-content grid2">
       ${p.view==='letters'?`
       <div class="fld"><label>مصدر بيانات التعبئة</label><select id="ps_peo">
         ${DB.pages.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${p.peoplePage===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
@@ -2409,6 +2471,8 @@ function openPageSet(){
     </div>`,
     `<button class="btn primary" id="psSave">حفظ الإعدادات</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
   const sections=[...document.querySelectorAll('.settings-section')];sections.forEach(d=>d.ontoggle=()=>{if(d.open)sections.forEach(x=>{if(x!==d)x.open=false})});
+  const drawLockSettings=()=>{const mode=$('#ps_lock_mode').value,pin=mode==='pin';$('#ps_pin_wrap').hidden=!pin;$('#ps_pin_confirm_wrap').hidden=!pin;$('#ps_lock_note').innerHTML=mode==='biometric'?'<b>بصمة الجهاز:</b> يسجّل كل مستخدم جهازه عند أول فتح. يعمل عبر Face ID أو Touch ID أو وسيلة قفل الجهاز المتاحة، ويتطلب اتصالًا آمنًا ومتصفحًا داعمًا.':mode==='pin'?'<b>الرقم السري:</b> سيُطلب من كل مستخدم لديه صلاحية مشاهدة الصفحة، مع إيقاف مؤقت بعد خمس محاولات خاطئة.':'ستفتح الصفحة مباشرة للمستخدمين المصرّح لهم.'};
+  $('#ps_lock_mode').onchange=drawLockSettings;drawLockSettings();
   $('#ps_primary').onchange=()=>{$('#ps_card_title_label').textContent=$('#ps_primary').selectedOptions[0]?.textContent||''};
   let ico=p.icon, acc=p.accent;
   $('#psIcons').querySelectorAll('[data-ico]').forEach(b=>b.onclick=()=>{ico=b.dataset.ico;
@@ -2425,7 +2489,16 @@ function openPageSet(){
     cur=null; save(); render(); toast('حُذفت الصفحة'); });
   $('#psSave').onclick=async()=>{
     const n=$('#ps_name').value.trim(); if(!n) return toast('اسم الصفحة مطلوب','err');
+    const lockMode=$('#ps_lock_mode').value,lockPin=$('#ps_lock_pin').value,lockConfirm=$('#ps_lock_pin_confirm').value;
+    let lockPinRecord=p.lockPin||null;
+    if(lockMode==='pin'){
+      if(!lockPinRecord&&!lockPin)return toast('أدخل رقمًا سريًا للصفحة','err');
+      if(lockPin&&(!/^\d{4,12}$/.test(lockPin)))return toast('الرقم السري يجب أن يكون من 4 إلى 12 رقمًا','err');
+      if(lockPin!==lockConfirm)return toast('تأكيد الرقم السري غير مطابق','err');
+      if(lockPin){try{lockPinRecord=await makePagePin(lockPin)}catch(e){return toast('تعذّر تأمين الرقم السري في هذا المتصفح','err')}}
+    }
     p.name=n; p.sub=$('#ps_sub').value.trim(); p.group=$('#ps_group').value.trim(); p.icon=ico; p.accent=acc; p.view=$('#ps_view').value;p.primaryCol=$('#ps_primary').value;
+    p.lockMode=lockMode;p.lockPin=lockMode==='pin'?lockPinRecord:null;unlockedPageId=null;
     p.showSearch=$('#ps_search').checked;p.showImport=$('#ps_import').checked;p.showExport=$('#ps_export').checked;p.showPrint=$('#ps_print').checked;p.showPreview=$('#ps_preview').checked;p.showLog=$('#ps_history').checked;p.showEdit=$('#ps_edit').checked;p.showDelete=$('#ps_delete').checked;
     p.chipsCol=$('#ps_chips').value; p.logCol=$('#ps_log').value;
     p.avatars=$('#ps_ava').checked; p.showUpdated=$('#ps_upd').checked;
