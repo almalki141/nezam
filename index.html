@@ -1786,7 +1786,7 @@ async function requestPageUnlock(p){
   }finally{pageUnlockBusy=false}
 }
 async function go(id){
-  let target=id?DB.pages.find(x=>x.id===id):pg();
+  let target=id?pg(id):pg();
   if(!target||!can(target.id,'view')){const v=visiblePages();if(!v.length)return;target=v[0]}
   const changed=target.id!==cur;
   if(changed)unlockedPageId=null;
