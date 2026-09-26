@@ -17,7 +17,11 @@ grant insert, update, delete on public.public_pages to authenticated;
 
 drop policy if exists "public can view published pages" on public.public_pages;
 create policy "public can view published pages" on public.public_pages
-for select to anon, authenticated using (
+for select to anon using (published = true);
+
+drop policy if exists "members can view workspace public pages" on public.public_pages;
+create policy "members can view workspace public pages" on public.public_pages
+for select to authenticated using (
   published = true or exists (
     select 1 from public.workspace_members m
     where m.workspace_id = public_pages.workspace_id and m.user_id = auth.uid()
