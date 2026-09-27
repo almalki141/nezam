@@ -33,11 +33,11 @@ create policy "workspace admins manage public pages" on public.public_pages
 for all to authenticated using (
   exists (
     select 1 from public.workspace_members m
-    where m.workspace_id = public_pages.workspace_id and m.user_id = auth.uid() and m.role = 'admin'
+    where m.workspace_id = public_pages.workspace_id and m.user_id = auth.uid() and m.role in ('owner','admin')
   )
 ) with check (
   exists (
     select 1 from public.workspace_members m
-    where m.workspace_id = public_pages.workspace_id and m.user_id = auth.uid() and m.role = 'admin'
+    where m.workspace_id = public_pages.workspace_id and m.user_id = auth.uid() and m.role in ('owner','admin')
   )
 );
