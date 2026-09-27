@@ -393,12 +393,9 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 .utable{width:100%;border-collapse:collapse;font-size:13px}
 .utable th{background:var(--surface-2);padding:8px 10px;text-align:right;font-size:12px;border-bottom:1px solid var(--line)}
 .utable td{padding:8px 10px;border-bottom:1px solid var(--line-2)}
-.permgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-.permrow{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
-.permrow span{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.permrow select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;background:var(--surface-2)}
+.permgrid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}.permrow{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}.perm-page-info{display:flex;align-items:flex-start;gap:10px;min-width:0}.perm-page-no{flex:none;width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--pine);font-size:11px;font-weight:900}.perm-page-info b,.perm-page-info small{display:block;white-space:normal;overflow-wrap:anywhere}.perm-page-info b{font-size:13.5px;color:var(--ink)}.perm-page-info small{margin-top:2px;font-size:10.5px;color:var(--ink-3)}.permrow select{width:100%;min-width:0}.perm-section{grid-column:1/-1;margin-top:7px;padding:8px 12px;border-radius:9px;background:var(--pine);color:#fff;font-size:12px;font-weight:900}.quick-login{margin-top:9px;width:100%;justify-content:center;background:linear-gradient(135deg,#eff8f6,#fff);color:var(--pine);border:1px solid #bcd8d2}.quick-login-mark{width:25px;height:25px;border-radius:8px;display:grid;place-items:center;background:var(--pine);color:#fff}.quick-security-card{text-align:center}.quick-security-icon{width:70px;height:70px;margin:0 auto 12px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,var(--pine),#176d66);color:#fff;box-shadow:0 12px 30px rgba(14,58,56,.2)}.quick-pin{font-size:24px!important;letter-spacing:10px;text-align:center;direction:ltr}
+.permrow select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;background:var(--surface-2)}
 .perm-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);margin-bottom:9px}.perm-toolbar b{width:100%;font-size:12px;color:var(--ink-3)}
-.perm-section{grid-column:1/-1;font-size:12px;font-weight:800;color:var(--pine-2);padding:8px 3px 2px;border-bottom:1px solid var(--line)}
 .toasts{position:fixed;bottom:20px;left:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--pine);color:#fff;padding:11px 17px;border-radius:9px;font-size:13.5px;font-weight:600;
   box-shadow:0 10px 30px rgba(0,0,0,.25);animation:pop .16s ease-out;border-inline-start:3px solid var(--brass-2);max-width:360px}
@@ -527,7 +524,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .m-head{position:sticky;top:0;z-index:3;background:var(--surface)}.m-foot{position:sticky;bottom:0;z-index:3}.m-foot .btn{flex:1;justify-content:center;min-height:46px}
   .m-body:has(.utable){overflow-x:visible}.utable{min-width:0;display:block}.utable thead{display:none}.utable tbody{display:grid;gap:9px}.utable tr{display:block;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}.utable td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid var(--line-2)}.utable td::before{content:attr(data-label);font-size:10.5px;color:var(--ink-3);font-weight:800}.utable td:last-child{border:0;padding-top:10px}.utable td.acts{width:auto}.utable td.acts .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line);margin-inline-start:5px}
   #pageOrder .frow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:7px;padding:11px;border:1px solid var(--line);border-radius:13px;margin-bottom:8px;background:var(--surface-2)}#pageOrder .frow>b{min-width:0!important;align-self:center}#pageOrder .frow>input{grid-column:1/-1;width:100%;min-height:44px;font-size:16px}#pageOrder .frow .fx{grid-column:3;grid-row:1;display:flex}#pageOrder .iconbtn{width:42px;height:42px;background:var(--surface);border:1px solid var(--line)}
-  .mobile-col-picker{display:grid;grid-template-columns:1fr;gap:6px}.mobile-col-picker label,.permrow{min-height:44px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);display:flex;align-items:center;gap:8px}.mobile-col-picker input{width:19px!important;height:19px}
+  .mobile-col-picker{display:grid;grid-template-columns:1fr;gap:6px}.mobile-col-picker label{min-height:44px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);display:flex;align-items:center;gap:8px}.mobile-col-picker input{width:19px!important;height:19px}.permrow{grid-template-columns:1fr;padding:11px}.permrow select{min-width:0!important;width:100%}
   .settings-section{border-radius:12px}.settings-section>summary{min-height:52px;padding:11px 12px;font-size:13px}.settings-content{padding:11px}.settings-content.grid2{grid-template-columns:1fr;gap:11px}
   .cmrow{padding:9px;border-radius:12px;background:var(--surface)}.cm-summary{min-height:42px}.cm-editor{padding-top:9px}.cmtop{grid-template-columns:38px minmax(0,1fr) 44px;gap:7px}.cmtop>select{grid-column:2/-1}.cmtop>.iconbtn{grid-column:3;grid-row:1}.cmmove{grid-row:1/3}.cmmove button{width:36px;height:25px}.cmflags{display:grid;grid-template-columns:1fr 1fr;gap:6px}.cmflags label{min-height:40px;padding:7px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}.cmopt{grid-template-columns:1fr auto}.cmopt select{grid-column:1}.cmopt .iconbtn{grid-column:2;grid-row:1/3}
   .card-layout-settings{grid-template-columns:1fr 1fr;padding:8px;gap:7px}.card-slot{padding:9px}.card-slot select{font-size:16px;min-height:42px}.card-slot.featured{grid-column:1/-1}
@@ -788,6 +785,26 @@ async function makePagePin(pin){const salt=ab2b64(rnd(16));return {salt,hash:awa
 async function verifyPagePin(pin,rec){if(!rec?.salt||!rec?.hash)return false;const got=await pagePinDigest(pin,rec.salt);let diff=got.length^rec.hash.length;for(let i=0;i<Math.max(got.length,rec.hash.length);i++)diff|=(got.charCodeAt(i)||0)^(rec.hash.charCodeAt(i)||0);return diff===0}
 function pageCredentialKey(p){return `${VKEY}_page_bio_${WORKSPACE_ID||'local'}_${ME?.id||'user'}_${p.id}`}
 function platformAuthAvailable(){return !!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext)}
+const QUICK_LOGIN_KEY='nezam_quick_login_v1';
+function quickLoginRecord(){return localGet(QUICK_LOGIN_KEY)}
+async function quickPinKey(pin,salt){return deriveKEK(String(pin),salt,600000)}
+async function enableQuickLogin(){
+  if(!ME||!DEK)return;
+  if(!platformAuthAvailable())return toast('البصمة أو التحقق البيومتري غير متاح في هذا الجهاز أو المتصفح','err');
+  const vu=VAULT.users.find(x=>x.id===ME.id)||{},email=vu.email||'',current=quickLoginRecord();
+  modal('بصمة الوجه والرقم السري',`<div class="quick-security-card"><div class="quick-security-icon">${ic('shieldk',34)}</div><h3>دخول سريع وآمن لهذا الجهاز</h3><p class="hint">ستتحقق المنظومة أولًا ببصمة الوجه أو بصمة الجهاز، ثم تطلب رقمًا سريًا خاصًا بهذا الجهاز. لا تُحفظ كلمة مرور حسابك.</p></div><div class="grid2"><div class="fld"><label>رقم سري من 6 إلى 8 أرقام</label><input id="quickPin1" class="quick-pin" type="password" inputmode="numeric" minlength="6" maxlength="8" autocomplete="new-password"></div><div class="fld"><label>تأكيد الرقم السري</label><input id="quickPin2" class="quick-pin" type="password" inputmode="numeric" minlength="6" maxlength="8" autocomplete="new-password"></div></div>${current?'<div class="gnote">الدخول السريع مفعّل حاليًا على هذا الجهاز. يمكنك استبداله أو إيقافه.</div>':''}`,`<button class="btn primary" id="quickEnable">${current?'إعادة التفعيل':'تفعيل الدخول السريع'}</button>${current?'<button class="btn danger" id="quickDisable">إيقافه على هذا الجهاز</button>':''}<button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
+  const onlyDigits=e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,8)};$('#quickPin1').oninput=onlyDigits;$('#quickPin2').oninput=onlyDigits;
+  if($('#quickDisable'))$('#quickDisable').onclick=()=>{localStorage.removeItem(QUICK_LOGIN_KEY);closeModal();toast('أُوقف الدخول بالبصمة على هذا الجهاز')};
+  $('#quickEnable').onclick=async()=>{const p1=$('#quickPin1').value,p2=$('#quickPin2').value;if(!/^\d{6,8}$/.test(p1))return toast('اختر رقمًا سريًا من 6 إلى 8 أرقام','err');if(p1!==p2)return toast('الرقمان غير متطابقين','err');const btn=$('#quickEnable');btn.disabled=true;btn.textContent='انتظر تحقق الجهاز…';try{const cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'منظومة الشؤون الإدارية'},user:{id:rnd(32),name:email||ME.name,displayName:ME.name||'مستخدم المنظومة'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none'}});if(!cred)throw new Error('cancelled');const salt=ab2b64(rnd(16)),key=await quickPinKey(p1,salt),wrapped=await wrapDEK(key,DEK),wid=await workspaceId();localSet(QUICK_LOGIN_KEY,{email,userId:ME.id,workspaceId:wid,credentialId:b64url(cred.rawId),salt,...wrapped,createdAt:nowTs()});closeModal();toast('تم تفعيل الدخول بالبصمة والرقم السري على هذا الجهاز')}catch(e){btn.disabled=false;btn.textContent='تفعيل الدخول السريع';toast(e.name==='NotAllowedError'?'لم يكتمل التحقق البيومتري':'تعذّر تفعيل الدخول السريع','err')}};
+}
+async function quickUnlock(){
+  const rec=quickLoginRecord();if(!rec)return;
+  if(!platformAuthAvailable())return gErr('التحقق البيومتري غير متاح في هذا الجهاز. استخدم كلمة المرور.');
+  const btn=$('#l_quick');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> تحقق بالبصمة…'}
+  try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(rec.credentialId)}],userVerification:'required',timeout:60000}})}catch(e){if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول بالبصمة والرقم السري'}return e.name==='NotAllowedError'?null:gErr('تعذّر التحقق ببصمة الجهاز. استخدم كلمة المرور.')}
+  modal('أدخل الرقم السري للجهاز',`<div class="quick-security-card"><div class="quick-security-icon">${ic('lock',32)}</div><p class="hint">اكتمل التحقق البيومتري. أدخل رقم هذا الجهاز لفتح بياناتك المشفرة.</p></div><div class="fld"><input id="quickUnlockPin" class="quick-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="one-time-code" autofocus></div>`,`<button class="btn primary" id="quickUnlockGo">فتح المنظومة</button><button class="btn ghost" id="quickUnlockCancel">إلغاء</button>`,'sm');
+  const run=async()=>{const pin=$('#quickUnlockPin').value;if(!/^\d{6,8}$/.test(pin))return toast('أدخل الرقم السري من 6 إلى 8 أرقام','err');const go=$('#quickUnlockGo');go.disabled=true;go.textContent='جارٍ فتح البيانات…';try{if(!SB_SESSION)await cloudSession();if(!SB_SESSION)throw new Error('session');WORKSPACE_ID=rec.workspaceId||null;VAULT=await vaultRead();if(!VAULT)throw new Error('vault');const vu=VAULT.users.find(x=>x.id===rec.userId);if(!vu||vu.active===false)throw new Error('account');const key=await quickPinKey(pin,rec.salt);DEK=await unwrapDEK(key,rec);DB=await decObj(DEK,VAULT.data);ME=(DB.users||[]).find(x=>x.id===rec.userId);if(!ME)throw new Error('account');MYREV=VAULT.rev||1;closeModal();enterApp();audit('دخول سريع','بصمة الجهاز والرقم السري');save();toast('تم الدخول الآمن بالبصمة')}catch(e){go.disabled=false;go.textContent='فتح المنظومة';$('#quickUnlockPin').value='';$('#quickUnlockPin').focus();toast(e.message==='session'?'انتهت جلسة الجهاز؛ ادخل بكلمة المرور مرة واحدة':'الرقم السري غير صحيح أو تغيّرت بيانات الحساب','err')}};$('#quickUnlockGo').onclick=run;$('#quickUnlockPin').onkeydown=e=>{if(e.key==='Enter')run()};$('#quickUnlockCancel').onclick=()=>{closeModal();if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول بالبصمة والرقم السري'}};
+}
 async function usePageBiometric(p){
   if(!platformAuthAvailable())throw new Error('unsupported');
   const key=pageCredentialKey(p),saved=localGet(key);
@@ -1177,9 +1194,11 @@ function screenLogin(lockedUser,note){
       <input id="l_mail" type="email" value="${esc(em)}" ${lockedUser?'readonly':''} autocomplete="username"></div>
     <div class="fld" style="margin-bottom:16px"><label>كلمة المرور</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <button class="btn primary gbig" id="l_go">دخول</button>
+    ${quickLoginRecord()?`<button class="btn quick-login" id="l_quick"><span class="quick-login-mark">◎</span> الدخول بالبصمة والرقم السري</button>`:''}
     <p style="text-align:center;font-size:11.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.8">
       نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#l_go').onclick=doLogin;
+  if($('#l_quick'))$('#l_quick').onclick=quickUnlock;
   $('#l_pw').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   setTimeout(()=>{const f=lockedUser?$('#l_pw'):$('#l_mail'); if(f) f.focus();},60);
 }
@@ -1601,6 +1620,7 @@ function openAppearanceSettings(){
 function renderSideBtns(){
   const b=[];
   b.push(`<button class="sbtn" id="btnPw">${ic('lock',13)} كلمة المرور</button>`);
+  b.push(`<button class="sbtn" id="btnQuick">${ic('shieldk',13)} بصمة الوجه والدخول السريع</button>`);
   if(isAdmin()){
     b.push(`<button class="sbtn wide" id="btnAppearance">${ic('gear',13)} مظهر المنظومة — لجميع المستخدمين</button>`);
     b.push(`<button class="sbtn" id="btnWelcome">${ic('edit',13)} شاشة الترحيب</button>`);
@@ -1617,6 +1637,7 @@ function renderSideBtns(){
   $('#sideRefreshIcon').innerHTML=ic('sync',14);
   $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث المنظومة…';try{if(!(await flushPendingSave()))throw new Error('save');const kept=await keepSessionForRefresh();if(!kept)throw new Error('resume');const u=new URL(location.href);u.searchParams.set('_refresh',Date.now());location.replace(u.href);}catch(e){btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة';toast('تعذّر تحديث المنظومة، حاول مرة أخرى','err')}};
   $('#btnPw').onclick=openChangePw;
+  $('#btnQuick').onclick=enableQuickLogin;
   $('#btnLock').onclick=lockSession;
   if($('#btnAppearance'))$('#btnAppearance').onclick=openAppearanceSettings;
   $('#sideToolsToggle').onclick=()=>{$('#side').querySelector('.side-foot').classList.toggle('tools-open');};
@@ -2695,8 +2716,8 @@ function openUsers(){
 }
 function permGrid(perms){
   let last=''; return `<div class="perm-toolbar"><b>تطبيق صلاحية واحدة على جميع الصفحات</b>${LEVELS.map(l=>`<button type="button" class="btn ghost sm" data-perm-all="${l}">${LEVEL_AR[l]}</button>`).join('')}</div>
-    <div class="permgrid">${DB.pages.map(p=>{const g=p.group||'صفحات مستقلة',head=g!==last?(last=g,`<div class="perm-section">${esc(g)}</div>`):'';return head+`<div class="permrow"><span title="${esc(p.name)}">${esc(p.name)}</span>
-    <select data-pp="${p.id}">${LEVELS.map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`;}).join('')}</div>`;
+    <div class="permgrid">${DB.pages.map((p,i)=>{const g=p.group||'صفحات مستقلة',head=g!==last?(last=g,`<div class="perm-section">مجموعة: ${esc(g)}</div>`):'';return head+`<div class="permrow"><div class="perm-page-info"><span class="perm-page-no">${i+1}</span><span><b>${esc(p.name||'صفحة بدون اسم')}</b><small>${esc(p.sub||'بدون وصف')} · ${(p.rows||[]).length} سجل</small></span></div>
+    <select data-pp="${p.id}" aria-label="صلاحية صفحة ${esc(p.name||'بدون اسم')}">${LEVELS.map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`;}).join('')}</div>`;
 }
 function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات');});}
 function openAddUser(){
