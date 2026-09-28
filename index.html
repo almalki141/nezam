@@ -395,7 +395,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 .utable{width:100%;border-collapse:collapse;font-size:13px}
 .utable th{background:var(--surface-2);padding:8px 10px;text-align:right;font-size:12px;border-bottom:1px solid var(--line)}
 .utable td{padding:8px 10px;border-bottom:1px solid var(--line-2)}
-.permgrid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}.permrow{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}.perm-page-info{display:flex;align-items:flex-start;gap:10px;min-width:0}.perm-page-no{flex:none;width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--pine);font-size:11px;font-weight:900}.perm-page-info b,.perm-page-info small{display:block;white-space:normal;overflow-wrap:anywhere}.perm-page-info b{font-size:13.5px;color:var(--ink)}.perm-page-info small{margin-top:2px;font-size:10.5px;color:var(--ink-3)}.permrow select{width:100%;min-width:0}.perm-section{grid-column:1/-1;margin-top:7px;padding:8px 12px;border-radius:9px;background:var(--pine);color:#fff;font-size:12px;font-weight:900}.quick-login{margin-top:9px;width:100%;justify-content:center;background:linear-gradient(135deg,#eff8f6,#fff);color:var(--pine);border:1px solid #bcd8d2}.quick-login-mark{width:25px;height:25px;border-radius:8px;display:grid;place-items:center;background:var(--pine);color:#fff}.quick-security-card{text-align:center}.quick-security-icon{width:70px;height:70px;margin:0 auto 12px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,var(--pine),#176d66);color:#fff;box-shadow:0 12px 30px rgba(14,58,56,.2)}.quick-pin{font-size:24px!important;letter-spacing:10px;text-align:center;direction:ltr}
+.permgrid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}.permrow{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}.perm-page-info{display:flex;align-items:flex-start;gap:10px;min-width:0}.perm-page-no{flex:none;width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--pine);font-size:11px;font-weight:900}.perm-page-info b,.perm-page-info small{display:block;white-space:normal;overflow-wrap:anywhere}.perm-page-info b{font-size:13.5px;color:var(--ink)}.perm-page-info small{margin-top:2px;font-size:10.5px;color:var(--ink-3)}.permrow select{width:100%;min-width:0}.perm-section{grid-column:1/-1;margin-top:7px;padding:8px 12px;border-radius:9px;background:var(--pine);color:#fff;font-size:12px;font-weight:900}
 .permrow select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;background:var(--surface-2)}
 .perm-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);margin-bottom:9px}.perm-toolbar b{width:100%;font-size:12px;color:var(--ink-3)}
 .toasts{position:fixed;bottom:20px;left:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
@@ -773,13 +773,6 @@ async function keepSessionForRefresh(){
 async function takeRefreshSession(){
   try{const db=await resumeDb(),rec=await new Promise((resolve,reject)=>{const tx=db.transaction('state','readwrite'),s=tx.objectStore('state'),q=s.get('refresh');q.onsuccess=()=>{const v=q.result;s.delete('refresh');resolve(v)};q.onerror=()=>reject(q.error);});db.close();return rec&&Date.now()-rec.at<60000?rec:null;}catch(e){return null;}
 }
-async function quickVaultCachePut(vault,rec=quickLoginRecord()){
-  if(!vault||!rec)return false;
-  try{const db=await resumeDb();await new Promise((resolve,reject)=>{const tx=db.transaction('state','readwrite');tx.objectStore('state').put({id:'quick-vault',workspaceId:rec.workspaceId,userId:rec.userId,vault,at:Date.now()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close();return true}catch(e){return false}
-}
-async function quickVaultCacheGet(rec){
-  try{const db=await resumeDb(),out=await new Promise((resolve,reject)=>{const q=db.transaction('state','readonly').objectStore('state').get('quick-vault');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)});db.close();return out&&out.userId===rec.userId&&out.workspaceId===rec.workspaceId?out.vault:null}catch(e){return null}
-}
 async function quickDeviceClear(){try{const db=await resumeDb();await new Promise((resolve,reject)=>{const tx=db.transaction('state','readwrite');tx.objectStore('state').delete('quick-vault');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close()}catch(e){}}
 
 const NOSTORE=false;
@@ -795,45 +788,7 @@ async function pagePinDigest(pin,salt){
 }
 async function makePagePin(pin){const salt=ab2b64(rnd(16));return {salt,hash:await pagePinDigest(pin,salt)}}
 async function verifyPagePin(pin,rec){if(!rec?.salt||!rec?.hash)return false;const got=await pagePinDigest(pin,rec.salt);let diff=got.length^rec.hash.length;for(let i=0;i<Math.max(got.length,rec.hash.length);i++)diff|=(got.charCodeAt(i)||0)^(rec.hash.charCodeAt(i)||0);return diff===0}
-function pageCredentialKey(p){return `${VKEY}_page_bio_${WORKSPACE_ID||'local'}_${ME?.id||'user'}_${p.id}`}
-function platformAuthAvailable(){return !!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext)}
-const QUICK_LOGIN_KEY='nezam_quick_login_v1';
-function quickLoginRecord(){return localGet(QUICK_LOGIN_KEY)}
-const QUICK_PIN_ITERS=150000;
-async function quickPinKey(pin,salt,iters){return deriveKEK(String(pin),salt,iters||QUICK_PIN_ITERS)}
 function quickWait(promise,ms=15000){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms))])}
-async function quickPrfKey(secret){const raw=await SUB.digest('SHA-256',secret);return SUB.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt'])}
-async function enableQuickLogin(){
-  if(!ME||!DEK)return;
-  if(!platformAuthAvailable())return toast('البصمة أو التحقق البيومتري غير متاح في هذا الجهاز أو المتصفح','err');
-  const vu=VAULT.users.find(x=>x.id===ME.id)||{},email=vu.email||'',current=quickLoginRecord();
-  modal('الدخول ببصمة الوجه',`<div class="quick-security-card"><div class="quick-security-icon">${ic('shieldk',34)}</div><h3>دخول سريع لهذا الجهاز</h3><p class="hint">ميزة اختيارية لكل مستخدم. سيفتح النظام ببصمة الوجه أو بصمة الجهاز فقط، ولن يطلب رمزًا إضافيًا من داخل المنظومة.</p></div>${current?'<div class="gnote">الدخول بالبصمة مفعّل حاليًا على هذا الجهاز. أعد تفعيله لتطبيق الطريقة الجديدة دون رمز.</div>':''}`,`<button class="btn primary" id="quickEnable">${current?'إعادة تفعيل البصمة':'تفعيل البصمة على هذا الجهاز'}</button>${current?'<button class="btn danger" id="quickDisable">إيقافها على هذا الجهاز</button>':''}<button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
-  if($('#quickDisable'))$('#quickDisable').onclick=async()=>{localStorage.removeItem(QUICK_LOGIN_KEY);await quickDeviceClear();closeModal();toast('أُوقف الدخول بالبصمة على هذا الجهاز')};
-  $('#quickEnable').onclick=async()=>{const btn=$('#quickEnable');btn.disabled=true;btn.textContent='انتظر تحقق الجهاز…';try{const prfSalt=rnd(32),cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'منظومة الشؤون الإدارية'},user:{id:rnd(32),name:email||ME.name,displayName:ME.name||'مستخدم المنظومة'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none',extensions:{prf:{eval:{first:prfSalt}}}}});if(!cred)throw new Error('cancelled');const secret=cred.getClientExtensionResults?.().prf?.results?.first;if(!secret)throw new Error('prf');btn.textContent='جارٍ تجهيز الدخول…';const key=await quickPrfKey(secret),wrapped=await wrapDEK(key,DEK),wid=await quickWait(workspaceId()),record={version:3,email,userId:ME.id,workspaceId:wid,credentialId:b64url(cred.rawId),prfSalt:ab2b64(prfSalt),...wrapped,createdAt:nowTs()};localSet(QUICK_LOGIN_KEY,record);await quickVaultCachePut(VAULT,record);closeModal();toast('تم تفعيل الدخول ببصمة الجهاز')}catch(e){btn.disabled=false;btn.textContent='تفعيل البصمة على هذا الجهاز';if(e.message==='prf')return toast('هذا الجهاز لا يدعم الدخول الآمن بالبصمة دون رمز إضافي','err');toast(e.name==='NotAllowedError'?'لم يكتمل التحقق البيومتري':e.message==='timeout'?'الاتصال بطيء؛ حاول مرة أخرى':'تعذّر تفعيل البصمة على هذا الجهاز','err')}};
-}
-async function quickUnlock(){
-  const rec=quickLoginRecord();if(!rec)return;
-  if(!platformAuthAvailable())return gErr('التحقق البيومتري غير متاح في هذا الجهاز. استخدم كلمة المرور.');
-  const btn=$('#l_quick');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> تحقق بالبصمة…'}
-  try{
-    if(rec.version!==3||!rec.prfSalt)throw new Error('upgrade');
-    const cred=await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(rec.credentialId)}],userVerification:'required',timeout:60000,extensions:{prf:{eval:{first:new Uint8Array(b642ab(rec.prfSalt))}}}}});
-    const secret=cred?.getClientExtensionResults?.().prf?.results?.first;if(!secret)throw new Error('prf');if(btn)btn.innerHTML='<span class="spin"></span> جارٍ ربط المزامنة…';
-    if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');DEK=await unwrapDEK(await quickPrfKey(secret),rec);WORKSPACE_ID=rec.workspaceId||null;VAULT=await quickWait(vaultRead(),15000);
-    if(!VAULT)throw new Error('vault');const vu=VAULT.users.find(x=>x.id===rec.userId);if(!vu||vu.active===false)throw new Error('account');DB=await decObj(DEK,VAULT.data);ME=(DB.users||[]).find(x=>x.id===rec.userId);if(!ME)throw new Error('account');MYREV=VAULT.rev||1;enterApp();audit('دخول سريع','بصمة الجهاز');toast('تم الدخول بالبصمة والمزامنة متصلة');
-  }catch(e){if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول ببصمة الوجه'}if(e.name==='NotAllowedError')return;if(e.message==='upgrade')return gErr('حدّث طريقة البصمة: ادخل بكلمة المرور مرة واحدة، ثم أعد تفعيل البصمة من أدوات النظام.');if(e.message==='prf')return gErr('إصدار هذا الجهاز لا يدعم الدخول الآمن بالبصمة دون رمز. استخدم كلمة المرور.');gErr(e.message==='session'?'انتهت جلسة الجهاز؛ ادخل بكلمة المرور مرة واحدة.':'تعذّر فتح البيانات بالبصمة. استخدم كلمة المرور ثم أعد تفعيلها.')}
-}
-async function usePageBiometric(p){
-  if(!platformAuthAvailable())throw new Error('unsupported');
-  const key=pageCredentialKey(p),saved=localGet(key);
-  if(saved?.id){
-    await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(saved.id)}],userVerification:'required',timeout:60000}});
-    return true;
-  }
-  const cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'منظومة الشؤون الإدارية'},user:{id:rnd(32),name:String(ME?.email||ME?.name||'user'),displayName:String(ME?.name||'مستخدم المنظومة')},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none'}});
-  if(!cred)throw new Error('cancelled');
-  localSet(key,{id:b64url(cred.rawId),at:Date.now()});return true;
-}
 async function cloudSession(){
   if(!SB) return null;
   const {data,error}=await SB.auth.getSession();
@@ -864,7 +819,7 @@ async function vaultRead(){
   const {data,error}=await SB.from('workspaces').select('vault,revision').eq('id',wid).maybeSingle();
   if(error) throw error;
   if(!data||!data.vault) return null;
-  MEMV=data.vault; quickVaultCachePut(MEMV); return MEMV;
+  MEMV=data.vault; return MEMV;
 }
 async function vaultRevision(){
   if(!SB_SESSION) await cloudSession();
@@ -885,7 +840,7 @@ async function vaultWrite(v,expectedRev){
   const {data,error}=await q.select('revision').maybeSingle();
   if(error) throw error;
   if(expectedRev!=null&&!data)return false;
-  MEMV=v; quickVaultCachePut(MEMV);
+  MEMV=v;
   return true;
 }
 async function vaultWriteReliable(v,expectedRev){
@@ -1215,11 +1170,9 @@ function screenLogin(lockedUser,note){
       <input id="l_mail" type="email" value="${esc(em)}" ${lockedUser?'readonly':''} autocomplete="username"></div>
     <div class="fld" style="margin-bottom:16px"><label>كلمة المرور</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <button class="btn primary gbig" id="l_go">دخول</button>
-    ${quickLoginRecord()?`<button class="btn quick-login" id="l_quick"><span class="quick-login-mark">◎</span> الدخول ببصمة الوجه</button>`:''}
     <p style="text-align:center;font-size:11.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.8">
       نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#l_go').onclick=doLogin;
-  if($('#l_quick'))$('#l_quick').onclick=quickUnlock;
   $('#l_pw').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   setTimeout(()=>{const f=lockedUser?$('#l_pw'):$('#l_mail'); if(f) f.focus();},60);
 }
@@ -1274,6 +1227,7 @@ function resetIdle(){ clearTimeout(idleTimer); if(ME) idleTimer=setTimeout(lockS
 
 function enterApp(){
   DB.users=DB.users||[]; DB.audit=DB.audit||[]; DB.pages=DB.pages||[];
+  if(!DB.deviceAuthRemovedV1){DB.pages.forEach(p=>{if(p.lockMode==='biometric'){p.lockMode='none';p.lockPin=null}});DB.deviceAuthRemovedV1=true;localStorage.removeItem('nezam_quick_login_v1');quickDeviceClear();save()}
   if(!DB.uniqueRulesV1){
     DB.pages.forEach(p=>(p.cols||[]).forEach(c=>{
       if(/^(الاسم|اسم الفرد|رقم الهوية|الرقم العام|الرقم العسكري|رقم المعاملة)$/.test(String(c.name||'').trim())) c.unique=true;
@@ -1641,7 +1595,6 @@ function openAppearanceSettings(){
 function renderSideBtns(){
   const b=[];
   b.push(`<button class="sbtn" id="btnPw">${ic('lock',13)} كلمة المرور</button>`);
-  b.push(`<button class="sbtn" id="btnQuick">${ic('shieldk',13)} بصمة الوجه والدخول السريع</button>`);
   if(isAdmin()){
     b.push(`<button class="sbtn wide" id="btnAppearance">${ic('gear',13)} مظهر المنظومة — لجميع المستخدمين</button>`);
     b.push(`<button class="sbtn" id="btnWelcome">${ic('edit',13)} شاشة الترحيب</button>`);
@@ -1658,7 +1611,6 @@ function renderSideBtns(){
   $('#sideRefreshIcon').innerHTML=ic('sync',14);
   $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث البيانات…';try{if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');if(!(await flushPendingSave()))throw new Error('save');const remote=await quickWait(vaultRead(),15000);if(!remote)throw new Error('data');if(remote.rev>MYREV){VAULT=remote;DB=await decObj(DEK,VAULT.data);MYREV=VAULT.rev;ME=(DB.users||[]).find(x=>x.id===ME.id)||ME;render()}setSave('محفوظ');toast('تم تحديث البيانات بنجاح')}catch(e){toast(e.message==='session'?'انتهت جلسة الدخول؛ ادخل بكلمة المرور مرة واحدة':'تعذّر تحديث البيانات؛ تحقق من الاتصال','err')}finally{btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة'}};
   $('#btnPw').onclick=openChangePw;
-  $('#btnQuick').onclick=enableQuickLogin;
   $('#btnLock').onclick=lockSession;
   if($('#btnAppearance'))$('#btnAppearance').onclick=openAppearanceSettings;
   $('#sideToolsToggle').onclick=()=>{$('#side').querySelector('.side-foot').classList.toggle('tools-open');};
@@ -1807,18 +1759,10 @@ function stripeHTML(p){
   return h;
 }
 async function requestPageUnlock(p){
+  if(p?.lockMode==='biometric')return true;
   if(!p||!p.lockMode||p.lockMode==='none'||unlockedPageId===p.id)return true;
   if(pageUnlockBusy)return false;pageUnlockBusy=true;
   try{
-    if(p.lockMode==='biometric'){
-      const enrolled=!!localGet(pageCredentialKey(p));
-      const ok=await new Promise(resolve=>{
-        pageUnlockCancel=resolve;
-        modal('صفحة محمية',`<div class="page-lock-prompt"><div class="page-lock-mark">${ic('shield',28)}</div><h4>${esc(p.name)}</h4><p>${enrolled?'استخدم بصمة الوجه أو الإصبع أو قفل الجهاز للمتابعة.':'سجّل هذا الجهاز أول مرة، ثم استخدم بصمته لفتح الصفحة لاحقًا.'}</p><div class="gnote">هذا القفل حماية إضافية ولا يغيّر صلاحيات مشاهدة الصفحة.</div></div>`,`<button class="btn primary" id="pageBioOpen">${enrolled?'فتح ببصمة الجهاز':'تسجيل هذا الجهاز وفتح الصفحة'}</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
-        $('#pageBioOpen').onclick=async()=>{const b=$('#pageBioOpen');b.disabled=true;b.innerHTML='<span class="spin"></span> بانتظار الجهاز…';try{await usePageBiometric(p);pageUnlockCancel=null;closeModal();resolve(true)}catch(e){b.disabled=false;b.textContent=enrolled?'فتح ببصمة الجهاز':'تسجيل هذا الجهاز وفتح الصفحة';toast(e?.message==='unsupported'?'البصمة غير متاحة في هذا المتصفح أو الاتصال غير آمن':'لم يتم التحقق من بصمة الجهاز','err')}};
-      });
-      if(ok)unlockedPageId=p.id;return ok;
-    }
     let attempts=0;
     const ok=await new Promise(resolve=>{
       pageUnlockCancel=resolve;
@@ -2531,7 +2475,6 @@ function openPageSet(){
       <div class="fld full"><label>طريقة حماية الصفحة</label><select id="ps_lock_mode">
         <option value="none" ${!p.lockMode||p.lockMode==='none'?'selected':''}>بدون قفل</option>
         <option value="pin" ${p.lockMode==='pin'?'selected':''}>رقم سري للصفحة</option>
-        <option value="biometric" ${p.lockMode==='biometric'?'selected':''}>بصمة الوجه أو الإصبع / قفل الجهاز</option>
       </select></div>
       <div class="fld" id="ps_pin_wrap"><label>${p.lockPin?'رقم سري جديد (اختياري)':'الرقم السري'} </label><input id="ps_lock_pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="new-password" placeholder="من 4 إلى 12 رقمًا"><span class="hint">${p.lockPin?'اتركه فارغًا للاحتفاظ بالرقم الحالي.':'لا يُحفظ الرقم نفسه داخل المنظومة.'}</span></div>
       <div class="fld" id="ps_pin_confirm_wrap"><label>تأكيد الرقم السري</label><input id="ps_lock_pin_confirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="new-password" placeholder="أعد كتابة الرقم"></div>
@@ -2553,7 +2496,7 @@ function openPageSet(){
     </div>`,
     `<button class="btn primary" id="psSave">حفظ الإعدادات</button><button class="btn ghost" onclick="closeModal()">إلغاء</button>`);
   const sections=[...document.querySelectorAll('.settings-section')];sections.forEach(d=>d.ontoggle=()=>{if(d.open)sections.forEach(x=>{if(x!==d)x.open=false})});
-  const drawLockSettings=()=>{const mode=$('#ps_lock_mode').value,pin=mode==='pin';$('#ps_pin_wrap').hidden=!pin;$('#ps_pin_confirm_wrap').hidden=!pin;$('#ps_lock_note').innerHTML=mode==='biometric'?'<b>بصمة الجهاز:</b> يسجّل كل مستخدم جهازه عند أول فتح. يعمل عبر Face ID أو Touch ID أو وسيلة قفل الجهاز المتاحة، ويتطلب اتصالًا آمنًا ومتصفحًا داعمًا.':mode==='pin'?'<b>الرقم السري:</b> سيُطلب من كل مستخدم لديه صلاحية مشاهدة الصفحة، مع إيقاف مؤقت بعد خمس محاولات خاطئة.':'ستفتح الصفحة مباشرة للمستخدمين المصرّح لهم.'};
+  const drawLockSettings=()=>{const mode=$('#ps_lock_mode').value,pin=mode==='pin';$('#ps_pin_wrap').hidden=!pin;$('#ps_pin_confirm_wrap').hidden=!pin;$('#ps_lock_note').innerHTML=mode==='pin'?'<b>الرقم السري:</b> سيُطلب من كل مستخدم لديه صلاحية مشاهدة الصفحة، مع إيقاف مؤقت بعد خمس محاولات خاطئة.':'ستفتح الصفحة مباشرة للمستخدمين المصرّح لهم.'};
   $('#ps_lock_mode').onchange=drawLockSettings;drawLockSettings();
   $('#ps_primary').onchange=()=>{$('#ps_card_title_label').textContent=$('#ps_primary').selectedOptions[0]?.textContent||''};
   let ico=p.icon, acc=p.accent;
