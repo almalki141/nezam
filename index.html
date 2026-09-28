@@ -284,6 +284,7 @@ html[data-theme="dark"] .sheet{color:#DDE7E4}
 .sheet .body{white-space:pre-wrap;word-wrap:break-word}
 .sheet .attsec{margin-top:24px;padding-top:13px;border-top:1px dashed var(--line);font-family:var(--ui-font);font-size:13.5px;line-height:1.9}
 .sheet .attsec h5{margin:0 0 7px;font-size:13px;font-weight:800;color:var(--pine-2)}
+.letter-workspace{max-width:1120px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.letter-head{display:grid;grid-template-columns:auto minmax(240px,1fr) auto;gap:12px;align-items:center;padding:15px 17px;background:linear-gradient(135deg,var(--pine),var(--pine-2));color:#fff}.letter-head-copy h3{margin:0;font-size:17px}.letter-head-copy p{margin:3px 0 0;color:#c4d6d2;font-size:11.5px}.letter-template-select{min-height:44px;min-width:260px;border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:8px 12px;background:#fff;color:var(--ink);font:inherit}.letter-back{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.24)!important;color:#fff!important}.letter-controls{display:flex;gap:9px;align-items:end;flex-wrap:wrap;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}.letter-fill{display:grid;gap:5px;flex:1;min-width:240px}.letter-fill span{font-size:11px;font-weight:800;color:var(--ink-2)}.letter-fill select{min-height:42px}.letter-actions{display:flex;gap:7px;flex-wrap:wrap}.letter-workspace .sheetwrap{min-height:520px;max-height:none;padding:30px}.letter-workspace .sheet{max-width:790px;min-height:460px;padding:48px 54px}.letter-workspace .sheet .body{font-size:16px;line-height:2.15}
 .ph{background:#F5E7C6;border-bottom:1px dashed #B08640;border-radius:2px;padding:0 2px}
 html[data-theme="dark"] .ph{background:#3A2E14}
 
@@ -519,6 +520,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .split{gap:10px}.tpl-list{flex-direction:row;overflow-x:auto}.tpl{min-width:210px}
   .desk-bar>*{flex:1}.desk-bar .lbl{flex-basis:100%}.desk-bar select{min-width:100%}
   .sheetwrap{padding:8px;max-height:none}.sheet{padding:22px 18px;font-size:15px;line-height:1.9}
+  .letter-workspace{margin:0;border-radius:12px;box-shadow:none}.letter-head{grid-template-columns:1fr auto;padding:12px;gap:9px}.letter-head-copy{grid-column:1}.letter-head-copy h3{font-size:15px}.letter-head-copy p{display:none}.letter-back{grid-column:2;grid-row:1;min-height:42px}.letter-template-select{grid-column:1/-1;grid-row:2;min-width:0;width:100%;font-size:16px}.letter-controls{display:grid;grid-template-columns:1fr;padding:11px}.letter-fill{min-width:0}.letter-fill select{font-size:16px}.letter-actions{display:grid;grid-template-columns:1fr 1fr}.letter-actions .btn,.letter-actions .iconbtn{width:100%;min-height:44px}.letter-actions .btn.brass{grid-column:1/-1}.letter-workspace .sheetwrap{padding:8px;min-height:0;background:var(--surface-2)}.letter-workspace .sheet{min-height:0;padding:24px 17px;border-radius:8px}.letter-workspace .sheet .lh{align-items:flex-start;flex-wrap:wrap;gap:6px}.letter-workspace .sheet .lh .d{width:100%;margin:0}.letter-workspace .sheet .body{font-size:14px;line-height:2;overflow-wrap:anywhere}
   .overlay{padding:0;align-items:flex-end}.modal,.modal.sm,.modal.lg{max-width:none;border-radius:16px 16px 0 0;max-height:94dvh}
   .m-head{padding:13px 15px}.m-body{padding:15px;max-height:calc(100dvh - 132px)}.m-foot{padding:11px 15px;padding-bottom:max(11px,env(safe-area-inset-bottom))}
   .m-head{position:sticky;top:0;z-index:3;background:var(--surface)}.m-foot{position:sticky;bottom:0;z-index:3}.m-foot .btn{flex:1;justify-content:center;min-height:46px}
@@ -1523,7 +1525,7 @@ const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
 const listCol=p=>p.cols.find(c=>c.type==='list');
 const photoCol=p=>p.cols.find(c=>c.type==='image');
 const DEFAULT_AVATAR='default-soldier-avatar.png';
-function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'letter',mobileView:'cards',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];ui[cur].mobileView=ui[cur].mobileView==='details'?'page':(ui[cur].mobileView||'cards');return ui[cur]; }
+function U(){ ui[cur]=ui[cur]||{q:'',sort:{k:null,d:1},chip:'',f:{},sel:null,picked:[],mode:'table',mobileView:'cards',fill:'',page:1,pageSize:25,display:'compact',summary:[{c:'',v:''},{c:'',v:''}]};ui[cur].picked=ui[cur].picked||[];ui[cur].mobileView=ui[cur].mobileView==='details'?'page':(ui[cur].mobileView||'cards');return ui[cur]; }
 function chipsCol(p){ if(p.chipsCol==='none') return null;
   if(p.chipsCol) return p.cols.find(c=>c.id===p.chipsCol&&!c.hidden)||null;
   return vis(p).find(c=>c.type==='select'&&(c.options||[]).length<=6)||null; }
@@ -1829,7 +1831,7 @@ async function go(id){
   if(changed)unlockedPageId=null;
   if(!(await requestPageUnlock(target)))return;
   cur=target.id;
-  if(changed&&cur) U().display=matchMedia('(max-width:600px)').matches?'detail':'compact';
+  if((changed||id)&&cur){U().mode='table';U().display=matchMedia('(max-width:600px)').matches?'detail':'compact'}
   $('#side').classList.remove('open'); $('#scrim').classList.remove('on');
   renderNav(); renderTop();
   const p=pg();
@@ -2052,7 +2054,7 @@ function renderTable(p){
   $('#pageBody').innerHTML=toolsHTML(p,seg)+chips+`<div class="register mobile-mode-${u.mobileView} view-${u.mobileView==='page'?'detail':(u.display==='compact'?'compact':'detail')}">
     <div class="reg-head">${icon(p.icon,16)}<h3>${esc(p.name)}</h3>${can(p.id,'full')?`<label class="mobile-select-all"><input type="checkbox" id="mobileSelectAll" ${rows.length&&rows.every(r=>u.picked.includes(r.id))?'checked':''}> الكل</label>`:''}${can(p.id,'full')&&u.picked.length?`<button class="btn danger sm" id="bulkDelete">${ic('trash',13)} حذف المحددين (${u.picked.length})</button><button class="btn ghost sm" id="clearPicked">إلغاء التحديد</button>`:''}<span class="meta">عرض ${allRows.length?first+1:0}–${Math.min(first+pageSize,allRows.length)} من ${allRows.length}</span></div>${body}${mobileCards}${pager}</div>`;
   bindTools(p); bindCells();
-  const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);};
+  const tl=$('#toLetter'); if(tl) tl.onclick=()=>{u.mode='letter';renderLetters(p);window.scrollTo({top:0,behavior:'smooth'})};
   const a2=$('#bAdd2'); if(a2) a2.onclick=()=>openRow();
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{u.chip=b.dataset.ch;u.page=1;refreshBody();});
   document.querySelectorAll('[data-s]').forEach(h=>h.onclick=()=>{const k=h.dataset.s;u.sort=u.sort.k===k?{k,d:-u.sort.d}:{k,d:1};u.page=1;refreshBody();});
@@ -2076,26 +2078,15 @@ function renderLetters(p){
   if(!rows.find(r=>r.id===u.sel)) u.sel=rows[0]?rows[0].id:null;
   const peo=DB.pages.find(x=>x.id===p.peoplePage)||DB.pages.find(x=>x.id!==p.id)||DB.pages[0];
   const ed=can(p.id,'edit'), fu=can(p.id,'full');
-  $('#pageBody').innerHTML=toolsHTML(p,`<div class="seg"><button id="toTable">جدول</button><button class="on">خطاب</button></div>`)
-   +`<div class="split">
-      <div class="tpl-list">${rows.length?rows.map(r=>`<button class="tpl ${u.sel===r.id?'on':''}" data-sel="${r.id}">
-         <h4>${esc(rowTitle(p,r))}</h4><div class="cat">${esc(vis(p).filter(c=>c.type==='select').map(c=>cellText(p,c,r))[0]||'—')}</div></button>`).join('')
-         :`<div style="padding:20px;text-align:center;color:var(--ink-3);font-size:13.5px;border:1px dashed var(--line);border-radius:10px">لا توجد صيغ.</div>`}</div>
-      <div class="deskpanel">
-        <div class="desk-bar">
-          <span class="lbl">تعبئة من ${esc(peo?peo.name:'—')}:</span>
-          <select id="fillSel"><option value="">— بدون تعبئة —</option>
-            ${peo&&can(peo.id,'view')?peo.rows.map(r=>`<option value="${r.id}" ${u.fill===r.id?'selected':''}>${esc(rowTitle(peo,r))}</option>`).join(''):''}</select>
-          <div class="spacer"></div>
-          ${ed?`<button class="iconbtn" id="bEd" title="تعديل الصيغة">${ic('edit')}</button>`:''}
-          ${fu?`<button class="iconbtn del" id="bDl" title="حذف الصيغة">${ic('trash')}</button>`:''}
-          <button class="btn ghost" id="bCopy">نسخ النص</button>
-          ${canExport()?`<button class="btn ghost" id="bPrintL">طباعة الخطاب</button>`:''}
-          <button class="btn brass" id="bMake">فتح معاملة</button>
-        </div><div class="sheetwrap" id="sheetWrap"></div></div></div>`;
-  bindTools(p);
+  $('#pageBody').innerHTML=`<section class="letter-workspace">
+    <header class="letter-head"><div class="letter-head-copy"><h3>عرض الخطاب</h3><p>اختر الصيغة ثم عاين الخطاب واطبعه أو أنشئ منه معاملة</p></div>
+      <button class="btn letter-back" id="toTable">${ic('rt',15)} العودة إلى الجدول</button>
+      <select class="letter-template-select" id="letterTemplate" aria-label="اختيار صيغة الخطاب">${rows.length?rows.map(r=>`<option value="${r.id}" ${u.sel===r.id?'selected':''}>${esc(rowTitle(p,r))}</option>`).join(''):'<option value="">لا توجد صيغ خطابات</option>'}</select></header>
+    <div class="letter-controls"><label class="letter-fill"><span>تعبئة بيانات الخطاب من ${esc(peo?peo.name:'—')}</span><select id="fillSel"><option value="">بدون تعبئة تلقائية</option>${peo&&can(peo.id,'view')?peo.rows.map(r=>`<option value="${r.id}" ${u.fill===r.id?'selected':''}>${esc(rowTitle(peo,r))}</option>`).join(''):''}</select></label>
+      <div class="letter-actions">${ed?`<button class="btn ghost" id="bEd">${ic('edit',15)} تعديل الصيغة</button>`:''}${fu?`<button class="btn ghost" id="bDl">${ic('trash',15)} حذف</button>`:''}<button class="btn ghost" id="bCopy">نسخ النص</button>${canExport()?`<button class="btn ghost" id="bPrintL">طباعة</button>`:''}<button class="btn brass" id="bMake">فتح معاملة</button></div></div>
+    <div class="sheetwrap" id="sheetWrap"></div></section>`;
   $('#toTable').onclick=()=>{u.mode='table';renderTable(p);};
-  document.querySelectorAll('[data-sel]').forEach(b=>b.onclick=()=>{u.sel=b.dataset.sel;renderLetters(p);});
+  $('#letterTemplate').onchange=e=>{u.sel=e.target.value;drawSheet(p)};
   $('#fillSel').onchange=e=>{u.fill=e.target.value;drawSheet(p);};
   if($('#bEd')) $('#bEd').onclick=()=>u.sel?openRow(u.sel):toast('اختر صيغة أولاً','err');
   if($('#bDl')) $('#bDl').onclick=()=>u.sel?delRow(u.sel):toast('اختر صيغة أولاً','err');
