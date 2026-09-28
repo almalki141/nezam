@@ -776,6 +776,7 @@ async function quickVaultCachePut(vault,rec=quickLoginRecord()){
 async function quickVaultCacheGet(rec){
   try{const db=await resumeDb(),out=await new Promise((resolve,reject)=>{const q=db.transaction('state','readonly').objectStore('state').get('quick-vault');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)});db.close();return out&&out.userId===rec.userId&&out.workspaceId===rec.workspaceId?out.vault:null}catch(e){return null}
 }
+async function quickDeviceClear(){try{const db=await resumeDb();await new Promise((resolve,reject)=>{const tx=db.transaction('state','readwrite');tx.objectStore('state').delete('quick-vault');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close()}catch(e){}}
 
 const NOSTORE=false;
 let MEMV=null, SB_SESSION=null;
@@ -797,36 +798,26 @@ function quickLoginRecord(){return localGet(QUICK_LOGIN_KEY)}
 const QUICK_PIN_ITERS=150000;
 async function quickPinKey(pin,salt,iters){return deriveKEK(String(pin),salt,iters||QUICK_PIN_ITERS)}
 function quickWait(promise,ms=15000){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms))])}
+async function quickPrfKey(secret){const raw=await SUB.digest('SHA-256',secret);return SUB.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt'])}
 async function enableQuickLogin(){
   if(!ME||!DEK)return;
   if(!platformAuthAvailable())return toast('البصمة أو التحقق البيومتري غير متاح في هذا الجهاز أو المتصفح','err');
   const vu=VAULT.users.find(x=>x.id===ME.id)||{},email=vu.email||'',current=quickLoginRecord();
-  modal('بصمة الوجه والرقم السري',`<div class="quick-security-card"><div class="quick-security-icon">${ic('shieldk',34)}</div><h3>دخول سريع وآمن لهذا الجهاز</h3><p class="hint">ستتحقق المنظومة أولًا ببصمة الوجه أو بصمة الجهاز، ثم تطلب رقمًا سريًا خاصًا بهذا الجهاز. لا تُحفظ كلمة مرور حسابك.</p></div><div class="grid2"><div class="fld"><label>رقم سري من 6 إلى 8 أرقام</label><input id="quickPin1" class="quick-pin" type="password" inputmode="numeric" minlength="6" maxlength="8" autocomplete="new-password"></div><div class="fld"><label>تأكيد الرقم السري</label><input id="quickPin2" class="quick-pin" type="password" inputmode="numeric" minlength="6" maxlength="8" autocomplete="new-password"></div></div>${current?'<div class="gnote">الدخول السريع مفعّل حاليًا على هذا الجهاز. يمكنك استبداله أو إيقافه.</div>':''}`,`<button class="btn primary" id="quickEnable">${current?'إعادة التفعيل':'تفعيل الدخول السريع'}</button>${current?'<button class="btn danger" id="quickDisable">إيقافه على هذا الجهاز</button>':''}<button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
-  const onlyDigits=e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,8)};$('#quickPin1').oninput=onlyDigits;$('#quickPin2').oninput=onlyDigits;
-  if($('#quickDisable'))$('#quickDisable').onclick=()=>{localStorage.removeItem(QUICK_LOGIN_KEY);closeModal();toast('أُوقف الدخول بالبصمة على هذا الجهاز')};
-  $('#quickEnable').onclick=async()=>{const p1=$('#quickPin1').value,p2=$('#quickPin2').value;if(!/^\d{6,8}$/.test(p1))return toast('اختر رقمًا سريًا من 6 إلى 8 أرقام','err');if(p1!==p2)return toast('الرقمان غير متطابقين','err');const btn=$('#quickEnable');btn.disabled=true;btn.textContent='انتظر تحقق الجهاز…';try{const cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'منظومة الشؤون الإدارية'},user:{id:rnd(32),name:email||ME.name,displayName:ME.name||'مستخدم المنظومة'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none'}});if(!cred)throw new Error('cancelled');btn.textContent='جارٍ حفظ الدخول السريع…';const salt=ab2b64(rnd(16)),key=await quickPinKey(p1,salt,QUICK_PIN_ITERS),wrapped=await wrapDEK(key,DEK),wid=await quickWait(workspaceId()),record={email,userId:ME.id,workspaceId:wid,credentialId:b64url(cred.rawId),salt,iters:QUICK_PIN_ITERS,...wrapped,createdAt:nowTs()};localSet(QUICK_LOGIN_KEY,record);await quickVaultCachePut(VAULT,record);closeModal();toast('تم تفعيل الدخول بالبصمة والرقم السري على هذا الجهاز')}catch(e){btn.disabled=false;btn.textContent='تفعيل الدخول السريع';toast(e.name==='NotAllowedError'?'لم يكتمل التحقق البيومتري':e.message==='timeout'?'الاتصال بطيء؛ حاول مرة أخرى':'تعذّر تفعيل الدخول السريع','err')}};
+  modal('الدخول ببصمة الوجه',`<div class="quick-security-card"><div class="quick-security-icon">${ic('shieldk',34)}</div><h3>دخول سريع لهذا الجهاز</h3><p class="hint">ميزة اختيارية لكل مستخدم. سيفتح النظام ببصمة الوجه أو بصمة الجهاز فقط، ولن يطلب رمزًا إضافيًا من داخل المنظومة.</p></div>${current?'<div class="gnote">الدخول بالبصمة مفعّل حاليًا على هذا الجهاز. أعد تفعيله لتطبيق الطريقة الجديدة دون رمز.</div>':''}`,`<button class="btn primary" id="quickEnable">${current?'إعادة تفعيل البصمة':'تفعيل البصمة على هذا الجهاز'}</button>${current?'<button class="btn danger" id="quickDisable">إيقافها على هذا الجهاز</button>':''}<button class="btn ghost" onclick="closeModal()">إلغاء</button>`,'sm');
+  if($('#quickDisable'))$('#quickDisable').onclick=async()=>{localStorage.removeItem(QUICK_LOGIN_KEY);await quickDeviceClear();closeModal();toast('أُوقف الدخول بالبصمة على هذا الجهاز')};
+  $('#quickEnable').onclick=async()=>{const btn=$('#quickEnable');btn.disabled=true;btn.textContent='انتظر تحقق الجهاز…';try{const prfSalt=rnd(32),cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'منظومة الشؤون الإدارية'},user:{id:rnd(32),name:email||ME.name,displayName:ME.name||'مستخدم المنظومة'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none',extensions:{prf:{eval:{first:prfSalt}}}}});if(!cred)throw new Error('cancelled');const secret=cred.getClientExtensionResults?.().prf?.results?.first;if(!secret)throw new Error('prf');btn.textContent='جارٍ تجهيز الدخول…';const key=await quickPrfKey(secret),wrapped=await wrapDEK(key,DEK),wid=await quickWait(workspaceId()),record={version:3,email,userId:ME.id,workspaceId:wid,credentialId:b64url(cred.rawId),prfSalt:ab2b64(prfSalt),...wrapped,createdAt:nowTs()};localSet(QUICK_LOGIN_KEY,record);await quickVaultCachePut(VAULT,record);closeModal();toast('تم تفعيل الدخول ببصمة الجهاز')}catch(e){btn.disabled=false;btn.textContent='تفعيل البصمة على هذا الجهاز';if(e.message==='prf')return toast('هذا الجهاز لا يدعم الدخول الآمن بالبصمة دون رمز إضافي','err');toast(e.name==='NotAllowedError'?'لم يكتمل التحقق البيومتري':e.message==='timeout'?'الاتصال بطيء؛ حاول مرة أخرى':'تعذّر تفعيل البصمة على هذا الجهاز','err')}};
 }
 async function quickUnlock(){
   const rec=quickLoginRecord();if(!rec)return;
   if(!platformAuthAvailable())return gErr('التحقق البيومتري غير متاح في هذا الجهاز. استخدم كلمة المرور.');
   const btn=$('#l_quick');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> تحقق بالبصمة…'}
-  try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(rec.credentialId)}],userVerification:'required',timeout:60000}})}catch(e){if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول بالبصمة والرقم السري'}return e.name==='NotAllowedError'?null:gErr('تعذّر التحقق ببصمة الجهاز. استخدم كلمة المرور.')}
-  modal('أدخل الرقم السري للجهاز',`<div class="quick-security-card"><div class="quick-security-icon">${ic('lock',32)}</div><p class="hint">اكتمل التحقق البيومتري. أدخل رقم هذا الجهاز لفتح بياناتك المشفرة.</p></div><div class="fld"><input id="quickUnlockPin" class="quick-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="one-time-code" autofocus></div>`,`<button class="btn primary" id="quickUnlockGo">فتح المنظومة</button><button class="btn ghost" id="quickUnlockCancel">إلغاء</button>`,'sm');
-  const run=async()=>{
-    const pin=$('#quickUnlockPin').value;if(!/^\d{6,8}$/.test(pin))return toast('أدخل الرقم السري من 6 إلى 8 أرقام','err');
-    const go=$('#quickUnlockGo');go.disabled=true;
-    try{
-      go.textContent=rec.iters?'جارٍ فتح البيانات…':'جارٍ ترقية الدخول السريع لأول مرة…';const usedIters=rec.iters||600000,key=await quickPinKey(pin,rec.salt,usedIters);DEK=await unwrapDEK(key,rec);
-      WORKSPACE_ID=rec.workspaceId||null;VAULT=await quickVaultCacheGet(rec);
-      if(!VAULT){go.textContent='جارٍ جلب البيانات لأول مرة…';if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');VAULT=await quickWait(vaultRead(),15000)}
-      if(!VAULT)throw new Error('vault');const vu=VAULT.users.find(x=>x.id===rec.userId);if(!vu||vu.active===false)throw new Error('account');
-      DB=await decObj(DEK,VAULT.data);ME=(DB.users||[]).find(x=>x.id===rec.userId);if(!ME)throw new Error('account');
-      if(!rec.iters||rec.iters!==QUICK_PIN_ITERS){const salt=ab2b64(rnd(16)),fastKey=await quickPinKey(pin,salt,QUICK_PIN_ITERS),wrapped=await wrapDEK(fastKey,DEK);localSet(QUICK_LOGIN_KEY,{...rec,salt,iters:QUICK_PIN_ITERS,...wrapped,updatedAt:nowTs()})}
-      MYREV=VAULT.rev||1;closeModal();enterApp();audit('دخول سريع','بصمة الجهاز والرقم السري');toast('تم الدخول الآمن بالبصمة');
-      cloudSession().then(s=>{if(s)syncQuietly();else toast('تم الدخول محليًا؛ أدخل بكلمة المرور لاحقًا لتفعيل المزامنة','err')}).catch(()=>toast('تم الدخول محليًا؛ المزامنة غير متاحة الآن','err'));
-    }catch(e){go.disabled=false;go.textContent='فتح المنظومة';$('#quickUnlockPin').value='';$('#quickUnlockPin').focus();const msg=e.message==='session'?'انتهت جلسة الجهاز؛ ادخل بكلمة المرور مرة واحدة':e.message==='timeout'?'الاتصال بطيء ولم تصل البيانات؛ حاول مرة أخرى':e.message==='vault'?'تعذّر العثور على بيانات المنشأة':'الرقم السري غير صحيح أو تغيّرت بيانات الحساب';toast(msg,'err')}
-  };
-  $('#quickUnlockGo').onclick=run;$('#quickUnlockPin').onkeydown=e=>{if(e.key==='Enter')run()};$('#quickUnlockCancel').onclick=()=>{closeModal();if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول بالبصمة والرقم السري'}};
+  try{
+    if(rec.version!==3||!rec.prfSalt)throw new Error('upgrade');
+    const cred=await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(rec.credentialId)}],userVerification:'required',timeout:60000,extensions:{prf:{eval:{first:new Uint8Array(b642ab(rec.prfSalt))}}}}});
+    const secret=cred?.getClientExtensionResults?.().prf?.results?.first;if(!secret)throw new Error('prf');if(btn)btn.innerHTML='<span class="spin"></span> جارٍ فتح المنظومة…';DEK=await unwrapDEK(await quickPrfKey(secret),rec);WORKSPACE_ID=rec.workspaceId||null;VAULT=await quickVaultCacheGet(rec);
+    if(!VAULT){if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');VAULT=await quickWait(vaultRead(),15000)}
+    if(!VAULT)throw new Error('vault');const vu=VAULT.users.find(x=>x.id===rec.userId);if(!vu||vu.active===false)throw new Error('account');DB=await decObj(DEK,VAULT.data);ME=(DB.users||[]).find(x=>x.id===rec.userId);if(!ME)throw new Error('account');MYREV=VAULT.rev||1;enterApp();audit('دخول سريع','بصمة الجهاز');toast('تم الدخول ببصمة الجهاز');cloudSession().then(s=>{if(s)syncQuietly()}).catch(()=>{});
+  }catch(e){if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول ببصمة الوجه'}if(e.name==='NotAllowedError')return;if(e.message==='upgrade')return gErr('حدّث طريقة البصمة: ادخل بكلمة المرور مرة واحدة، ثم أعد تفعيل البصمة من أدوات النظام.');if(e.message==='prf')return gErr('إصدار هذا الجهاز لا يدعم الدخول الآمن بالبصمة دون رمز. استخدم كلمة المرور.');gErr(e.message==='session'?'انتهت جلسة الجهاز؛ ادخل بكلمة المرور مرة واحدة.':'تعذّر فتح البيانات بالبصمة. استخدم كلمة المرور ثم أعد تفعيلها.')}
 }
 async function usePageBiometric(p){
   if(!platformAuthAvailable())throw new Error('unsupported');
@@ -1217,7 +1208,7 @@ function screenLogin(lockedUser,note){
       <input id="l_mail" type="email" value="${esc(em)}" ${lockedUser?'readonly':''} autocomplete="username"></div>
     <div class="fld" style="margin-bottom:16px"><label>كلمة المرور</label><input id="l_pw" type="password" autocomplete="current-password"></div>
     <button class="btn primary gbig" id="l_go">دخول</button>
-    ${quickLoginRecord()?`<button class="btn quick-login" id="l_quick"><span class="quick-login-mark">◎</span> الدخول بالبصمة والرقم السري</button>`:''}
+    ${quickLoginRecord()?`<button class="btn quick-login" id="l_quick"><span class="quick-login-mark">◎</span> الدخول ببصمة الوجه</button>`:''}
     <p style="text-align:center;font-size:11.5px;color:var(--ink-3);margin:14px 0 0;line-height:1.8">
       نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#l_go').onclick=doLogin;
