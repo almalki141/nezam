@@ -818,9 +818,9 @@ async function quickUnlock(){
   try{
     if(rec.version!==3||!rec.prfSalt)throw new Error('upgrade');
     const cred=await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:urlb64(rec.credentialId)}],userVerification:'required',timeout:60000,extensions:{prf:{eval:{first:new Uint8Array(b642ab(rec.prfSalt))}}}}});
-    const secret=cred?.getClientExtensionResults?.().prf?.results?.first;if(!secret)throw new Error('prf');if(btn)btn.innerHTML='<span class="spin"></span> جارٍ فتح المنظومة…';DEK=await unwrapDEK(await quickPrfKey(secret),rec);WORKSPACE_ID=rec.workspaceId||null;VAULT=await quickVaultCacheGet(rec);
-    if(!VAULT){if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');VAULT=await quickWait(vaultRead(),15000)}
-    if(!VAULT)throw new Error('vault');const vu=VAULT.users.find(x=>x.id===rec.userId);if(!vu||vu.active===false)throw new Error('account');DB=await decObj(DEK,VAULT.data);ME=(DB.users||[]).find(x=>x.id===rec.userId);if(!ME)throw new Error('account');MYREV=VAULT.rev||1;enterApp();audit('دخول سريع','بصمة الجهاز');toast('تم الدخول ببصمة الجهاز');cloudSession().then(s=>{if(s)syncQuietly()}).catch(()=>{});
+    const secret=cred?.getClientExtensionResults?.().prf?.results?.first;if(!secret)throw new Error('prf');if(btn)btn.innerHTML='<span class="spin"></span> جارٍ ربط المزامنة…';
+    if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');DEK=await unwrapDEK(await quickPrfKey(secret),rec);WORKSPACE_ID=rec.workspaceId||null;VAULT=await quickWait(vaultRead(),15000);
+    if(!VAULT)throw new Error('vault');const vu=VAULT.users.find(x=>x.id===rec.userId);if(!vu||vu.active===false)throw new Error('account');DB=await decObj(DEK,VAULT.data);ME=(DB.users||[]).find(x=>x.id===rec.userId);if(!ME)throw new Error('account');MYREV=VAULT.rev||1;enterApp();audit('دخول سريع','بصمة الجهاز');toast('تم الدخول بالبصمة والمزامنة متصلة');
   }catch(e){if(btn){btn.disabled=false;btn.innerHTML='<span class="quick-login-mark">◎</span> الدخول ببصمة الوجه'}if(e.name==='NotAllowedError')return;if(e.message==='upgrade')return gErr('حدّث طريقة البصمة: ادخل بكلمة المرور مرة واحدة، ثم أعد تفعيل البصمة من أدوات النظام.');if(e.message==='prf')return gErr('إصدار هذا الجهاز لا يدعم الدخول الآمن بالبصمة دون رمز. استخدم كلمة المرور.');gErr(e.message==='session'?'انتهت جلسة الجهاز؛ ادخل بكلمة المرور مرة واحدة.':'تعذّر فتح البيانات بالبصمة. استخدم كلمة المرور ثم أعد تفعيلها.')}
 }
 async function usePageBiometric(p){
@@ -887,6 +887,9 @@ async function vaultWrite(v,expectedRev){
   if(expectedRev!=null&&!data)return false;
   MEMV=v; quickVaultCachePut(MEMV);
   return true;
+}
+async function vaultWriteReliable(v,expectedRev){
+  let last;for(let i=0;i<3;i++){try{const ok=await vaultWrite(v,expectedRev);return ok}catch(e){last=e;if(i<2){await new Promise(r=>setTimeout(r,700*(i+1)));await cloudSession().catch(()=>null)}}}throw last;
 }
 async function readOld(k){
   try{ if(window.storage&&window.storage.get){ const r=await window.storage.get(k); if(r&&r.value) return JSON.parse(r.value); } }catch(e){}
@@ -1319,7 +1322,7 @@ function persist(){
     try{
       VAULT.data=await encObj(DEK,DB);
       const expectedRev=MYREV;VAULT.rev=expectedRev+1; VAULT.updatedAt=nowTs();
-      if(!(await vaultWrite(VAULT,expectedRev))){const remote=await vaultRead();return conflict(remote)||false}MYREV=VAULT.rev;
+      if(!(await vaultWriteReliable(VAULT,expectedRev))){const remote=await vaultRead();return conflict(remote)||false}MYREV=VAULT.rev;
       savedVersion=Math.max(savedVersion,targetVersion);
       const sz=vaultSize(VAULT),seconds=(Date.now()-started)/1000; $('#sizeTxt').textContent=fmtSize(sz); $('#sizeTxt').title='حجم البيانات المشفرة المحفوظة';
       setSave(sz>4000000?`محفوظ · ${seconds.toFixed(1)}ث · اقترب حد المساحة`:`محفوظ · ${seconds.toFixed(1)}ث`,sz>4000000);
@@ -1653,7 +1656,7 @@ function renderSideBtns(){
   b.push(`<button class="sbtn wide" id="btnLock">${ic('lock',13)} قفل الجلسة الآن</button>`);
   $('#sideBtns').innerHTML=b.join('');
   $('#sideRefreshIcon').innerHTML=ic('sync',14);
-  $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث المنظومة…';try{if(!(await flushPendingSave()))throw new Error('save');const kept=await keepSessionForRefresh();if(!kept)throw new Error('resume');const u=new URL(location.href);u.searchParams.set('_refresh',Date.now());location.replace(u.href);}catch(e){btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة';toast('تعذّر تحديث المنظومة، حاول مرة أخرى','err')}};
+  $('#sideRefresh').onclick=async()=>{const btn=$('#sideRefresh');btn.disabled=true;btn.classList.add('loading');btn.lastChild.textContent=' جارٍ تحديث البيانات…';try{if(!SB_SESSION)await quickWait(cloudSession(),10000);if(!SB_SESSION)throw new Error('session');if(!(await flushPendingSave()))throw new Error('save');const remote=await quickWait(vaultRead(),15000);if(!remote)throw new Error('data');if(remote.rev>MYREV){VAULT=remote;DB=await decObj(DEK,VAULT.data);MYREV=VAULT.rev;ME=(DB.users||[]).find(x=>x.id===ME.id)||ME;render()}setSave('محفوظ');toast('تم تحديث البيانات بنجاح')}catch(e){toast(e.message==='session'?'انتهت جلسة الدخول؛ ادخل بكلمة المرور مرة واحدة':'تعذّر تحديث البيانات؛ تحقق من الاتصال','err')}finally{btn.disabled=false;btn.classList.remove('loading');btn.lastChild.textContent=' تحديث المنظومة'}};
   $('#btnPw').onclick=openChangePw;
   $('#btnQuick').onclick=enableQuickLogin;
   $('#btnLock').onclick=lockSession;
