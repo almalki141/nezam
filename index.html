@@ -598,6 +598,43 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
   .mobile-card-field{display:flex;align-items:baseline;justify-content:space-between;gap:12px;width:100%;padding:0;min-width:0}.mobile-card-field small{font-size:11px;font-weight:400;color:var(--ink-2);flex:none;max-width:45%;overflow-wrap:anywhere}.mobile-card-field b{font-size:13px;font-weight:400;color:var(--field-color);max-width:55%;white-space:normal;overflow-wrap:anywhere;direction:inherit;text-align:left}
   .mobile-record-actions .iconbtn{min-height:44px;height:44px;font-size:12px;font-weight:400}.mobile-record-actions .act-more{flex:0 0 44px;color:var(--ink-2);border-inline-start:1px solid var(--line-2)}.mobile-record-actions .act-more::after{display:none}
 }
+/* ============ SAHM | قسم الأسواق ============ */
+.market-shell{display:flex;flex-direction:column;gap:16px;max-width:1180px;margin:0 auto}
+.market-hero{background:linear-gradient(135deg,var(--surface),var(--surface-2));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow-sm)}
+.market-kicker{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:var(--green);background:var(--green-bg);border:1px solid var(--green-br);padding:5px 10px;border-radius:999px;margin-bottom:10px}
+.market-hero h3{font-size:23px;margin:0 0 6px;color:var(--ink)}
+.market-hero p{margin:0;color:var(--ink-2);font-size:14px}
+.market-search{margin-top:18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.market-search label{display:block;font-size:12px;font-weight:800;color:var(--ink-2);margin:0 0 6px}
+.market-search input{width:100%;height:48px;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:0 14px;outline:none;font-size:16px;font-weight:700;direction:ltr;text-align:left}
+.market-search input:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(176,134,64,.12)}
+.market-analyze{height:48px;padding:0 20px;border-radius:11px;background:var(--pine);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.market-analyze:hover{filter:brightness(1.08)}
+.market-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.market-status-card{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.market-status-card span{font-size:12px;color:var(--ink-3)}
+.market-status-card b{font-size:13px;color:var(--ink)}
+.market-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 4px var(--amber-bg);flex:none}
+.market-result{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.market-result-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.market-result-head h4{margin:0;font-size:16px}.market-result-head p{margin:3px 0 0;font-size:12px;color:var(--ink-3)}
+.market-badge{font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:999px;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-br)}
+.market-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.market-metric{padding:18px;border-inline-start:1px solid var(--line);border-bottom:1px solid var(--line);min-height:105px}
+.market-metric:nth-child(3n+1){border-inline-start:none}
+.market-metric:nth-last-child(-n+3){border-bottom:none}
+.market-metric .t{font-size:12px;color:var(--ink-3);margin-bottom:8px}.market-metric .v{font-size:18px;font-weight:800;color:var(--ink)}.market-metric .s{font-size:11.5px;color:var(--ink-3);margin-top:5px}
+.market-empty{padding:18px;background:var(--surface-2);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:9px}
+.market-detail{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px 18px;border-top:1px solid var(--line)}
+.market-detail-card{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.market-detail-card h5{font-size:12.5px;margin:0 0 8px}.market-detail-card ul{margin:0;padding:0 18px 0 0;color:var(--ink-2);font-size:12.5px}.market-detail-card li{margin:5px 0}
+.market-dot.ok{background:var(--green);box-shadow:0 0 0 4px var(--green-bg)}.market-dot.bad{background:var(--red);box-shadow:0 0 0 4px var(--red-bg)}
+.market-analyze[disabled]{opacity:.65;cursor:wait}.market-badge.good{background:var(--green-bg);color:var(--green);border-color:var(--green-br)}.market-badge.bad{background:var(--red-bg);color:var(--red);border-color:var(--red-br)}
+.market-roadmap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.market-step{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:14px}.market-step b{display:block;font-size:13px;margin-bottom:4px}.market-step span{font-size:12px;color:var(--ink-3)}
+@media(max-width:760px){.market-search{grid-template-columns:1fr}.market-status,.market-grid,.market-roadmap,.market-detail{grid-template-columns:1fr}.market-metric{border-inline-start:none!important;border-bottom:1px solid var(--line)!important}.market-metric:last-child{border-bottom:none!important}}
+
+
 </style>
 <style>
 :root{--shell-bg:var(--pine);--shell-ink:#fff;--side-muted:#a6bcb6}
@@ -1253,11 +1290,13 @@ function enterApp(){
 const LEVELS=['none','view','edit','full'];
 const LEVEL_AR={none:'لا صلاحية',view:'اطّلاع فقط',edit:'إضافة وتعديل',full:'تحكم كامل (مع الحذف)'};
 const isAdmin=()=>!!(ME&&ME.role==='admin');
+const MARKET_PAGE_ID='__sahm_markets__';
+function marketSystemPage(){return {id:MARKET_PAGE_ID,name:'الأسواق',sub:'تحليل الأسهم',icon:'chart',accent:'green',kind:'market',view:'market',cols:[],rows:[]}}
 const EXCEL_LIBRARY_ID='__excel_library__';
 function excelLibraryPage(){return {id:EXCEL_LIBRARY_ID,name:'نماذج Excel',sub:'ملفات جاهزة للتنزيل لجميع مستخدمي المنظومة',icon:'file',accent:'green',kind:'excelLibrary',cols:[],rows:Array.isArray(DB.excelTemplates)?DB.excelTemplates:[]}}
-function can(pageId,lvl){ if(!ME) return false; if(pageId===EXCEL_LIBRARY_ID)return isAdmin()||lvl==='view'; if(isAdmin()) return true;
+function can(pageId,lvl){ if(!ME) return false; if(pageId===MARKET_PAGE_ID)return isAdmin()||lvl==='view'; if(pageId===EXCEL_LIBRARY_ID)return isAdmin()||lvl==='view'; if(isAdmin()) return true;
   const p=(ME.perms||{})[pageId]||'none'; return LEVELS.indexOf(p)>=LEVELS.indexOf(lvl); }
-const visiblePages=()=>[...DB.pages.filter(p=>can(p.id,'view')),...(ME?[excelLibraryPage()]:[])];
+const visiblePages=()=>[...DB.pages.filter(p=>can(p.id,'view')),...(ME?[excelLibraryPage(),marketSystemPage()]:[])];
 const canExport=()=>isAdmin()||(ME&&ME.canExport!==false);
 const canImport=p=>isAdmin()||(ME&&ME.canImport!==false&&can(p.id,'full'));
 function audit(act,detail){ DB.audit=DB.audit||[]; DB.audit.unshift({at:nowTs(),by:ME?ME.name:'—',act,detail:detail||''});
@@ -1479,7 +1518,7 @@ $('#lbx').onclick=e=>{ if(e.target.id==='lbx') closeLB(); };
 /* ==================================================================
    8) وصول للبيانات
 ================================================================== */
-const pg=id=>(id||cur)===EXCEL_LIBRARY_ID?excelLibraryPage():DB.pages.find(p=>p.id===(id||cur));
+const pg=id=>(id||cur)===MARKET_PAGE_ID?marketSystemPage():(id||cur)===EXCEL_LIBRARY_ID?excelLibraryPage():DB.pages.find(p=>p.id===(id||cur));
 const vis=p=>p.cols.filter(c=>!c.hidden);
 const primary=p=>p.cols.find(c=>c.id===p.primaryCol&&!['image','gallery','files'].includes(c.type))||vis(p).find(c=>!['image','gallery','files'].includes(c.type))||vis(p)[0]||p.cols[0];
 const bodyCol=p=>p.cols.find(c=>c.type==='longtext');
@@ -1665,7 +1704,7 @@ function showHome(){
   const hy=(hijriNums(new Date())||{y:1448}).y;
   const converter=`<details class="date-converter" ${innerWidth>600?'open':''}><summary class="date-converter-head"><i>${ic('calendar',18)}</i><div><b>محول التاريخ</b><span>تقويم أم القرى السعودي</span></div></summary><div class="date-converter-body"><div class="date-converter-grid"><div class="fld" style="margin:0"><label>التقويم الميلادي</label><input type="date" id="convG" min="1900-04-30" max="2077-11-16"></div><button class="date-swap" id="convSwap">⇄</button><div class="fld" style="margin:0"><label>التاريخ الهجري</label><div class="hijri-selects"><select id="convHY"><option value="">السنة</option>${Array.from({length:161},(_,i)=>1320+i).map(y=>`<option ${y===hy?'selected':''}>${y}</option>`).join('')}</select><select id="convHM"><option value="">الشهر</option>${hm.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('')}</select><select id="convHD"><option value="">اليوم</option>${Array.from({length:30},(_,i)=>`<option>${i+1}</option>`).join('')}</select></div></div></div><div class="date-result" id="convResult"></div></div></details>`;
   const groups=orderedGroupNames(pages);
-  const pageIcon=p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.rows.length} ${p.kind==='excelLibrary'?'ملف':'سجل'}</span></span></button>`;
+  const pageIcon=p=>`<button class="welcome-card" data-home-pg="${p.id}"><span class="wi" style="color:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon,22)}</span><span><b>${esc(p.name)}</b><span>${p.kind==='market'?'تحليل الأسهم':p.rows.length+' '+(p.kind==='excelLibrary'?'ملف':'سجل')}</span></span></button>`;
   const gateways=pages.filter(p=>!String(p.group||'').trim()).map(pageIcon).join('')+groups.map(g=>{const ps=pages.filter(p=>String(p.group||'').trim()===g),first=ps[0];return `<div class="home-group"><button class="home-group-head" data-hgroup aria-expanded="false"><span class="grp-arr">⌄</span><span class="wi" style="color:${CVAR[first.accent]||CVAR.gold}">${icon(first.icon,22)}</span><span><b>${esc(g)}</b><small>${ps.length} صفحات</small></span></button><div class="home-group-menu">${ps.map(p=>`<button data-home-pg="${p.id}">${icon(p.icon,15)}<span>${esc(p.name)}</span></button>`).join('')}</div></div>`}).join('');
   $('#pageBody').innerHTML=`<section class="welcome"><button class="executive-exit" id="executiveExit">إنهاء العرض القيادي</button><div class="welcome-hero"><div class="welcome-copy"><div class="welcome-kicker">مركز القيادة الإداري</div><h2>${esc(DB.welcomeTitle||('مرحباً، '+(ME.name||'')))}</h2><p>${esc(DB.welcomeSubtitle||DB.unit||'من هنا تبدأ إدارة أعمالك اليومية')}</p><div class="welcome-date"><span>${esc(fmtDateLong(todayISO()))}</span><span>${esc(fmtG(todayISO()))} م</span></div><button class="executive-trigger" id="executiveMode">${ic('eye',14)} العرض القيادي</button></div><div class="welcome-logo">${icon('shield',42)}</div></div><div class="welcome-stats"><div class="welcome-stat"><b>${pages.length}</b><span>صفحة متاحة</span></div><div class="welcome-stat"><b>${total}</b><span>إجمالي السجلات</span></div><div class="welcome-stat"><b>${populated}</b><span>صفحات نشطة</span></div></div><div class="command-center"><div class="command-center-head"><i>${ic('search',18)}</i><div><b>الوصول الذكي</b><span>اكتب اسم الصفحة أو الأمر الذي تريده</span></div></div><div class="command-center-form"><input id="homeCommand" list="homeCommands" placeholder="مثال: افتح المعاملات أو المستخدمون"><datalist id="homeCommands">${pages.map(p=>`<option value="${esc(p.name)}">`).join('')}${isAdmin()?'<option value="المستخدمون"><option value="مظهر المنظومة">':''}</datalist><button class="btn primary" id="runHomeCommand">انتقال</button></div></div><div class="daily-brief"><span class="daily-brief-icon">${ic('clipboard',21)}</span><span><b>موجز اليوم</b><span>${todayUpdates?'تم تحديث '+todayUpdates+' سجل اليوم ضمن الصفحات المتاحة لك.':'لا توجد تحديثات مسجلة اليوم؛ مساحة العمل جاهزة للبدء.'}</span></span><strong>${todayUpdates}</strong></div><div class="home-motivation"><b>كل أعمالك تبدأ من مكان واحد</b><span>اختر صفحة العمل المطلوبة، وأنجز مهامك بسرعة حسب صلاحياتك.</span></div><div class="welcome-section-title"><h3>صفحات العمل</h3><span>وصول سريع إلى مهامك</span></div><div class="welcome-pages">${gateways||'<div class="empty">لا توجد صفحات مصرّح لك بها</div>'}</div>${announcements}${converter}</section>`;
   document.querySelectorAll('[data-home-pg]').forEach(b=>b.onclick=()=>go(b.dataset.homePg));
@@ -1745,16 +1784,17 @@ function renderTop(){
   $('#topbar').innerHTML=`
     <button class="burger" id="burger" aria-label="فتح قائمة الصفحات"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <div class="mobile-brand-title">منظومة الشؤون الإدارية</div>
-    <div class="page-heading"><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p><span class="mobile-record-count">${p.rows.length} ${p.kind==='excelLibrary'?'ملف':'سجل'}</span></div>
+    <div class="page-heading"><h2><span class="tag"></span>${esc(p.name)}</h2><p class="sub">${esc(p.sub||'')}</p><span class="mobile-record-count">${p.kind==='market'?'تحليل الأسهم':p.rows.length+' '+(p.kind==='excelLibrary'?'ملف':'سجل')}</span></div>
     <div class="date-summary"><div><b>${esc(fmtDateLong(todayISO()))}</b><span>${esc(fmtG(todayISO()))} م</span></div>${ic('calendar',17)}</div>
-    ${isAdmin()&&p.kind!=='excelLibrary'?`<div class="pgtools">
+    ${isAdmin()&&p.kind!=='excelLibrary'&&p.kind!=='market'?`<div class="pgtools">
       <button class="btn ghost sm" id="btnCols">${ic('cols')} الأعمدة</button>
       <button class="btn ghost sm" id="btnPageSet">${ic('gear')} إعدادات الصفحة</button></div>`:''}
     <div class="stripe" id="stripe">${stripeHTML(p)}</div>${DB.tickerEnabled!==false&&DB.ticker?`<div class="ticker"><span style="animation-duration:${Math.max(8,Math.min(60,+(DB.tickerSpeed||22)))}s">${esc(DB.ticker)}</span></div>`:''}`;
   $('#burger').onclick=()=>{$('#side').classList.add('open');$('#scrim').classList.add('on');};
-  if(isAdmin()&&p.kind!=='excelLibrary'){ $('#btnCols').onclick=openCols; $('#btnPageSet').onclick=openPageSet; }
+  if(isAdmin()&&p.kind!=='excelLibrary'&&p.kind!=='market'){ $('#btnCols').onclick=openCols; $('#btnPageSet').onclick=openPageSet; }
 }
 function stripeHTML(p){
+  if(p.kind==='market')return '<div class="cell"><span class="t">محلل الأسهم</span></div>';
   if(p.kind==='excelLibrary')return `<div class="cell"><span class="n">${p.rows.length}</span><span class="t">ملفات متاحة للتنزيل</span></div>`;
   const cell=(n,t,c)=>`<div class="cell"><span class="n" ${c?`style="color:${c}"`:''}>${n}</span><span class="t">${esc(t)}</span></div>`;
   const rows=rowsOf(p); let h=cell(rows.length,(rows.length===p.rows.length?'إجمالي السجلات':'نتيجة التصفية من '+p.rows.length));
@@ -1780,6 +1820,104 @@ async function requestPageUnlock(p){
     if(ok)unlockedPageId=p.id;return ok;
   }finally{pageUnlockBusy=false}
 }
+const SAHM_API_BASE=(localStorage.getItem('SAHM_API_BASE')||'http://127.0.0.1:8000').replace(/\/$/,'');
+
+async function marketHealth(){
+  try{
+    const r=await fetch(SAHM_API_BASE+'/api/health',{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  }catch(e){ return {ok:false,error:String(e)}; }
+}
+function mFmt(v,d=2){ return (v===null||v===undefined||Number.isNaN(Number(v)))?'—':Number(v).toLocaleString('en-US',{maximumFractionDigits:d}); }
+function setMetric(id,value){ const e=$('#'+id); if(e) e.textContent=value; }
+function fillMarketAnalysis(data){
+  const a=data.analysis||{}, q=data.quote||{};
+  $('#marketResultTitle').textContent=(data.name||'السهم')+' — '+data.symbol;
+  $('#marketResultSub').textContent=`آخر شمعة: ${a.as_of||'—'} · المصدر: ${data.source||'—'}${q.is_delayed===true?' · سعر متأخر':''}`;
+  const badge=$('#marketResultBadge'); badge.textContent=a.status_ar||'تم التحليل'; badge.className='market-badge '+(a.status==='REJECTED'?'bad':'good');
+  setMetric('mTrend',a.trend||'—');
+  setMetric('mScore',(a.score??'—')+' / 100');
+  setMetric('mEntry',a.entry?`${mFmt(a.entry.low)} – ${mFmt(a.entry.high)}`:'—');
+  setMetric('mStop',mFmt(a.stop));
+  setMetric('mTargets',Array.isArray(a.targets)?a.targets.map(x=>mFmt(x)).join(' / '):'—');
+  setMetric('mRR',a.risk_reward!=null?mFmt(a.risk_reward,2)+'R':'—');
+  const price=(q.price??a.price);
+  $('#marketEmpty').innerHTML=`${icon('chart',16)} السعر: <b>${mFmt(price)}</b> · الدعم: <b>${mFmt(a.support)}</b> · المقاومة: <b>${mFmt(a.resistance)}</b> · RSI: <b>${mFmt(a.indicators&&a.indicators.rsi14,1)}</b> · Relative Volume: <b>${mFmt(a.indicators&&a.indicators.relative_volume,2)}x</b>`;
+  const reasons=(a.reasons||[]), risks=(a.risks||[]);
+  $('#marketReasons').innerHTML=reasons.length?reasons.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>لا توجد أسباب إيجابية إضافية مسجلة.</li>';
+  $('#marketRisks').innerHTML=risks.length?risks.map(x=>`<li>${esc(x)}</li>`).join(''):'<li>لا توجد مخاطر فنية إضافية مسجلة.</li>';
+}
+function renderMarket(p){
+  $('#pageBody').innerHTML=`
+    <div class="market-shell">
+      <section class="market-hero">
+        <div class="market-kicker">${icon('chart',14)} SAHM — V2</div>
+        <h3>محلل الأسهم</h3>
+        <p>أدخل رمز السهم. يحسب المحرك المؤشرات من بيانات السوق الحقيقية. شغّل محرك SAHM على هذا الجهاز قبل بدء التحليل.</p>
+        <div class="market-search">
+          <div><label for="marketSymbol">رمز السهم</label><input id="marketSymbol" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="مثال: 1120 أو 2222"></div>
+          <button class="market-analyze" id="marketAnalyze">${ic('search',16)} تحليل السهم</button>
+        </div>
+      </section>
+
+      <div class="market-status">
+        <div class="market-status-card"><div><span>مصدر البيانات</span><b>SAHMK API</b></div><i class="market-dot" id="marketDataDot"></i></div>
+        <div class="market-status-card"><div><span>محرك التحليل</span><b id="marketEngineTxt">فحص الاتصال…</b></div><i class="market-dot" id="marketEngineDot"></i></div>
+        <div class="market-status-card"><div><span>تكلفة AI للتحليل</span><b>0 Tokens</b></div><i class="market-dot ok"></i></div>
+      </div>
+
+      <section class="market-result">
+        <div class="market-result-head">
+          <div><h4 id="marketResultTitle">نتيجة التحليل</h4><p id="marketResultSub">لم يتم إرسال أي سهم للتحليل بعد.</p></div>
+          <span class="market-badge" id="marketResultBadge">جاهز</span>
+        </div>
+        <div class="market-grid">
+          <div class="market-metric"><div class="t">الاتجاه</div><div class="v" id="mTrend">—</div><div class="s">Trend</div></div>
+          <div class="market-metric"><div class="t">SAHM Score</div><div class="v" id="mScore">— / 100</div><div class="s">جودة الفرصة</div></div>
+          <div class="market-metric"><div class="t">منطقة الدخول</div><div class="v" id="mEntry">—</div><div class="s">Entry</div></div>
+          <div class="market-metric"><div class="t">وقف الخسارة</div><div class="v" id="mStop">—</div><div class="s">Invalidation / Stop</div></div>
+          <div class="market-metric"><div class="t">الأهداف</div><div class="v" id="mTargets">—</div><div class="s">Targets</div></div>
+          <div class="market-metric"><div class="t">العائد / المخاطرة</div><div class="v" id="mRR">—</div><div class="s">Risk / Reward</div></div>
+        </div>
+        <div class="market-empty" id="marketEmpty">${icon('shield',16)} النتائج تظهر فقط من بيانات حقيقية يرجعها المحرك.</div>
+        <div class="market-detail">
+          <div class="market-detail-card"><h5>لماذا أعطى هذه النتيجة؟</h5><ul id="marketReasons"><li>بانتظار أول تحليل.</li></ul></div>
+          <div class="market-detail-card"><h5>مخاطر أو أسباب الانتظار</h5><ul id="marketRisks"><li>بانتظار أول تحليل.</li></ul></div>
+        </div>
+      </section>
+    </div>`;
+
+  const inp=$('#marketSymbol'), btn=$('#marketAnalyze');
+  marketHealth().then(h=>{
+    const ed=$('#marketEngineDot'), dd=$('#marketDataDot'), et=$('#marketEngineTxt');
+    if(!ed||!dd||!et)return;
+    if(h.ok){ ed.classList.add('ok'); et.textContent='SAHM Engine '+(h.version||''); if(h.sahmk_configured){dd.classList.add('ok')}else{dd.classList.add('bad');} }
+    else{ ed.classList.add('bad'); dd.classList.add('bad'); et.textContent='غير متصل'; }
+  });
+  const submit=async()=>{
+    const symbol=(inp.value||'').trim().toUpperCase();
+    if(!symbol){ toast('اكتب رمز السهم أولاً','err'); inp.focus(); return; }
+    btn.disabled=true; btn.innerHTML='<span class="spin"></span> جارٍ التحليل…';
+    $('#marketResultTitle').textContent='السهم: '+symbol;
+    $('#marketResultSub').textContent='يجري الآن جلب البيانات وحساب المؤشرات…';
+    $('#marketResultBadge').textContent='تحليل'; $('#marketResultBadge').className='market-badge';
+    try{
+      const r=await fetch(SAHM_API_BASE+'/api/analyze/'+encodeURIComponent(symbol)+'?interval=1d',{cache:'no-store'});
+      const data=await r.json().catch(()=>({}));
+      if(!r.ok) throw new Error(data.detail||('HTTP '+r.status));
+      fillMarketAnalysis(data);
+      toast('اكتمل تحليل '+symbol);
+    }catch(e){
+      $('#marketResultSub').textContent=String(e.message||e).includes('PLAN_LIMIT')?'تحليل الشموع يحتاج باقة Starter أو أعلى في SAHMK.':String(e.message||e);
+      $('#marketResultBadge').textContent='تعذر التحليل'; $('#marketResultBadge').className='market-badge bad';
+      toast('تعذر التحليل — تحقق من تشغيل SAHM Engine ومفتاح SAHMK','err');
+    }finally{ btn.disabled=false; btn.innerHTML=`${ic('search',16)} تحليل السهم`; }
+  };
+  btn.onclick=submit;
+  inp.onkeydown=e=>{if(e.key==='Enter') submit();};
+}
+
 async function go(id){
   document.body.classList.remove('executive-view');
   let target=id?pg(id):pg();
@@ -1794,7 +1932,7 @@ async function go(id){
   const p=pg();
   $('#pageBody').className='page record-page';
   $('#pageBody').style.setProperty('--acc',CVAR[p.accent]||CVAR.gold);
-  if(p.kind==='excelLibrary')renderExcelLibrary();else if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
+  if(p.kind==='market')renderMarket(p);else if(p.kind==='excelLibrary')renderExcelLibrary();else if(p.view==='letters'&&U().mode==='letter') renderLetters(p); else renderTable(p);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 const render=()=>cur?go():showHome();
