@@ -1,0 +1,14 @@
+services:
+  whatsapp-bridge:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8787:8787"
+    volumes:
+      - whatsapp_session:/app/.wwebjs_auth
+      - whatsapp_data:/app/data
+
+volumes:
+  whatsapp_session:
+  whatsapp_data:
