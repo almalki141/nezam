@@ -3,3 +3,8 @@ node_modules/
 .wwebjs_cache/
 data/
 .env
+.runtime/
+certs/
+bridge.log
+.chrome-profile/
+.npm-cache/

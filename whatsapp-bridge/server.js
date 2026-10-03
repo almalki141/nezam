@@ -2,6 +2,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const https = require('https');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
@@ -57,7 +58,9 @@ let running=false;
 async function runDueJobs(){if(running||!connected)return;running=true;try{for(const job of jobs){const now=new Date();if(job.status==='sent'||new Date(job.scheduledAt)>now||(job.nextAttempt&&new Date(job.nextAttempt)>now)||+(job.attempts||0)>=5)continue;try{await send(job.to,job.message);job.status='sent';job.sentAt=new Date().toISOString();job.error='';writeJobs(jobs);await new Promise(r=>setTimeout(r,2500));}catch(error){job.status='failed';job.attempts=+(job.attempts||0)+1;job.nextAttempt=new Date(Date.now()+Math.min(3600000,job.attempts*10*60000)).toISOString();job.error=error.message;writeJobs(jobs);}}}finally{running=false;}}
 setInterval(runDueJobs,30000);
 
-app.listen(PORT,'0.0.0.0',()=>console.log(`Nezam WhatsApp bridge listening on ${PORT}`));
+const tlsKey=process.env.TLS_KEY, tlsCert=process.env.TLS_CERT;
+if(tlsKey&&tlsCert){https.createServer({key:fs.readFileSync(tlsKey),cert:fs.readFileSync(tlsCert)},app).listen(PORT,'127.0.0.1',()=>console.log(`Nezam WhatsApp bridge listening securely on localhost:${PORT}`));}
+else app.listen(PORT,'127.0.0.1',()=>console.log(`Nezam WhatsApp bridge listening locally on ${PORT}`));
 
 async function shutdown(){writeJobs(jobs);try{await client.destroy();}catch{}process.exit(0);}
 process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
