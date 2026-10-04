@@ -1300,7 +1300,9 @@ const EXCEL_LIBRARY_ID='__excel_library__';
 function excelLibraryPage(){return {id:EXCEL_LIBRARY_ID,name:'نماذج Excel',sub:'ملفات جاهزة للتنزيل لجميع مستخدمي المنظومة',icon:'file',accent:'green',kind:'excelLibrary',cols:[],rows:Array.isArray(DB.excelTemplates)?DB.excelTemplates:[]}}
 function can(pageId,lvl){ if(!ME) return false; if(pageId===MARKET_PAGE_ID||pageId===BUSINESS_PAGE_ID)return isAdmin()||LEVELS.indexOf((ME.perms||{})[pageId]||'none')>=LEVELS.indexOf(lvl); if(pageId===EXCEL_LIBRARY_ID)return isAdmin()||lvl==='view'; if(isAdmin()) return true;
   const p=(ME.perms||{})[pageId]||'none'; return LEVELS.indexOf(p)>=LEVELS.indexOf(lvl); }
-const visiblePages=()=>[...DB.pages.filter(p=>can(p.id,'view')),...(ME?[...(can(BUSINESS_PAGE_ID,'view')?[businessSystemPage()]:[]),excelLibraryPage(),...(can(MARKET_PAGE_ID,'view')?[marketSystemPage()]:[])]:[])];
+function allPageDefinitions(){return [...DB.pages,businessSystemPage(),excelLibraryPage(),marketSystemPage()]}
+function orderedPages(pages){const order=Array.isArray(DB.pageOrder)?DB.pageOrder:[],rank=new Map(order.map((id,i)=>[id,i]));return [...pages].sort((a,b)=>(rank.has(a.id)?rank.get(a.id):1e6)-(rank.has(b.id)?rank.get(b.id):1e6))}
+const visiblePages=()=>orderedPages(allPageDefinitions().filter(p=>p.id===EXCEL_LIBRARY_ID?!!ME:can(p.id,'view')));
 const canExport=()=>isAdmin()||(ME&&ME.canExport!==false);
 const canImport=p=>isAdmin()||(ME&&ME.canImport!==false&&can(p.id,'full'));
 function audit(act,detail){ DB.audit=DB.audit||[]; DB.audit.unshift({at:nowTs(),by:ME?ME.name:'—',act,detail:detail||''});
@@ -2546,9 +2548,10 @@ function drawCM(){
 }
 function openPageOrder(){
   if(!isAdmin()) return;
-  modal('ترتيب وتجميع الصفحات','<div class="gnote">رتّب المجموعات أولاً، ثم رتّب الصفحات داخلها. اكتب اسم المجموعة نفسه للصفحات التي تريد جمعها، أو اتركه فارغًا.</div><div class="welcome-section-title"><h3>ترتيب المجموعات</h3></div><div id="groupOrder"></div><div class="welcome-section-title"><h3>الصفحات والمجموعات</h3></div><div id="pageOrder"></div>',
+  modal('ترتيب وتجميع الصفحات','<div class="gnote">يمكنك الآن ترتيب جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي ونماذج Excel. صفحات النظام تظهر بعلامة واضحة، وصلاحية فتحها تُحدد لكل مستخدم من شاشة الصلاحيات.</div><div class="welcome-section-title"><h3>ترتيب المجموعات</h3></div><div id="groupOrder"></div><div class="welcome-section-title"><h3>جميع الصفحات</h3></div><div id="pageOrder"></div>',
     '<button class="btn primary" id="poDone">حفظ</button>','lg');
-  const sync=()=>document.querySelectorAll('[data-pgroup]').forEach(x=>DB.pages[+x.dataset.pgroup].group=x.value.trim());
+  let order=orderedPages(allPageDefinitions()).map(p=>p.id);
+  const sync=()=>document.querySelectorAll('[data-pgroup]').forEach(x=>{const p=DB.pages.find(p=>p.id===x.dataset.pgroup);if(p)p.group=x.value.trim()});
   const drawGroups=()=>{
     DB.groupOrder=orderedGroupNames(DB.pages);
     $('#groupOrder').innerHTML=DB.groupOrder.length?DB.groupOrder.map((g,i)=>`<div class="frow"><div class="fi">${icon('folder',16)}</div><b>${esc(g)}</b><div class="fx"><button class="iconbtn" data-gu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-gd="${i}" ${i===DB.groupOrder.length-1?'disabled':''}>▼</button></div></div>`).join(''):'<p class="dim" style="font-size:12px">لا توجد مجموعات بعد.</p>';
@@ -2556,15 +2559,16 @@ function openPageOrder(){
     document.querySelectorAll('[data-gd]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gd;[DB.groupOrder[i+1],DB.groupOrder[i]]=[DB.groupOrder[i],DB.groupOrder[i+1]];drawGroups()});
   };
   const draw=()=>{
-    $('#pageOrder').innerHTML=DB.pages.map((p,i)=>`<div class="frow">
-      <div class="fi">${icon(p.icon,16)}</div><b style="min-width:150px">${esc(p.name)}</b><input data-pgroup="${i}" value="${esc(p.group||'')}" placeholder="اسم المجموعة" style="flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--surface)">
-      <div class="fx"><button class="iconbtn" data-pu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-pd="${i}" ${i===DB.pages.length-1?'disabled':''}>▼</button></div></div>`).join('');
-    document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pu;[DB.pages[i-1],DB.pages[i]]=[DB.pages[i],DB.pages[i-1]];draw();});
-    document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pd;[DB.pages[i+1],DB.pages[i]]=[DB.pages[i],DB.pages[i+1]];draw();});
+    const defs=new Map(allPageDefinitions().map(p=>[p.id,p]));
+    $('#pageOrder').innerHTML=order.map((id,i)=>{const p=defs.get(id);if(!p)return '';const system=!DB.pages.some(x=>x.id===id);return `<div class="frow">
+      <div class="fi">${icon(p.icon,16)}</div><b style="min-width:150px">${esc(p.name)} ${system?'<span class="badge b-gold">صفحة نظام</span>':''}</b>${system?'<span class="dim" style="flex:1">تُدار من صلاحيات المستخدمين</span>':`<input data-pgroup="${p.id}" value="${esc(p.group||'')}" placeholder="اسم المجموعة" style="flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--surface)">`}
+      <div class="fx"><button class="iconbtn" data-pu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-pd="${i}" ${i===order.length-1?'disabled':''}>▼</button></div></div>`}).join('');
+    document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pu;[order[i-1],order[i]]=[order[i],order[i-1]];draw();});
+    document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pd;[order[i+1],order[i]]=[order[i],order[i+1]];draw();});
     document.querySelectorAll('[data-pgroup]').forEach(x=>x.onchange=()=>{sync();drawGroups()});
   };
   draw();drawGroups();
-  $('#poDone').onclick=async()=>{sync();DB.groupOrder=orderedGroupNames(DB.pages);audit('ترتيب وتجميع الصفحات','تحديث القائمة والمجموعات');const btn=$('#poDone');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ';return toast('تعذّر حفظ الترتيب؛ حاول مرة أخرى','err')}closeModal();render();toast('حُفظ ترتيب المجموعات والصفحات');};
+  $('#poDone').onclick=async()=>{sync();DB.pageOrder=order;DB.groupOrder=orderedGroupNames(DB.pages);audit('ترتيب وتجميع الصفحات','تحديث ترتيب جميع الصفحات والمجموعات');const btn=$('#poDone');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ';return toast('تعذّر حفظ الترتيب؛ حاول مرة أخرى','err')}closeModal();render();toast('حُفظ ترتيب جميع الصفحات');};
 }
 function openTickerSettings(){
   modal('إعدادات الشريط المتحرك',`<div class="grid2">
@@ -2821,10 +2825,10 @@ function openUsers(){
 }
 function permGrid(perms){
   let last=''; return `<div class="perm-toolbar"><b>تطبيق صلاحية واحدة على جميع الصفحات</b>${LEVELS.map(l=>`<button type="button" class="btn ghost sm" data-perm-all="${l}">${LEVEL_AR[l]}</button>`).join('')}</div>
-    <div class="permgrid">${[businessSystemPage(),marketSystemPage(),...DB.pages].map((p,i)=>{const g=p.group||'صفحات مستقلة',head=g!==last?(last=g,`<div class="perm-section">مجموعة: ${esc(g)}</div>`):'';return head+`<div class="permrow"><div class="perm-page-info"><span class="perm-page-no">${i+1}</span><span><b>${esc(p.name||'صفحة بدون اسم')}</b><small>${esc(p.sub||'بدون وصف')} · ${(p.rows||[]).length} سجل</small></span></div>
-    <select data-pp="${p.id}" aria-label="صلاحية صفحة ${esc(p.name||'بدون اسم')}">${(p.id===MARKET_PAGE_ID?['none','view']:LEVELS).map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`;}).join('')}</div>`;
+    <div class="permgrid">${orderedPages([businessSystemPage(),marketSystemPage(),...DB.pages]).map((p,i)=>{const g=p.group||'صفحات مستقلة',head=g!==last?(last=g,`<div class="perm-section">مجموعة: ${esc(g)}</div>`):'';return head+`<div class="permrow"><div class="perm-page-info"><span class="perm-page-no">${i+1}</span><span><b>${esc(p.name||'صفحة بدون اسم')}</b><small>${esc(p.sub||'بدون وصف')} · ${(p.rows||[]).length} سجل</small></span></div>
+    <select data-pp="${p.id}" aria-label="صلاحية صفحة ${esc(p.name||'بدون اسم')}">${LEVELS.map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`;}).join('')}</div>`;
 }
-function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>{if(s.dataset.pp!==MARKET_PAGE_ID)s.value=b.dataset.permAll;});toast('طُبّقت الصلاحية على جميع الصفحات');});}
+function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي');});}
 function openAddUser(){
   modal('إنشاء حساب مستخدم',`
     <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد؛ سيدخل بالبريد والكلمة المؤقتة ثم يختار كلمة مرور خاصة به.</div>
