@@ -3489,14 +3489,26 @@ const ACADEMY_FIRST_AID_VIDEOS=[
   ['تنفس','إسعاف مرضى الأزمات التنفسية','LFi0M8YlX8Q'],
   ['لدغات','إسعاف المصاب باللدغات السامة','4iym0m9o4pY']
 ];
+const ACADEMY_SAFETY_ITEMS=[
+  ['heat-causes','أسباب الإجهاد الحراري وطرق الوقاية','https://www.youtube.com/watch?v=7q3uvjY4jRI','وزارة الصحة السعودية'],
+  ['heat-first-aid','الطريقة الصحيحة لإسعاف مصاب الإجهاد الحراري','https://www.youtube.com/watch?v=-3RM1YzZQ48','وزارة الصحة السعودية'],
+  ['sunstroke','الخطوات الإسعافية للمصاب بضربة شمس','https://www.youtube.com/watch?v=EXHM3zBfMT0','وزارة الصحة السعودية'],
+  ['heat-knowledge','ما تحتاج معرفته عن الإجهاد الحراري','https://www.youtube.com/watch?v=eVN7N__uZz8','وزارة الصحة السعودية'],
+  ['first-aid-mistakes','أشهر الأخطاء في الإسعافات الأولية وتصحيحها','https://www.youtube.com/watch?v=_YxL-SEJwik','وزارة الصحة السعودية'],
+  ['floods','التحذير من مجاري السيول وتجمعات المياه','https://t.me/SaudiDCD/14031','الدفاع المدني السعودي'],
+  ['drowning','السلامة والوقاية من الغرق','https://t.me/SaudiDCD/14030','الدفاع المدني السعودي'],
+  ['wildfires','مخاطر حرائق الغابات والمناطق المفتوحة','https://t.me/SaudiDCD/14043','الدفاع المدني السعودي']
+];
 let academyVideoImporting=false;
 const renderAcademyBase=renderAcademy;
 renderAcademy=function(){
-  if(isAdmin()&&!DB.academyFirstAidVideosAdded&&!academyVideoImporting){
+  if(isAdmin()&&(!DB.academyFirstAidVideosAdded||!DB.academySafetyItemsAdded)&&!academyVideoImporting){
     academyVideoImporting=true;
-    const old=DB.academyLessons,existing=Array.isArray(old)?old:[],newItems=ACADEMY_FIRST_AID_VIDEOS.filter(([, ,id])=>!existing.some(x=>String(x.source||'').includes(id))).map(([key,title,id])=>({id:'firstaid-video-'+id,path:'firstaid',type:'awareness',title,description:'فيديو توعوي في الإسعافات الأولية',body:'شاهد الفيديو وتحقق من إرشادات الجهات الصحية المعتمدة. التدريب العملي مهم للتعامل مع الحالات الطارئة.',source:'https://youtu.be/'+id,provider:''}));
-    DB.academyLessons=[...existing,...newItems];DB.academyFirstAidVideosAdded=true;
-    commitNow().then(ok=>{academyVideoImporting=false;if(!ok){DB.academyLessons=old;delete DB.academyFirstAidVideosAdded;toast('تعذّرت إضافة الفيديوهات، أعد فتح الأكاديمية للمحاولة','err');return}if(cur===ACADEMY_ID)renderAcademy()});
+    const old=DB.academyLessons,oldFirst=DB.academyFirstAidVideosAdded,oldSafety=DB.academySafetyItemsAdded,existing=Array.isArray(old)?old:[];
+    const first=oldFirst?[]:ACADEMY_FIRST_AID_VIDEOS.filter(([, ,id])=>!existing.some(x=>String(x.source||'').includes(id))).map(([key,title,id])=>({id:'firstaid-video-'+id,path:'firstaid',type:'awareness',title,description:'فيديو توعوي في الإسعافات الأولية',body:'شاهد الفيديو وتحقق من إرشادات الجهات الصحية المعتمدة. التدريب العملي مهم للتعامل مع الحالات الطارئة.',source:'https://youtu.be/'+id,provider:''}));
+    const safety=oldSafety?[]:ACADEMY_SAFETY_ITEMS.filter(([key,title,url])=>!existing.some(x=>x.path==='safety'&&(x.id==='safety-'+key||x.source===url))).map(([key,title,url,provider])=>({id:'safety-'+key,path:'safety',type:'awareness',title,description:'مادة توعوية في السلامة الميدانية',body:'افتح المادة من مصدرها للاطلاع على الإرشادات.',source:url,provider}));
+    DB.academyLessons=[...existing,...first,...safety];DB.academyFirstAidVideosAdded=true;DB.academySafetyItemsAdded=true;
+    commitNow().then(ok=>{academyVideoImporting=false;if(!ok){DB.academyLessons=old;if(oldFirst===undefined)delete DB.academyFirstAidVideosAdded;else DB.academyFirstAidVideosAdded=oldFirst;if(oldSafety===undefined)delete DB.academySafetyItemsAdded;else DB.academySafetyItemsAdded=oldSafety;toast('تعذّرت إضافة المواد، أعد فتح الأكاديمية للمحاولة','err');return}if(cur===ACADEMY_ID)renderAcademy()});
   }
   renderAcademyBase();
   if(can(ACADEMY_ID,'view')&&U().academyPath==='fitness'){
