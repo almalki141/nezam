@@ -641,6 +641,13 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscr
 <style>
 :root{--shell-bg:var(--pine);--shell-ink:#fff;--side-muted:#a6bcb6}
 html[data-ui-theme="navy"]{--bg:#EEF1F6;--surface:#fff;--surface-2:#F4F6FA;--paper:#FBFCFE;--ink:#192D41;--ink-2:#526579;--ink-3:#63778C;--line:#DCE3EC;--line-2:#E8EDF3;--pine:#18334E;--pine-2:#244B6D;--pine-3:#102638;--brass:#6B7D95;--brass-2:#B9C6D5;--side-muted:#B7C8D8}
+html[data-ui-theme="royal"]{--bg:#EDF0F4;--surface:#FFFFFF;--surface-2:#F5F7FA;--paper:#FFFEFC;--ink:#172B43;--ink-2:#526881;--ink-3:#718499;--line:#DCE4EC;--line-2:#E9EEF3;--pine:#132D47;--pine-2:#254663;--pine-3:#0B1F32;--brass:#9D783A;--brass-2:#D8BB80;--gold:#89652C;--gold-bg:#F8EFDF;--gold-br:#E9D3A9;--shell-bg:#112B43;--shell-ink:#fff;--side-muted:#B9C9D4;--shadow-sm:0 5px 20px rgba(20,40,60,.07);--shadow:0 18px 50px rgba(20,40,60,.12)}
+html[data-ui-theme="royal"] .side{background:linear-gradient(180deg,#193751,#0E253B);box-shadow:-8px 0 28px rgba(19,45,71,.1)}
+html[data-ui-theme="royal"] .nav-item.on{background:linear-gradient(90deg,rgba(202,168,105,.08),rgba(202,168,105,.2));box-shadow:inset -3px 0 #D8BB80}
+html[data-ui-theme="royal"] .btn.primary{background:linear-gradient(135deg,#B69559,#8D6A33);border-color:#9D783A;color:#fff;box-shadow:0 5px 14px rgba(141,106,51,.18)}
+html[data-ui-theme="royal"] .btn.primary:hover{background:linear-gradient(135deg,#C0A06A,#98743B)}
+html[data-ui-theme="royal"] .card,html[data-ui-theme="royal"] .biz-card,html[data-ui-theme="royal"] .home-group-head,html[data-ui-theme="royal"] .welcome-stat{border-color:var(--line);box-shadow:var(--shadow-sm)}
+html[data-ui-theme="royal"] .topbar{background:#fff;border-bottom:1px solid var(--line)}
 html[data-ui-theme="pearl"]{--bg:#F6F7F5;--surface:#fff;--surface-2:#FAFBF9;--paper:#FCFCFA;--ink:#243A34;--ink-2:#596B64;--ink-3:#677970;--line:#E2E7E2;--line-2:#EDF0EB;--pine:#24594D;--pine-2:#317461;--pine-3:#193F36;--brass:#8C7949;--brass-2:#D3C393;--shell-bg:#fff;--shell-ink:#24594D}
 html[data-ui-theme="luxe"]{--bg:#F2F0EA;--surface:#FFFEFB;--surface-2:#F7F3EA;--paper:#fff;--ink:#172B29;--ink-2:#52635F;--ink-3:#72807C;--line:#DED8C9;--line-2:#EDE8DD;--pine:#092E2D;--pine-2:#154A47;--pine-3:#061F1E;--brass:#9A6B20;--brass-2:#E4C477;--shell-bg:#092E2D;--shell-ink:#FFF9EA;--side-muted:#B9CBC5}
 html[data-ui-theme="space"]{color-scheme:dark;--bg:#060A18;--surface:#10172A;--surface-2:#151F36;--paper:#11192C;--ink:#F1F6FF;--ink-2:#B3C1D9;--ink-3:#8191AE;--line:#263654;--line-2:#1C2943;--pine:#635BFF;--pine-2:#776EFF;--pine-3:#0A1025;--brass:#24D9FF;--brass-2:#8DEBFF;--shell-bg:#090F24;--shell-ink:#F4F8FF;--side-muted:#8FA4CC;--green:#4CE6B3;--green-bg:#0E352F;--green-br:#1B6655;--red:#FF7E99;--red-bg:#3A1724;--red-br:#67263A;--blue:#73BEFF;--blue-bg:#102B47;--blue-br:#21527D;--amber:#FFC766;--amber-bg:#372913;--amber-br:#674A1D;--plum:#CE91FF;--plum-bg:#2C1940;--plum-br:#543076;--gold:#8DEBFF;--gold-bg:#102D3A;--gold-br:#245568;--slate:#AFC0DC;--slate-bg:#172238;--slate-br:#2B3D5D;--shadow-sm:0 5px 18px rgba(0,0,0,.28),0 0 0 1px rgba(104,119,255,.07);--shadow:0 18px 48px rgba(0,0,0,.42),0 0 28px rgba(99,91,255,.10)}
@@ -1643,6 +1650,7 @@ function renderWho(){
 const APP_THEMES={
   green:{name:'الأخضر الحكومي',hint:'أخضر داكن، لؤلؤي، ولمسة ذهبية',primary:'#0E3A38',bg:'#EDF0EE',ink:'#0F2320',accent:'#D8B573',shell:'#0E3A38'},
   navy:{name:'الكحلي المؤسسي',hint:'كحلي عميق، أبيض، ولمسة فضية',primary:'#18334E',bg:'#EEF1F6',ink:'#192D41',accent:'#B9C6D5',shell:'#18334E'},
+  royal:{name:'الكحلي الذهبي الفاخر',hint:'كحلي راقٍ، خلفية هادئة، ولمسات ذهبية مستوحاة من دليل الإجراءات',primary:'#132D47',bg:'#EDF0F4',ink:'#172B43',accent:'#D8BB80',shell:'#112B43'},
   pearl:{name:'اللؤلؤي',hint:'واجهة فاتحة جدًا مع أخضر هادئ',primary:'#24594D',bg:'#F6F7F5',ink:'#243A34',accent:'#D3C393',shell:'#FFFFFF'},
   luxe:{name:'القيادي الفاخر',hint:'زمردي عميق، عاجي، وذهب معتّق',primary:'#092E2D',bg:'#F2F0EA',ink:'#172B29',accent:'#E4C477',shell:'#092E2D'},
   space:{name:'القيادة الفضائية',hint:'كحلي كوني، زجاج داكن، وتوهج سماوي بنفسجي',primary:'#635BFF',bg:'#060A18',ink:'#F1F6FF',accent:'#24D9FF',shell:'#090F24'}
