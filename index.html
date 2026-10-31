@@ -3479,6 +3479,32 @@ renderCreativeHub=function(p){
   if($('#guideEdit'))$('#guideEdit').onclick=()=>editCreative(p,active);
   if($('#guideDelete'))$('#guideDelete').onclick=()=>ask('حذف «'+esc(active.title)+'»؟',async()=>{const old=DB.procedureGuide;DB.procedureGuide=old.filter(x=>x.id!==active.id);if(!await commitNow()){DB.procedureGuide=old;return toast('تعذّر الحفظ','err')}renderCreativeHub(pg());toast('تم الحذف')},'حذف');
 };
+const ACADEMY_FIRST_AID_VIDEOS=[
+  ['نزيف','إسعاف المصاب بالنزيف','f-icmfh97Es'],
+  ['اختناق','إسعاف المصاب بالغصة أو الاختناق','dZ9-i_UpjlA'],
+  ['صرع','إسعاف المصاب بحالة صرع','55dtD1afVK8'],
+  ['غريق','كيفية إنقاذ الغريق','M9scZtEfsBI'],
+  ['تنفس','إسعاف مرضى الأزمات التنفسية','LFi0M8YlX8Q'],
+  ['لدغات','إسعاف المصاب باللدغات السامة','4iym0m9o4pY']
+];
+let academyVideoImporting=false;
+const renderAcademyBase=renderAcademy;
+renderAcademy=function(){
+  if(isAdmin()&&!DB.academyFirstAidVideosAdded&&!academyVideoImporting){
+    academyVideoImporting=true;
+    const old=DB.academyLessons,existing=Array.isArray(old)?old:[],newItems=ACADEMY_FIRST_AID_VIDEOS.filter(([, ,id])=>!existing.some(x=>String(x.source||'').includes(id))).map(([key,title,id])=>({id:'firstaid-video-'+id,path:'firstaid',type:'awareness',title,description:'فيديو توعوي في الإسعافات الأولية',body:'شاهد الفيديو وتحقق من إرشادات الجهات الصحية المعتمدة. التدريب العملي مهم للتعامل مع الحالات الطارئة.',source:'https://youtu.be/'+id,provider:''}));
+    DB.academyLessons=[...existing,...newItems];DB.academyFirstAidVideosAdded=true;
+    commitNow().then(ok=>{academyVideoImporting=false;if(!ok){DB.academyLessons=old;delete DB.academyFirstAidVideosAdded;toast('تعذّرت إضافة الفيديوهات، أعد فتح الأكاديمية للمحاولة','err');return}if(cur===ACADEMY_ID)renderAcademy()});
+  }
+  renderAcademyBase();
+};
+const showAcademyBase=showAcademy;
+showAcademy=function(x){
+  showAcademyBase(x);if(!x||!can(ACADEMY_ID,'view'))return;
+  let id='';try{const url=new URL(x.source),host=url.hostname.toLowerCase();if(host==='youtu.be')id=url.pathname.slice(1);else if(['www.youtube.com','youtube.com','m.youtube.com'].includes(host))id=url.searchParams.get('v')||''}catch(e){}
+  if(!/^[A-Za-z0-9_-]{11}$/.test(id))return;
+  const body=$('#mdl .m-body');if(!body)return;const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/'+id;frame.title='فيديو: '+x.title;frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';frame.allowFullscreen=true;frame.style.cssText='display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#111;margin:12px 0';body.insertBefore(frame,body.firstChild);
+};
 boot();
 formatFitnessWeek();
 </script>
