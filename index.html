@@ -648,6 +648,13 @@ html[data-ui-theme="royal"] .btn.primary{background:linear-gradient(135deg,#B695
 html[data-ui-theme="royal"] .btn.primary:hover{background:linear-gradient(135deg,#C0A06A,#98743B)}
 html[data-ui-theme="royal"] .card,html[data-ui-theme="royal"] .biz-card,html[data-ui-theme="royal"] .home-group-head,html[data-ui-theme="royal"] .welcome-stat{border-color:var(--line);box-shadow:var(--shadow-sm)}
 html[data-ui-theme="royal"] .topbar{background:#fff;border-bottom:1px solid var(--line)}
+html[data-ui-theme="golden"]{--bg:#F2EEE5;--surface:#FFFCF6;--surface-2:#F7F1E5;--paper:#FFFEFA;--ink:#342A1B;--ink-2:#64543B;--ink-3:#796B55;--line:#E3D6BF;--line-2:#EFE6D7;--pine:#72521F;--pine-2:#896832;--pine-3:#4D3718;--brass:#8C6628;--brass-2:#D5B778;--gold:#805B20;--gold-bg:#F7ECD6;--gold-br:#E4C998;--shell-bg:#5C421B;--shell-ink:#FFF9ED;--side-muted:#E3D2B2;--shadow-sm:0 5px 18px rgba(89,63,27,.08);--shadow:0 18px 48px rgba(89,63,27,.14)}
+html[data-ui-theme="golden"] .side{background:linear-gradient(180deg,#80602B,#523A19);box-shadow:-8px 0 28px rgba(69,49,20,.12)}
+html[data-ui-theme="golden"] .nav-item.on{background:rgba(255,244,219,.16);box-shadow:inset -3px 0 #E8CF98}
+html[data-ui-theme="golden"] .btn.primary{background:linear-gradient(135deg,#9D7A3E,#70501D);border-color:#74551F;color:#fffaf0;box-shadow:0 5px 14px rgba(104,73,27,.2)}
+html[data-ui-theme="golden"] .btn.primary:hover{background:linear-gradient(135deg,#AA884D,#7F5D29)}
+html[data-ui-theme="golden"] .topbar{background:#FFFCF6;border-bottom:1px solid var(--line)}
+html[data-ui-theme="golden"] .card,html[data-ui-theme="golden"] .biz-card,html[data-ui-theme="golden"] .home-group-head,html[data-ui-theme="golden"] .welcome-stat{border-color:var(--line);box-shadow:var(--shadow-sm)}
 html[data-ui-theme="pearl"]{--bg:#F6F7F5;--surface:#fff;--surface-2:#FAFBF9;--paper:#FCFCFA;--ink:#243A34;--ink-2:#596B64;--ink-3:#677970;--line:#E2E7E2;--line-2:#EDF0EB;--pine:#24594D;--pine-2:#317461;--pine-3:#193F36;--brass:#8C7949;--brass-2:#D3C393;--shell-bg:#fff;--shell-ink:#24594D}
 html[data-ui-theme="luxe"]{--bg:#F2F0EA;--surface:#FFFEFB;--surface-2:#F7F3EA;--paper:#fff;--ink:#172B29;--ink-2:#52635F;--ink-3:#72807C;--line:#DED8C9;--line-2:#EDE8DD;--pine:#092E2D;--pine-2:#154A47;--pine-3:#061F1E;--brass:#9A6B20;--brass-2:#E4C477;--shell-bg:#092E2D;--shell-ink:#FFF9EA;--side-muted:#B9CBC5}
 html[data-ui-theme="space"]{color-scheme:dark;--bg:#060A18;--surface:#10172A;--surface-2:#151F36;--paper:#11192C;--ink:#F1F6FF;--ink-2:#B3C1D9;--ink-3:#8191AE;--line:#263654;--line-2:#1C2943;--pine:#635BFF;--pine-2:#776EFF;--pine-3:#0A1025;--brass:#24D9FF;--brass-2:#8DEBFF;--shell-bg:#090F24;--shell-ink:#F4F8FF;--side-muted:#8FA4CC;--green:#4CE6B3;--green-bg:#0E352F;--green-br:#1B6655;--red:#FF7E99;--red-bg:#3A1724;--red-br:#67263A;--blue:#73BEFF;--blue-bg:#102B47;--blue-br:#21527D;--amber:#FFC766;--amber-bg:#372913;--amber-br:#674A1D;--plum:#CE91FF;--plum-bg:#2C1940;--plum-br:#543076;--gold:#8DEBFF;--gold-bg:#102D3A;--gold-br:#245568;--slate:#AFC0DC;--slate-bg:#172238;--slate-br:#2B3D5D;--shadow-sm:0 5px 18px rgba(0,0,0,.28),0 0 0 1px rgba(104,119,255,.07);--shadow:0 18px 48px rgba(0,0,0,.42),0 0 28px rgba(99,91,255,.10)}
@@ -1651,6 +1658,7 @@ const APP_THEMES={
   green:{name:'الأخضر الحكومي',hint:'أخضر داكن، لؤلؤي، ولمسة ذهبية',primary:'#0E3A38',bg:'#EDF0EE',ink:'#0F2320',accent:'#D8B573',shell:'#0E3A38'},
   navy:{name:'الكحلي المؤسسي',hint:'كحلي عميق، أبيض، ولمسة فضية',primary:'#18334E',bg:'#EEF1F6',ink:'#192D41',accent:'#B9C6D5',shell:'#18334E'},
   royal:{name:'الكحلي الذهبي الفاخر',hint:'كحلي راقٍ، خلفية هادئة، ولمسات ذهبية مستوحاة من دليل الإجراءات',primary:'#132D47',bg:'#EDF0F4',ink:'#172B43',accent:'#D8BB80',shell:'#112B43'},
+  golden:{name:'الذهبي الرسمي',hint:'ذهبي داكن هادئ، عاجي دافئ، وتفاصيل ذهبية رسمية',primary:'#72521F',bg:'#F2EEE5',ink:'#342A1B',accent:'#D5B778',shell:'#5C421B'},
   pearl:{name:'اللؤلؤي',hint:'واجهة فاتحة جدًا مع أخضر هادئ',primary:'#24594D',bg:'#F6F7F5',ink:'#243A34',accent:'#D3C393',shell:'#FFFFFF'},
   luxe:{name:'القيادي الفاخر',hint:'زمردي عميق، عاجي، وذهب معتّق',primary:'#092E2D',bg:'#F2F0EA',ink:'#172B29',accent:'#E4C477',shell:'#092E2D'},
   space:{name:'القيادة الفضائية',hint:'كحلي كوني، زجاج داكن، وتوهج سماوي بنفسجي',primary:'#635BFF',bg:'#060A18',ink:'#F1F6FF',accent:'#24D9FF',shell:'#090F24'}
