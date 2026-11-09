@@ -119,6 +119,14 @@ button{cursor:pointer;border:none;background:none}
 .nav-group-head{width:100%;display:flex;align-items:center;gap:7px;padding:8px 10px;color:#D8E6E2;font-size:12.5px;font-weight:700}
 .nav-group-head .count{margin-inline-start:auto;background:rgba(255,255,255,.1);padding:0 7px;border-radius:20px}.nav-group-head .arr{transition:transform .15s}.nav-group.closed .arr{transform:rotate(90deg)}
 .nav-group.closed .nav-group-pages{display:none}.nav-group-pages .nav-item{border-radius:0;padding-inline-start:15px}
+.nav-pinned{margin:4px 0 7px;padding:5px;border:1px solid rgba(216,181,115,.18);border-radius:10px;background:rgba(216,181,115,.055)}
+.nav-pinned-label{display:flex;align-items:center;gap:6px;padding:3px 6px 5px;color:var(--brass-2);font-size:10.5px;font-weight:800}.nav-pinned-label svg{width:12px;height:12px}.nav-pinned .nav-item{padding-block:8px}
+.page-order-help{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.page-order-status{display:inline-flex;align-items:center;gap:6px;color:var(--ink-3);font-size:11.5px;font-weight:700}.page-order-status:before{content:"";width:7px;height:7px;border-radius:50%;background:#4FC79E;box-shadow:0 0 0 3px rgba(79,199,158,.12)}
+.page-order-toolbar{display:grid;grid-template-columns:minmax(150px,1fr) auto auto;gap:7px;align-items:center;margin:10px 0 14px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}.page-order-toolbar select{min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.order-group{margin:9px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}.order-group.drag-over,.order-ungrouped.drag-over{border-color:var(--brass);box-shadow:0 0 0 3px rgba(176,134,64,.12)}.order-group-head{display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--surface-2);cursor:grab}.order-group-head:active{cursor:grabbing}.order-group-head .drag-handle,.order-page .drag-handle{color:var(--ink-3);font-size:17px;letter-spacing:-3px;user-select:none}.order-group-head b{flex:1}.order-group-head small{color:var(--ink-3)}.order-group-pages,.order-ungrouped{min-height:48px;padding:6px}.order-group-pages:empty:after,.order-ungrouped:empty:after{content:"أسقط الصفحات هنا";display:grid;place-items:center;min-height:42px;color:var(--ink-3);font-size:11.5px;border:1px dashed var(--line);border-radius:8px}.order-group.dragging,.order-page.dragging{opacity:.42}
+.order-page{display:grid;grid-template-columns:auto auto 32px minmax(0,1fr) auto;align-items:center;gap:8px;margin:4px 0;padding:8px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);cursor:grab}.order-page:active{cursor:grabbing}.order-page.selected{border-color:var(--pine-2);background:color-mix(in srgb,var(--pine) 5%,var(--surface))}.order-page.drop-before{box-shadow:inset 0 3px var(--brass)}.order-page.drop-after{box-shadow:inset 0 -3px var(--brass)}.order-page input[type="checkbox"]{width:18px;height:18px;accent-color:var(--pine)}.order-page .fi{width:32px;height:32px}.order-page-copy{min-width:0}.order-page-copy b,.order-page-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.order-page-copy small{margin-top:2px;color:var(--ink-3);font-size:10px}.order-pin{width:34px;height:34px;border-radius:8px;color:var(--ink-3);display:grid;place-items:center}.order-pin.on{color:var(--brass);background:rgba(216,181,115,.12)}
+.order-section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:16px 2px 7px}.order-section-title h4{margin:0;font-size:13px}.order-section-title button{font-size:11px;color:var(--pine);font-weight:800}.order-new-group{display:flex;gap:7px;margin-top:10px}.order-new-group input{flex:1;min-width:0;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+@media(max-width:600px){.page-order-toolbar{grid-template-columns:1fr 1fr}.page-order-toolbar select{grid-column:1/-1;font-size:16px}.order-page{grid-template-columns:auto auto 30px minmax(0,1fr) auto;padding:7px;gap:6px}.order-page-copy small{white-space:normal}.order-new-group{display:grid;grid-template-columns:1fr}.order-new-group input{font-size:16px;min-height:44px}.order-new-group .btn{justify-content:center}.order-group-head{padding:10px 8px}}
 .side-foot{padding:11px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:7px}
 .savepill{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#93B0A9;padding:1px 4px}
 .savepill .sz{margin-inline-start:auto;color:#7C9992}
@@ -753,7 +761,7 @@ html[data-ui-theme="golden"] .savepill .sz{color:#796B55}
     <div class="who" id="who"></div>
     <nav class="nav"><div class="nav-label">الصفحات</div><div id="navList"></div>
       <button class="nav-add" id="navAdd" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>إضافة صفحة</button>
-      <button class="nav-add" id="navSort" hidden>ترتيب وتجميع الصفحات</button>
+      <button class="nav-add" id="navSort" hidden>إدارة وترتيب الصفحات</button>
     </nav>
     <div class="side-foot">
       <div class="savepill"><span class="dot" id="saveDot"></span><span id="saveTxt">جاهز</span><span class="sz" id="sizeTxt"></span></div>
@@ -1394,6 +1402,10 @@ function can(pageId,lvl){ if(!ME) return false; if(pageId===MARKET_PAGE_ID||page
   const p=(ME.perms||{})[pageId]||'none'; return LEVELS.indexOf(p)>=LEVELS.indexOf(lvl); }
 function allPageDefinitions(){return [...DB.pages,dutyScreenPage(),businessSystemPage(),fitnessHubPage(),academyPage(),creativePage(OCCASIONS_ID),creativePage(GUIDE_ID),excelLibraryPage(),marketSystemPage()]}
 function orderedPages(pages){const order=Array.isArray(DB.pageOrder)?DB.pageOrder:[],rank=new Map(order.map((id,i)=>[id,i]));return [...pages].sort((a,b)=>(rank.has(a.id)?rank.get(a.id):1e6)-(rank.has(b.id)?rank.get(b.id):1e6))}
+function pinnedPageIds(){const valid=new Set(allPageDefinitions().map(p=>p.id));return [...new Set(Array.isArray(DB.pinnedPageIds)?DB.pinnedPageIds:[])].filter(id=>valid.has(id))}
+function navCollapseKey(){return 'nezam_nav_groups_'+(WORKSPACE_ID||'workspace')+'_'+(ME?.id||'user')}
+function collapsedNavGroups(defaults=[]){try{const raw=localStorage.getItem(navCollapseKey());return new Set(raw===null?defaults:JSON.parse(raw||'[]'))}catch{return new Set(defaults)}}
+function setNavGroupCollapsed(name,closed){const groups=collapsedNavGroups();closed?groups.add(name):groups.delete(name);try{localStorage.setItem(navCollapseKey(),JSON.stringify([...groups]))}catch{}}
 const visiblePages=()=>orderedPages(allPageDefinitions().filter(p=>p.id===EXCEL_LIBRARY_ID?!!ME:can(p.id,'view')));
 const canExport=()=>isAdmin()||(ME&&ME.canExport!==false);
 const canImport=p=>isAdmin()||(ME&&ME.canImport!==false&&can(p.id,'full'));
@@ -1779,12 +1791,13 @@ function orderedGroupNames(pages){
 function renderNav(){
   const list=visiblePages();
   const item=p=>`<button class="nav-item ${p.id===cur?'on':''}" data-pg="${p.id}" style="--acc:${CVAR[p.accent]||CVAR.gold}">${icon(p.icon)}<span class="nm">${esc(p.name)}</span><span class="count">${p.rows.length}</span></button>`;
-  const groups=orderedGroupNames(list);
-  const grouped=new Set(groups),plain=list.filter(p=>!String(p.group||'').trim()).map(item).join('');
-  $('#navList').innerHTML=`<button class="nav-item ${cur?'':'on'}" id="navHome">${ic('shieldk',16)}<span class="nm">الرئيسية</span></button>`+plain+groups.map(g=>{const ps=list.filter(p=>String(p.group||'').trim()===g);return `<div class="nav-group closed"><button class="nav-group-head" data-ng="${esc(g)}"><span class="arr">⌄</span>${esc(g)}<span class="count">${ps.length}</span></button><div class="nav-group-pages">${ps.map(item).join('')}</div></div>`;}).join('');
+  const pinnedSet=new Set(pinnedPageIds()),pinned=list.filter(p=>pinnedSet.has(p.id)),rest=list.filter(p=>!pinnedSet.has(p.id));
+  const groups=orderedGroupNames(rest),plain=rest.filter(p=>!String(p.group||'').trim()).map(item).join(''),closed=collapsedNavGroups(groups);
+  const pinnedHTML=pinned.length?`<div class="nav-pinned"><div class="nav-pinned-label">${ic('star',12)} الصفحات المثبتة</div>${pinned.map(item).join('')}</div>`:'';
+  $('#navList').innerHTML=`<button class="nav-item ${cur?'':'on'}" id="navHome">${ic('shieldk',16)}<span class="nm">الرئيسية</span></button>`+pinnedHTML+plain+groups.map(g=>{const ps=rest.filter(p=>String(p.group||'').trim()===g),isClosed=closed.has(g);return `<div class="nav-group ${isClosed?'closed':''}"><button class="nav-group-head" data-ng="${esc(g)}" aria-expanded="${String(!isClosed)}"><span class="arr">⌄</span>${esc(g)}<span class="count">${ps.length}</span></button><div class="nav-group-pages">${ps.map(item).join('')}</div></div>`;}).join('');
   $('#navHome').onclick=showHome;
   $('#navList').querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>go(b.dataset.pg));
-  $('#navList').querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>b.closest('.nav-group').classList.toggle('closed'));
+  $('#navList').querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>{const group=b.closest('.nav-group'),isClosed=group.classList.toggle('closed');b.setAttribute('aria-expanded',String(!isClosed));setNavGroupCollapsed(b.dataset.ng,isClosed)});
   renderMobileNav();
 }
 function showHome(){
@@ -2807,29 +2820,48 @@ function drawCM(){
 }
 function openPageOrder(){
   if(!isAdmin()) return;
-  modal('ترتيب وتجميع الصفحات','<div class="gnote">يمكنك الآن ترتيب جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي ونماذج Excel. صفحات النظام تظهر بعلامة واضحة، وصلاحية فتحها تُحدد لكل مستخدم من شاشة الصلاحيات.</div><div class="welcome-section-title"><h3>ترتيب المجموعات</h3></div><div id="groupOrder"></div><div class="welcome-section-title"><h3>جميع الصفحات</h3></div><div id="pageOrder"></div>',
-    '<button class="btn primary" id="poDone">حفظ</button>','lg');
-  let order=orderedPages(allPageDefinitions()).map(p=>p.id);
-  const sync=()=>{document.querySelectorAll('[data-pgroup]').forEach(x=>{const p=DB.pages.find(p=>p.id===x.dataset.pgroup);if(p)p.group=x.value.trim()});document.querySelectorAll('[data-spgroup]').forEach(x=>{DB.systemPageSettings=DB.systemPageSettings||{};DB.systemPageSettings[x.dataset.spgroup]={...(DB.systemPageSettings[x.dataset.spgroup]||{}),group:x.value.trim()}})};
-  const drawGroups=()=>{
-    DB.groupOrder=orderedGroupNames(allPageDefinitions());
-    $('#groupOrder').innerHTML=DB.groupOrder.length?DB.groupOrder.map((g,i)=>`<div class="frow"><div class="fi">${icon('folder',16)}</div><b>${esc(g)}</b><div class="fx"><button class="iconbtn" data-gu="${i}" ${i===0?'disabled':''}>▲</button><button class="iconbtn" data-gd="${i}" ${i===DB.groupOrder.length-1?'disabled':''}>▼</button></div></div>`).join(''):'<p class="dim" style="font-size:12px">لا توجد مجموعات بعد.</p>';
-    document.querySelectorAll('[data-gu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gu;[DB.groupOrder[i-1],DB.groupOrder[i]]=[DB.groupOrder[i],DB.groupOrder[i-1]];drawGroups()});
-    document.querySelectorAll('[data-gd]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gd;[DB.groupOrder[i+1],DB.groupOrder[i]]=[DB.groupOrder[i],DB.groupOrder[i+1]];drawGroups()});
-  };
-  const draw=()=>{
-    const defs=new Map(allPageDefinitions().map(p=>[p.id,p]));
-    $('#pageOrder').innerHTML=order.map((id,i)=>{const p=defs.get(id);if(!p)return '';const system=!DB.pages.some(x=>x.id===id);return `<div class="frow" style="flex-wrap:wrap">
-      <div class="fi">${icon(p.icon,16)}</div><b style="min-width:150px">${esc(p.name)} ${system?'<span class="badge b-gold">صفحة نظام</span>':''}</b><input ${system?'data-spgroup':'data-pgroup'}="${p.id}" value="${esc(p.group||'')}" placeholder="اسم المجموعة (اختياري)" style="flex:1;min-width:150px;padding:9px;border:1px solid var(--line);border-radius:7px;background:var(--surface)">
-      <div class="fx" style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn ghost sm" data-pfirst="${i}" ${i===0?'disabled':''}>⇈ الأول</button><button class="btn ghost sm" data-pu="${i}" ${i===0?'disabled':''}>▲ أعلى</button><button class="btn ghost sm" data-pd="${i}" ${i===order.length-1?'disabled':''}>▼ أسفل</button><button class="btn ghost sm" data-plast="${i}" ${i===order.length-1?'disabled':''}>⇊ الأخير</button></div></div>`}).join('');
-    document.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pu;[order[i-1],order[i]]=[order[i],order[i-1]];draw();});
-    document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pd;[order[i+1],order[i]]=[order[i],order[i+1]];draw();});
-    document.querySelectorAll('[data-pfirst]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.pfirst;order.unshift(order.splice(i,1)[0]);draw()});
-    document.querySelectorAll('[data-plast]').forEach(b=>b.onclick=()=>{sync();const i=+b.dataset.plast;order.push(order.splice(i,1)[0]);draw()});
-    document.querySelectorAll('[data-pgroup],[data-spgroup]').forEach(x=>x.onchange=()=>{sync();drawGroups()});
-  };
-  draw();drawGroups();
-  $('#poDone').onclick=async()=>{sync();DB.pageOrder=order;DB.groupOrder=orderedGroupNames(allPageDefinitions());audit('ترتيب وتجميع الصفحات','تحديث ترتيب جميع الصفحات والمجموعات');const btn=$('#poDone');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';const ok=await commitNow();if(!ok){btn.disabled=false;btn.textContent='حفظ';return toast('تعذّر حفظ الترتيب؛ حاول مرة أخرى','err')}closeModal();render();toast('حُفظ ترتيب جميع الصفحات');};
+  modal('إدارة وترتيب الصفحات',`<div class="gnote"><b>اسحب الصفحة أو المجموعة إلى مكانها الجديد.</b> يمكنك إسقاط الصفحة داخل مجموعة أو خارجها، وتحديد عدة صفحات لنقلها معًا. لا تتغير روابط الصفحات أو محتواها أو صلاحياتها.</div>
+    <div class="page-order-help"><span class="page-order-status" id="poStatus">الحفظ التلقائي مفعّل</span><button class="btn ghost sm" id="poSelectAll">تحديد الكل</button></div>
+    <div class="page-order-toolbar"><select id="poBulkGroup" aria-label="وجهة النقل الجماعي"></select><button class="btn ghost sm" id="poBulkMove">نقل المحدد</button><button class="btn ghost sm" id="poClear">إلغاء التحديد</button></div>
+    <div id="pageOrder"></div>
+    <div class="order-new-group"><input id="poNewGroup" maxlength="50" placeholder="اسم مجموعة جديدة"><button class="btn ghost" id="poCreateGroup">إنشاء ونقل المحدد</button></div>`,
+    '<button class="btn ghost" id="poUndo" disabled>تراجع</button><button class="btn primary" id="poDone">تم</button>','lg');
+  let order=orderedPages(allPageDefinitions()).map(p=>p.id),selected=new Set(),history=[],drag=null,logged=false;
+  const pageGroup=id=>{const p=DB.pages.find(x=>x.id===id);return String((p?p.group:systemPageSettings(id).group)||'').trim()};
+  const setPageGroup=(id,group)=>{const p=DB.pages.find(x=>x.id===id);if(p)p.group=group;else{DB.systemPageSettings=DB.systemPageSettings||{};DB.systemPageSettings[id]={...(DB.systemPageSettings[id]||{}),group}}};
+  const snapshot=()=>({pageOrder:[...order],groupOrder:[...(DB.groupOrder||[])],pinnedPageIds:[...pinnedPageIds()],pages:DB.pages.map(p=>[p.id,p.group||'']),systems:Object.fromEntries(allPageDefinitions().filter(p=>!DB.pages.some(x=>x.id===p.id)).map(p=>[p.id,systemPageSettings(p.id).group||'']))});
+  const restore=s=>{order=[...s.pageOrder];DB.groupOrder=[...s.groupOrder];DB.pinnedPageIds=[...s.pinnedPageIds];const custom=new Map(s.pages);DB.pages.forEach(p=>p.group=custom.get(p.id)||'');Object.entries(s.systems).forEach(([id,g])=>setPageGroup(id,g));};
+  const normalize=()=>{const valid=allPageDefinitions().map(p=>p.id),seen=new Set();order=[...order,...valid].filter(id=>valid.includes(id)&&!seen.has(id)&&seen.add(id));DB.pageOrder=[...order];DB.groupOrder=orderedGroupNames(allPageDefinitions());DB.pinnedPageIds=pinnedPageIds();};
+  const markSaving=()=>{const s=$('#poStatus');if(s)s.textContent='جارٍ الحفظ تلقائيًا…';save();setTimeout(()=>{const x=$('#poStatus');if(x)x.textContent='حُفظ الترتيب تلقائيًا'},500)};
+  const mutate=(label,fn)=>{history.push(snapshot());if(history.length>25)history.shift();fn();normalize();if(!logged){audit('إدارة ترتيب الصفحات','سحب ونقل وتجميع وتثبيت الصفحات');logged=true}markSaving();renderNav();draw();$('#poUndo').disabled=false;};
+  const movePages=(ids,targetGroup,anchor=null,after=false)=>{ids=order.filter(id=>ids.includes(id));if(!ids.length)return;let remaining=order.filter(id=>!ids.includes(id));ids.forEach(id=>setPageGroup(id,targetGroup));let at=remaining.length;if(anchor&&remaining.includes(anchor))at=remaining.indexOf(anchor)+(after?1:0);else{const targetIndexes=remaining.map((id,i)=>pageGroup(id)===targetGroup?i:-1).filter(i=>i>=0);if(targetIndexes.length)at=Math.max(...targetIndexes)+1}remaining.splice(at,0,...ids);order=remaining;};
+  const moveGroup=(name,before)=>{const groups=orderedGroupNames(allPageDefinitions()).filter(g=>g!==name),at=Math.max(0,groups.indexOf(before));groups.splice(at,0,name);DB.groupOrder=groups;};
+  const selectedIds=id=>selected.has(id)?order.filter(x=>selected.has(x)):[id];
+  const pageRow=p=>{const system=!DB.pages.some(x=>x.id===p.id),pinned=pinnedPageIds().includes(p.id);return `<div class="order-page ${selected.has(p.id)?'selected':''}" data-order-page="${p.id}">
+    <span class="drag-handle" draggable="true" data-page-drag="${p.id}" title="اسحب للتحريك">⋮⋮</span><input type="checkbox" data-po-check="${p.id}" ${selected.has(p.id)?'checked':''} aria-label="تحديد ${esc(p.name)}"><span class="fi">${icon(p.icon,16)}</span><span class="order-page-copy"><b>${esc(p.name)}</b><small>${system?'صفحة نظام · ':''}${pageGroup(p.id)||'خارج المجموعات'}</small></span><button class="order-pin ${pinned?'on':''}" data-po-pin="${p.id}" title="${pinned?'إلغاء التثبيت':'تثبيت أعلى القائمة'}" aria-label="${pinned?'إلغاء تثبيت':'تثبيت'} ${esc(p.name)}">${ic('star',16)}</button></div>`};
+  function bindDropZone(el,group){el.ondragover=e=>{if(drag?.type==='pages'){e.preventDefault();el.classList.add('drag-over')}};el.ondragleave=e=>{if(!el.contains(e.relatedTarget))el.classList.remove('drag-over')};el.ondrop=e=>{if(drag?.type!=='pages')return;e.preventDefault();e.stopPropagation();el.classList.remove('drag-over');const ids=[...drag.ids];drag=null;mutate('نقل صفحات',()=>movePages(ids,group))};}
+  function draw(){
+    const defs=new Map(allPageDefinitions().map(p=>[p.id,p])),groups=orderedGroupNames(allPageDefinitions()),plain=order.map(id=>defs.get(id)).filter(p=>p&&!pageGroup(p.id));
+    const selectedCount=selected.size;
+    $('#poBulkGroup').innerHTML=`<option value="">خارج المجموعات</option>${groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('')}`;
+    $('#poBulkMove').disabled=!selectedCount;$('#poClear').disabled=!selectedCount;$('#poSelectAll').textContent=selectedCount===order.length?'إلغاء تحديد الكل':'تحديد الكل';
+    $('#pageOrder').innerHTML=`<div class="order-section-title"><h4>خارج المجموعات</h4><span>${plain.length} صفحة</span></div><div class="order-ungrouped" data-drop-group="">${plain.map(pageRow).join('')}</div>
+      <div class="order-section-title"><h4>المجموعات</h4><span>اسحب عنوان المجموعة لترتيبها</span></div>${groups.map(g=>{const ps=order.map(id=>defs.get(id)).filter(p=>p&&pageGroup(p.id)===g);return `<section class="order-group" data-order-group="${esc(g)}"><div class="order-group-head" draggable="true" data-group-drag="${esc(g)}"><span class="drag-handle">⋮⋮</span>${icon('folder',16)}<b>${esc(g)}</b><small>${ps.length} صفحة</small></div><div class="order-group-pages" data-drop-group="${esc(g)}">${ps.map(pageRow).join('')}</div></section>`}).join('')||'<p class="dim">لا توجد مجموعات بعد؛ حدد صفحة واكتب اسم مجموعة جديدة.</p>'}`;
+    document.querySelectorAll('[data-po-check]').forEach(c=>c.onchange=()=>{c.checked?selected.add(c.dataset.poCheck):selected.delete(c.dataset.poCheck);draw()});
+    document.querySelectorAll('[data-po-pin]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.poPin;mutate('تثبيت صفحة',()=>{const pins=new Set(pinnedPageIds());pins.has(id)?pins.delete(id):pins.add(id);DB.pinnedPageIds=order.filter(x=>pins.has(x))})});
+    document.querySelectorAll('[data-page-drag]').forEach(h=>{h.ondragstart=e=>{const ids=selectedIds(h.dataset.pageDrag);drag={type:'pages',ids};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',ids.join(','));ids.forEach(id=>document.querySelector(`[data-order-page="${id}"]`)?.classList.add('dragging'))};h.ondragend=()=>{drag=null;document.querySelectorAll('.dragging,.drag-over,.drop-before,.drop-after').forEach(x=>x.classList.remove('dragging','drag-over','drop-before','drop-after'))}});
+    document.querySelectorAll('[data-order-page]').forEach(row=>{row.ondragover=e=>{if(drag?.type!=='pages')return;e.preventDefault();e.stopPropagation();const after=e.clientY>row.getBoundingClientRect().top+row.offsetHeight/2;row.classList.toggle('drop-before',!after);row.classList.toggle('drop-after',after)};row.ondragleave=()=>row.classList.remove('drop-before','drop-after');row.ondrop=e=>{if(drag?.type!=='pages')return;e.preventDefault();e.stopPropagation();const anchor=row.dataset.orderPage,after=e.clientY>row.getBoundingClientRect().top+row.offsetHeight/2,ids=[...drag.ids];drag=null;mutate('تحريك صفحات',()=>movePages(ids,pageGroup(anchor),anchor,after))}});
+    document.querySelectorAll('[data-drop-group]').forEach(el=>bindDropZone(el,el.dataset.dropGroup));
+    document.querySelectorAll('[data-group-drag]').forEach(head=>{head.ondragstart=e=>{drag={type:'group',name:head.dataset.groupDrag};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',drag.name);head.closest('.order-group').classList.add('dragging')};head.ondragend=()=>{drag=null;document.querySelectorAll('.dragging,.drag-over').forEach(x=>x.classList.remove('dragging','drag-over'))}});
+    document.querySelectorAll('[data-order-group]').forEach(group=>{group.ondragover=e=>{if(drag?.type==='group'&&drag.name!==group.dataset.orderGroup){e.preventDefault();group.classList.add('drag-over')}};group.ondragleave=e=>{if(!group.contains(e.relatedTarget))group.classList.remove('drag-over')};group.ondrop=e=>{if(drag?.type!=='group')return;e.preventDefault();e.stopPropagation();const name=drag.name,before=group.dataset.orderGroup;drag=null;mutate('ترتيب مجموعة',()=>moveGroup(name,before))}});
+  }
+  $('#poSelectAll').onclick=()=>{selected=selected.size===order.length?new Set():new Set(order);draw()};
+  $('#poClear').onclick=()=>{selected.clear();draw()};
+  $('#poBulkMove').onclick=()=>{const ids=order.filter(id=>selected.has(id));if(!ids.length)return;const group=$('#poBulkGroup').value;selected.clear();mutate('نقل جماعي',()=>movePages(ids,group))};
+  $('#poCreateGroup').onclick=()=>{const group=$('#poNewGroup').value.trim(),ids=order.filter(id=>selected.has(id));if(!group)return toast('اكتب اسم المجموعة الجديدة','err');if(!ids.length)return toast('حدد صفحة واحدة على الأقل لنقلها إلى المجموعة الجديدة','err');if(orderedGroupNames(allPageDefinitions()).includes(group))return toast('اسم المجموعة مستخدم؛ اخترها من قائمة النقل الجماعي','err');selected.clear();mutate('إنشاء مجموعة',()=>{DB.groupOrder=[...(DB.groupOrder||[]),group];movePages(ids,group)});$('#poNewGroup').value=''};
+  $('#poUndo').onclick=()=>{const previous=history.pop();if(!previous)return;restore(previous);normalize();markSaving();renderNav();draw();$('#poUndo').disabled=!history.length;toast('تم التراجع عن آخر تغيير')};
+  $('#poDone').onclick=async()=>{const btn=$('#poDone');btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ التأكيد…';if(!(await flushPendingSave())){btn.disabled=false;btn.textContent='تم';return toast('تعذّر تأكيد الحفظ؛ حاول مرة أخرى','err')}closeModal();render();toast('ترتيب الصفحات محفوظ ومطبّق')};
+  normalize();draw();
 }
 function openTickerSettings(){
   modal('إعدادات الشريط المتحرك',`<div class="grid2">
