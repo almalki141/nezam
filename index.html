@@ -1874,12 +1874,24 @@ const commanderSections={
 };
 const commanderNumber=new Intl.NumberFormat('ar-SA');
 const commanderFieldName=value=>String(value||'').trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا');
+const commanderShortcut=key=>key.startsWith('page:');
 function commanderTransactionStatus(page){
   return page?.cols?.find(col=>col.type==='select'&&commanderFieldName(col.name)==='حالة المعاملة');
 }
+function isCommanderTransactionPage(page){
+  return !!commanderTransactionStatus(page)&&page.cols.some(col=>
+    ['عنوان المعاملة','رقم المعاملة'].includes(commanderFieldName(col.name)));
+}
 function commanderAdministrativePages(){
-  return (DB.pages||[]).filter(page=>/^[a-z0-9_-]{1,80}$/i.test(page.id)&&commanderTransactionStatus(page)&&
-    page.cols.some(col=>['عنوان المعاملة','رقم المعاملة'].includes(commanderFieldName(col.name))));
+  return (DB.pages||[]).filter(isCommanderTransactionPage);
+}
+function commanderPageKey(page){
+  if(page.id===GUIDE_ID) return 'guide';
+  if(page.id===EXCEL_LIBRARY_ID) return 'templates';
+  return `${isCommanderTransactionPage(page)?'transactions':'page'}:${page.id}`;
+}
+function commanderPageOptions(){
+  return orderedPages(allPageDefinitions()).filter(page=>/^[a-z0-9_-]{1,80}$/i.test(page.id)).map(commanderPageKey);
 }
 function commanderSection(key){
   if(Object.hasOwn(commanderSections,key)) return commanderSections[key];
@@ -1889,6 +1901,7 @@ function commanderSection(key){
 function commanderPage(key){
   if(key==='guide') return pg(GUIDE_ID);
   if(key==='templates') return pg(EXCEL_LIBRARY_ID);
+  if(commanderShortcut(key)) return key.length>5?pg(key.slice(5)):null;
   if(key.startsWith('transactions:')) return commanderAdministrativePages().find(page=>page.id===key.slice('transactions:'.length));
   if(key==='transactions'){
     const candidates=commanderAdministrativePages();
@@ -1905,8 +1918,8 @@ function commanderPageIssue(key,account){
   if(!account) return 'اختر حساب العرض أولًا.';
   if(key==='announcements') return '';
   const page=commanderPage(key);
-  if(!page) return 'تعذّر تحديد صفحة إدارية مطابقة في المنظومة.';
-  if(page.lockMode&&page.lockMode!=='none') return 'الصفحة مقفلة برقم سري.';
+  if(!page) return 'هذه الصفحة غير موجودة في المنظومة.';
+  if(!commanderShortcut(key)&&page.lockMode&&page.lockMode!=='none') return 'الصفحة مقفلة برقم سري.';
   const canRead=account.id===ME?.id?can(page.id,'view'):
     account.role==='admin'||page.id===EXCEL_LIBRARY_ID||['view','edit','full'].includes(account.perms?.[page.id]);
   return canRead?'':'حساب العرض لا يملك صلاحية قراءة هذه الصفحة.';
@@ -1937,12 +1950,20 @@ function commanderPageContent(key){
 function commanderDashboard(data,account,preview=false){
   const seen=new Set(), updates=[];
   const pages=(data.layout?.pages||[]).filter(({key})=>{
-    if(seen.has(key)||!commanderAccess(key,account)) return false;
-    seen.add(key);
+    if(typeof key!=='string'||!commanderAccess(key,account)) return false;
+    const identity=commanderPage(key)?.id||key;
+    if(seen.has(identity)) return false;
+    seen.add(identity);
     return true;
   });
   const content=pages.map(({key,mode})=>{
     const section=commanderSection(key), page=commanderPage(key);
+    if(commanderShortcut(key)){
+      return `<article class="commander-page">
+        <div class="commander-page-title"><i>${icon('file',24)}</i><h3>${esc(page.name)}</h3></div>
+        ${preview?'<span class="commander-link">اختصار إلى الصفحة</span>':`<button type="button" class="commander-link" data-commander-page="${esc(key)}">فتح الصفحة <span aria-hidden="true">←</span></button>`}
+      </article>`;
+    }
     const name=esc(page?.name||section.title);
     const {count,caption,entries,groups}=commanderPageContent(key);
     if(data.layout?.updates!==false&&entries) {
@@ -1961,7 +1982,7 @@ function commanderDashboard(data,account,preview=false){
   const cards=(data.cards||[]).filter(c=>c.visible!==false);
   const recent=updates.sort((a,b)=>b.updated.localeCompare(a.updated)).slice(0,5);
   return `<div class="commander-surface"><header class="commander-head">
-    <div><small>موجز الصفحات المختارة</small><h2 ${preview?'':'id="commanderDisplayTitle"'}>${esc(data.title)}</h2></div>
+    <div><small>الصفحات المختارة</small><h2 ${preview?'':'id="commanderDisplayTitle"'}>${esc(data.title)}</h2></div>
     ${preview?'':`<div class="commander-tools"><button type="button" id="commanderFullscreen">ملء الشاشة</button><button type="button" id="commanderExit">إنهاء العرض</button></div>`}
     </header><div class="commander-body">
     ${content.length?`<div class="commander-grid">${content.join('')}</div>`:''}
@@ -2044,8 +2065,9 @@ async function openCommanderSettings(){
     const legacyPage=key==='transactions'?commanderPage(key):null;
     return [legacyPage?`transactions:${legacyPage.id}`:key,mode];
   }));
-  const pageOptions=['guide','templates','announcements',...orderedPages(commanderAdministrativePages()).map(page=>`transactions:${page.id}`)];
-  const pageOrder=[...new Set([...savedPages.keys(),...pageOptions])];
+  const selectedIds=new Set([...savedPages.keys()].map(key=>commanderPage(key)?.id).filter(Boolean));
+  const pageOptions=commanderPageOptions().filter(key=>!selectedIds.has(commanderPage(key)?.id));
+  const pageOrder=[...new Set([...savedPages.keys(),...pageOptions,'announcements'])];
   modal('إعداد شاشة القائد',`
     <div class="commander-settings-layout"><div id="commanderPreview" class="commander-preview" aria-label="معاينة العرض"></div>
     <div id="commanderSettingsControls" class="commander-controls">
@@ -2060,7 +2082,7 @@ async function openCommanderSettings(){
       <div class="commander-option" data-key="${esc(key)}">
         <span class="commander-drag" draggable="true" aria-hidden="true">⠿</span>
         <label><input type="checkbox" data-enabled ${savedPages.has(key)?'checked':''}> ${name}</label>
-        <select data-mode aria-label="طريقة عرض ${name}"><option value="summary">موجز</option><option value="full" ${savedPages.get(key)==='full'?'selected':''}>صفحة كاملة</option></select>
+        <select data-mode aria-label="طريقة عرض ${name}">${commanderShortcut(key)?'<option value="link">اختصار</option>':`<option value="summary">موجز</option><option value="full" ${savedPages.get(key)==='full'?'selected':''}>عرض تفصيلي</option>`}</select>
         <div class="commander-reorder"><button type="button" data-move="up" aria-label="تحريك ${name} للأعلى">↑</button><button type="button" data-move="down" aria-label="تحريك ${name} للأسفل">↓</button></div>
         <small data-unavailable hidden></small>
       </div>`;
@@ -2089,7 +2111,7 @@ async function openCommanderSettings(){
       const unavailable=!!issue;
       const enabled=item.querySelector('[data-enabled]');
       enabled.disabled=unavailable&&!enabled.checked;
-      item.querySelector('[data-mode]').disabled=!enabled.checked||unavailable;
+      item.querySelector('[data-mode]').disabled=!enabled.checked||unavailable||commanderShortcut(item.dataset.key);
       const hint=item.querySelector('[data-unavailable]');
       hint.textContent=issue;
       hint.hidden=!unavailable;
