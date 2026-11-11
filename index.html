@@ -755,11 +755,14 @@ html[data-ui-theme="golden"] .savepill .sz{color:#796B55}
 .duty-display-body{flex:1;min-width:0}
 .duty-slide-title h3{margin:0 0 12px;color:#f8f4e9;font-size:clamp(19px,2.5vw,31px)}
 .duty-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr));gap:12px;margin:0}
+.duty-summary-compact{grid-template-columns:repeat(auto-fit,minmax(min(100%,142px),1fr));gap:8px}
+.duty-summary-compact .duty-kpi{padding:11px}.duty-summary-compact .duty-kpi dd{font-size:clamp(20px,3vw,34px)}
 .duty-kpi{padding:clamp(12px,2.3vw,23px);border:1px solid #e9ce962e;border-radius:15px;background:#ffffff0d}
 .duty-kpi dd{margin:0;color:#f0d28c;font-size:clamp(26px,4vw,48px);font-weight:700;line-height:1.12}
 .duty-kpi dt{margin-top:7px;color:#e6eeee}
 .duty-table-wrap{overflow-x:auto;border:1px solid #ffffff26;border-radius:12px}
 .duty-summary+.duty-table-wrap,.duty-summary+.duty-panel-empty{margin-top:13px}
+.duty-summary+.duty-cards,.duty-summary+.duty-brief-list{margin-top:13px}
 .duty-table{width:100%;border-collapse:collapse;table-layout:fixed;text-align:right;color:#f8f4e9}
 .duty-table :is(th,td){padding:11px 13px;border-bottom:1px solid #ffffff19;text-align:right;vertical-align:top}
 .duty-table thead{background:#ffffff0d;color:#f0d28c}
@@ -788,6 +791,44 @@ html[data-ui-theme="golden"] .savepill .sz{color:#796B55}
 .duty-source-fields{display:flex;gap:8px 17px;flex-wrap:wrap;padding:8px 18px 2px 0}
 .duty-source-fields[hidden]{display:none}
 .duty-display-settings{align-items:start}
+.duty-layout-picker{flex-basis:100%;flex-wrap:wrap}
+.duty-layout-picker select{width:auto;min-width:100px}
+.duty-brief-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
+.duty-brief-list li{display:flex;flex-wrap:wrap;gap:8px 18px;padding:11px 13px;border-inline-start:3px solid #d6b8738c;border-radius:8px;background:#ffffff0d}
+.duty-brief-list b,.duty-record-card dt{color:#d8c08d;margin-inline-end:4px;font-size:.9em}
+.duty-record-card{margin:0;display:grid;align-content:start;gap:8px}
+.duty-record-card dd{margin:2px 0 0}
+.duty-custom-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.duty-custom-field{min-width:0;padding:13px 15px;border:1px solid #d6b87340;border-radius:12px;background:#ffffff0d}
+.duty-custom-field-wide{grid-column:1/-1}
+.duty-custom-field dt{color:#e6cd96;font-size:.9em;font-weight:700}
+.duty-custom-field dd{margin:5px 0 0;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
+.duty-custom-field[data-type="number"] dd{font-size:clamp(24px,4vw,42px);font-weight:700;line-height:1.25}
+.duty-custom-slide[data-layout="summary"] .duty-custom-fields{grid-template-columns:1fr}
+.duty-custom-slide[data-layout="summary"] .duty-custom-field{border-inline-start:3px solid #d6b8738c}
+.duty-custom-slide[data-layout="photo"] :is([data-type="image"],[data-type="gallery"]){order:-1}
+.duty-field-chip-list,.duty-field-choice-list{display:flex;flex-wrap:wrap;gap:7px 12px}
+.duty-field-bullets{margin:0;padding-inline-start:22px}
+.duty-field-media{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px}
+.duty-field-media figure{flex:1 1 230px;min-width:0}
+.duty-file-link{display:inline-block;text-decoration:none}
+.duty-custom-photo{margin:0;display:grid;place-items:center;padding:8px;border:1px solid #ffffff29;border-radius:14px;background:#071a276b}
+.duty-custom-photo img{display:block;max-width:100%;max-height:clamp(180px,40vh,560px);object-fit:contain;border-radius:8px}
+.duty-custom-slide[data-layout="photo"] img{max-height:clamp(220px,62vh,720px)}
+.duty-page-list{display:grid;gap:8px}
+.duty-page-entry{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.duty-page-entry small{display:block;color:var(--ink-3);margin-top:4px}
+.duty-page-entry-actions{display:flex;gap:6px}
+.duty-page-editor{padding:10px;margin-top:10px;border:1px solid var(--line);border-radius:10px}
+.duty-page-editor h3{margin:0}
+.duty-field-editor{min-width:0;margin:0 0 9px;padding:10px;border:1px solid var(--line);border-radius:10px}
+.duty-field-heading,.duty-field-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:center}
+.duty-field-value{display:grid;gap:6px;margin:8px 0}
+.duty-field-heading input,.duty-field-heading select,.duty-field-value :is(input:not([type="checkbox"]),select,textarea){width:100%}
+.duty-field-choice-list label{display:flex;align-items:center;gap:5px}
+.duty-field-files{display:grid;gap:6px}
+.duty-field-files>div{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.duty-field-files img{width:44px;height:34px;border-radius:4px;object-fit:cover}
 .duty-tv-mode{overflow:hidden;background:#071a27}
 .duty-tv-mode :is(.side,.topbar,.mobile-nav,.duty-toolbar,.duty-manage){display:none!important}
 .duty-tv-mode .duty-shell{max-width:none}
@@ -800,6 +841,7 @@ html[data-ui-theme="golden"] .savepill .sz{color:#796B55}
   .duty-head{flex-wrap:wrap}
   .duty-head-actions{justify-content:flex-start}
   .duty-cards,.duty-manage{grid-template-columns:1fr}
+  .duty-custom-fields,.duty-field-heading{grid-template-columns:1fr}
   .duty-table :is(th,td){padding:8px}
   .duty-tv-mode .duty-stage{min-height:0}
 }
@@ -1931,12 +1973,19 @@ function isCommanderTransactionPage(page){
 }
 function countAdministrativeTransactions(rows,status){
   const totals={open:0,action:0,closed:0,other:0};
-  const stateKeys=new Map(Object.entries(ADMIN_TRANSACTION_STATES).map(([key,label])=>[label,key]));
   for(const row of rows){
-    const value=String(row?.v?.[status.id]??'').trim();
-    totals[stateKeys.get(value)||'other']++;
+    totals[administrativeTransactionState(row?.v?.[status.id])]++;
   }
   return totals;
+}
+const ADMIN_TRANSACTION_STATE_KEYS=new Map([
+  ['في مسارها','open'],['قيد المتابعة','open'],['قيد التنفيذ','open'],['قيد المراجعة','open'],
+  ['يتطلب اجراء','action'],['بانتظار اجراء','action'],['يحتاج اجراء','action'],
+  ['منتهية','closed'],['منتهي','closed'],['مغلقة','closed'],['مغلق','closed'],
+  ['مكتملة','closed'],['مكتمل','closed'],['تم الانجاز','closed'],['تم الاغلاق','closed']
+]);
+function administrativeTransactionState(value){
+  return ADMIN_TRANSACTION_STATE_KEYS.get(commanderFieldName(value))||'other';
 }
 function commanderAdministrativePages(){
   return (DB.pages||[]).filter(isCommanderTransactionPage);
@@ -2551,10 +2600,47 @@ function renderPromotionCalculator(){
 
 let dutyRotateTimer=null,dutyClockTimer=null,dutyRotationMs=0,dutySavePending=false;
 const DUTY_ANNOUNCEMENTS_ID='__duty_home_announcements__';
+const DUTY_SOURCE_LAYOUTS={table:'جدول',summary:'موجز',cards:'بطاقات'};
+const DUTY_PAGE_LAYOUTS={summary:'موجز',cards:'بطاقات',photo:'صورة بارزة'};
+const DUTY_FIELD_TYPES=new Map(TYPES.map(([type,label])=>[type,type==='phone'?'رقم تواصل إداري':label]));
+const DUTY_MEDIA_TYPES=new Set(['image','gallery','files']);
 const dutyTypeLabel=t=>({task:'مهمة',procedure:'إجراء',announcement:'تنبيه'}[t]||'بطاقة');
 const dutyCount=new Intl.NumberFormat('ar-SA');
 const dutyTime=new Intl.DateTimeFormat('ar-SA',{timeZone:'Asia/Riyadh',hour:'2-digit',minute:'2-digit'});
 const dutyDate=new Intl.DateTimeFormat('ar-SA',{timeZone:'Asia/Riyadh',weekday:'long',year:'numeric',month:'long',day:'numeric'});
+const dutyDayFormat=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Riyadh',calendar:'gregory',year:'numeric',month:'2-digit',day:'2-digit'});
+let dutyDay='',dutyClockMs=0;
+
+function dutyDateKey(value){
+  if(typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const date=value instanceof Date?value:toDate(value);
+  if(!date||Number.isNaN(+date)) return '';
+  const parts=dutyDayFormat.formatToParts(date);
+  return ['year','month','day'].map(type=>parts.find(part=>part.type===type).value).join('-');
+}
+
+function updateAdminClosure(page,row,nextValues){
+  if(!isCommanderTransactionPage(page)) return;
+  const status=commanderTransactionStatus(page);
+  const wasClosed=administrativeTransactionState(row.v?.[status.id])==='closed';
+  const isClosed=administrativeTransactionState(nextValues[status.id])==='closed';
+  if(isClosed&&!wasClosed) row.adminClosedAt={field:status.id,at:nowTs()};
+  else if(!isClosed) delete row.adminClosedAt;
+}
+
+function dutyCompletionColumn(page){
+  const labels=['تاريخ الانجاز','تاريخ الاغلاق','تاريخ الانهاء','تاريخ انجاز المعامله','تاريخ اغلاق المعامله','تاريخ اتمام المعامله'];
+  return page.cols.find(col=>col.type==='date'&&!col.hidden&&labels.includes(commanderFieldName(col.name).replace(/ة/g,'ه')));
+}
+
+function dutyCompletedToday(rows,source,day){
+  const column=dutyCompletionColumn(source.page);
+  return rows.filter(row=>{
+    if(administrativeTransactionState(row?.v?.[source.status.id])!=='closed') return false;
+    const recorded=row.adminClosedAt?.field===source.status.id?row.adminClosedAt.at:null;
+    return (dutyDateKey(column?row.v?.[column.id]:null)||dutyDateKey(recorded))===day;
+  }).length;
+}
 
 function dutySettings(){
   const settings=DB.dutyScreenSettings||{};
@@ -2565,7 +2651,9 @@ function dutySettings(){
     rotationSeconds:Number.isFinite(rotation)&&rotation>=8?Math.min(60,Math.round(rotation)):15,
     autoRotate:settings.autoRotate!==false,
     showClock:settings.showClock!==false,
+    showDate:settings.showDate??(settings.showClock!==false),
     showCards:settings.showCards!==false,
+    dailyDigest:settings.dailyDigest===true,
     tickerText:settings.tickerText??DB.ticker??'',
     sources:Array.isArray(settings.sources)?settings.sources:[]
   };
@@ -2573,6 +2661,47 @@ function dutySettings(){
 
 function dutyRows(){
   return Array.isArray(DB.dutyScreenItems)?DB.dutyScreenItems.filter(row=>row&&typeof row==='object'):[];
+}
+
+function dutyDisplayPages(){
+  return Array.isArray(DB.dutyDisplayPages)?DB.dutyDisplayPages.filter(page=>page&&typeof page.id==='string'&&typeof page.title==='string'):[];
+}
+
+function dutyImageSource(value){
+  return typeof value==='string'&&value.length<=450000&&/^data:image\/(?:webp|jpeg|png);base64,[a-z0-9+/]+={0,2}$/i.test(value)?value:'';
+}
+
+function dutyPdfSource(value){
+  return typeof value==='string'&&value.length<=700000&&/^data:application\/pdf;base64,JVBERi0[A-Za-z0-9+/]*={0,2}$/.test(value)?value:'';
+}
+
+function dutyReferencePages(){
+  return [GUIDE_ID,EXCEL_LIBRARY_ID].filter(id=>can(id,'view')).map(id=>pg(id))
+    .filter(page=>page&&(!page.lockMode||page.lockMode==='none'));
+}
+
+function dutyReferenceTitle(ref){
+  const page=dutyReferencePages().find(source=>source.id===ref?.pageId);
+  const row=page?.rows?.find(entry=>entry?.id===ref?.rowId);
+  return row?.title||'';
+}
+
+function dutyFieldOptions(text){
+  return [...new Set(String(text||'').split('\n').map(line=>line.trim()).filter(Boolean))].slice(0,20);
+}
+
+function dutyDisplayFields(page){
+  if(Array.isArray(page.fields)) return page.fields;
+  const fields=[];
+  const add=(label,type,value)=>fields.push({label,type,value,visible:true});
+  if(Number.isSafeInteger(page.count)) add(page.countLabel||'العدد','number',page.count);
+  if(page.date) add('التاريخ','date',page.date);
+  if(page.summary) add('الموجز الإداري','longtext',page.summary);
+  for(const card of Array.isArray(page.cards)?page.cards:[]){
+    if(card?.title||card?.text) add(card.title||'بطاقة','longtext',card.text||'');
+  }
+  if(dutyImageSource(page.image)) add('صورة العرض','image',[{data:page.image,name:page.imageAlt||'صورة العرض'}]);
+  return fields;
 }
 
 function dutySources(){
@@ -2586,7 +2715,9 @@ function dutySources(){
       return {id:page.id,name:page.name,page,fields:{total:'عدد النماذج',title:'اسم النموذج',updated:'تاريخ التحديث'}};
     }
     const status=commanderTransactionStatus(page);
-    const fields=status&&!status.hidden?{total:'إجمالي المعاملات',...ADMIN_TRANSACTION_STATES}:{total:'إجمالي المعاملات'};
+    const fields=status&&!status.hidden?{
+      total:'إجمالي المعاملات',closedToday:'المنتهية اليوم',following:'المعاملات قيد المتابعة',...ADMIN_TRANSACTION_STATES
+    }:{total:'إجمالي المعاملات'};
     return {id:page.id,name:page.name,page,status,fields};
   });
   sources.push({id:DUTY_ANNOUNCEMENTS_ID,name:'إعلانات المنظومة',fields:{total:'عدد الإعلانات',title:'عنوان الإعلان'}});
@@ -2605,7 +2736,7 @@ function dutySelectedFields(source, fields){
   return Array.isArray(fields)?Object.keys(source.fields).filter(field=>fields.includes(field)):[];
 }
 
-function dutySourceData(source,selection){
+function dutySourceData(source,selection,day){
   if(dutySourceIssue(source)) return null;
   const fields=dutySelectedFields(source,selection);
   if(!fields.length) return null;
@@ -2616,8 +2747,13 @@ function dutySourceData(source,selection){
   if(source.status){
     const states=fields.filter(field=>field!=='total');
     if(states.length){
-      const totals=countAdministrativeTransactions(rows,source.status);
-      states.forEach(field=>stats.push({label:source.fields[field],value:totals[field]}));
+      const totals=states.some(field=>field!=='closedToday')?countAdministrativeTransactions(rows,source.status):{};
+      states.forEach(field=>{
+        let value=totals[field];
+        if(field==='closedToday') value=dutyCompletedToday(rows,source,day);
+        if(field==='following') value=totals.open+totals.action;
+        stats.push({label:source.fields[field],value});
+      });
     }
     return {stats,columns:[],rows:[]};
   }
@@ -2640,20 +2776,34 @@ function dutySourceData(source,selection){
   return {stats,columns,rows:tableRows};
 }
 
-function buildDutySlides(settings,items){
+function buildDutySlides(settings,items,day=dutyDateKey(new Date())){
   const sources=new Map(dutySources().map(source=>[source.id,source]));
-  const slides=[],seen=new Set();
+  const slides=[],digest=[],seen=new Set();
   for(const selection of settings.sources){
     const id=selection?.id;
     if(seen.has(id)) continue;
     const source=sources.get(id);
-    const data=dutySourceData(source,selection?.fields);
+    const data=dutySourceData(source,selection?.fields,day);
     if(!data) continue;
     seen.add(id);
     const {stats,columns,rows}=data;
-    for(let start=0;start<Math.max(1,rows.length);start+=6){
-      slides.push({kind:'source',key:`source:${id}:${start}`,title:source.name,stats,columns,rows:rows.slice(start,start+6)});
+    if(settings.dailyDigest&&source.status&&stats.length) digest.push({title:source.name,stats});
+    const layout=Object.hasOwn(DUTY_SOURCE_LAYOUTS,selection.layout)?selection.layout:'table';
+    const size=layout==='table'?6:4;
+    for(let start=0;start<Math.max(1,rows.length);start+=size){
+      slides.push({kind:'source',key:`source:${id}:${start}`,title:source.name,layout,stats,columns,rows:rows.slice(start,start+size)});
     }
+  }
+
+  if(settings.dailyDigest){
+    const digestSlides=[];
+    for(let start=0;start<Math.max(1,digest.length);start+=4){
+      digestSlides.push({kind:'digest',key:`digest:${start}`,rows:digest.slice(start,start+4)});
+    }
+    slides.unshift(...digestSlides);
+  }
+  for(const page of dutyDisplayPages()){
+    if(page.enabled===true) slides.push({kind:'custom',key:`custom:${page.id}`,page});
   }
 
   if(settings.showCards){
@@ -2686,6 +2836,269 @@ async function saveDutyChange(property,next,action,detail){
     }
     dutySavePending=false;
   }
+}
+
+function openDutyDisplayPages(){
+  if(!isAdmin()) return;
+  const pages=dutyDisplayPages();
+  modal('صفحات عرض الدوام',`
+    <div class="duty-page-list">${pages.map(page=>`
+      <article class="duty-page-entry">
+        <div><strong>${esc(page.title)}</strong><small>${esc(DUTY_PAGE_LAYOUTS[page.layout]||DUTY_PAGE_LAYOUTS.summary)} · ${page.enabled===true?'ظاهرة في العرض':'مخفية'}</small></div>
+        <div class="duty-page-entry-actions">
+          <button type="button" class="btn ghost sm" data-duty-custom-edit="${esc(page.id)}">تعديل</button>
+          <button type="button" class="btn danger sm" data-duty-custom-delete="${esc(page.id)}">حذف</button>
+        </div>
+      </article>`).join('')||'<p class="hint">أنشئ أول صفحة عرض وأضف إليها المحتوى الذي تختاره.</p>'}</div>`,
+    '<button type="button" class="btn primary" id="dutyCustomAdd">إنشاء صفحة عرض</button><button type="button" class="btn ghost" onclick="closeModal()">إغلاق</button>','lg');
+  $('#dutyCustomAdd').onclick=()=>editDutyDisplayPage();
+  $('#mdl').querySelectorAll('[data-duty-custom-edit]').forEach(button=>{
+    button.onclick=()=>editDutyDisplayPage(button.dataset.dutyCustomEdit);
+  });
+  $('#mdl').querySelectorAll('[data-duty-custom-delete]').forEach(button=>{
+    button.onclick=()=>{
+      const page=dutyDisplayPages().find(item=>item.id===button.dataset.dutyCustomDelete);
+      if(!page||!isAdmin()) return;
+      ask(`حذف صفحة العرض «${esc(page.title)}»؟`,async()=>{
+        if(!isAdmin()||dutySavePending) return;
+        const rows=dutyDisplayPages();
+        const next=rows.filter(item=>item.id!==page.id);
+        if(rows.length===next.length) return;
+        if(!await saveDutyChange('dutyDisplayPages',next,'حذف صفحة عرض',page.title)) return toast('تعذّر حذف الصفحة','err');
+        renderDutyScreen();
+        openDutyDisplayPages();
+        toast('حُذفت صفحة العرض');
+      },'حذف');
+    };
+  });
+}
+
+function dutyFieldValueHTML(field,references){
+  const {type,value}=field;
+  if(DUTY_MEDIA_TYPES.has(type)){
+    const files=Array.isArray(value)?value:[];
+    const accept=(type==='files'?'application/pdf,':'')+'image/jpeg,image/png,image/webp';
+    return `<label>الملفات <input type="file" data-field-files accept="${accept}" ${type==='image'?'':'multiple'}></label>
+      <div class="duty-field-files">${files.map((file,index)=>`<div>${dutyImageSource(file?.data)?`<img src="${esc(file.data)}" alt="">`:''}<span>${esc(file?.name)}</span><button type="button" class="btn ghost sm" data-remove-file="${index}">إزالة</button></div>`).join('')}</div>
+      <p class="hint" role="status" data-field-file-status></p>`;
+  }
+  if(type==='link'){
+    return `<label>سجل إداري <select data-field-reference><option value="">بدون ربط</option>${references.map((ref,index)=>`<option value="${index}" ${ref.pageId===value?.pageId&&ref.rowId===value?.rowId?'selected':''}>${esc(ref.label)}</option>`).join('')}</select></label>`;
+  }
+  if(type==='select'||type==='multiselect'){
+    return `<label>الخيارات (خيار لكل سطر)<textarea rows="3" maxlength="900" data-field-options>${esc(field.options||'')}</textarea></label><div data-field-choices></div>`;
+  }
+  if(type==='longtext'||type==='list'){
+    return `<label>${type==='list'?'البنود (بند لكل سطر)':'القيمة'} <textarea rows="3" maxlength="900" data-field-value>${esc(value??'')}</textarea></label>`;
+  }
+  const inputType={number:'number',date:'date',phone:'tel'}[type]||'text';
+  const extras=type==='number'?'step="any"':type==='hijri'?'inputmode="numeric" placeholder="1448/06/02"':'';
+  return `<label>القيمة <input type="${inputType}" maxlength="160" ${extras} value="${esc(value??'')}" data-field-value></label>`;
+}
+
+function editDutyFields(page,saveButton){
+  const fields=dutyDisplayFields(page).filter(field=>field&&DUTY_FIELD_TYPES.has(field.type)).map(field=>({
+    ...field,options:Array.isArray(field.options)?field.options.join('\n'):String(field.options||'')
+  }));
+  const list=$('#dpFields'),add=$('#dpAddField');
+  const references=dutyReferencePages().flatMap(page=>(Array.isArray(page.rows)?page.rows:[])
+    .filter(row=>row?.id&&row.title).map(row=>({pageId:page.id,rowId:row.id,label:`${page.name} — ${row.title}`})));
+  let pending=0;
+  const updateButtons=()=>{
+    add.disabled=fields.length>=16;
+    saveButton.disabled=pending>0;
+  };
+
+  function draw(){
+    list.innerHTML=fields.map((field,index)=>`<fieldset class="duty-field-editor" data-duty-field="${index}">
+      <div class="duty-field-heading"><label>اسم الحقل <input data-field-label maxlength="80" value="${esc(field.label||'')}"></label>
+        <label>نوع الحقل <select data-field-type>${[...DUTY_FIELD_TYPES].map(([key,label])=>`<option value="${key}" ${key===field.type?'selected':''}>${label}</option>`).join('')}</select></label>
+      </div>
+      <div class="duty-field-value">${dutyFieldValueHTML(field,references)}</div>
+      <div class="duty-field-actions"><label class="ck"><input type="checkbox" data-field-visible ${field.visible!==false?'checked':''}> إظهار الحقل</label>
+        <button type="button" class="btn ghost sm" data-remove-field>حذف الحقل</button></div>
+    </fieldset>`).join('');
+    updateButtons();
+
+    list.querySelectorAll('[data-duty-field]').forEach(group=>{
+      const index=Number(group.dataset.dutyField);
+      const field=fields[index];
+      group.querySelector('[data-field-label]').oninput=e=>{field.label=e.target.value};
+      group.querySelector('[data-field-visible]').onchange=e=>{field.visible=e.target.checked};
+      group.querySelector('[data-field-type]').onchange=e=>{
+        field.type=e.target.value;
+        field.value=DUTY_MEDIA_TYPES.has(field.type)||field.type==='multiselect'?[]:'';
+        draw();
+      };
+      group.querySelector('[data-remove-field]').onclick=()=>{fields.splice(index,1);draw()};
+      const input=group.querySelector('[data-field-value]');
+      if(input) input.oninput=e=>{field.value=e.target.value};
+      const reference=group.querySelector('[data-field-reference]');
+      if(reference) reference.onchange=e=>{
+        const selection=e.target.value===''?null:references[Number(e.target.value)];
+        field.value=selection?{pageId:selection.pageId,rowId:selection.rowId}:null;
+      };
+      const options=group.querySelector('[data-field-options]');
+      if(options){
+        const choices=group.querySelector('[data-field-choices]');
+        const paint=()=>{
+          const labels=dutyFieldOptions(field.options);
+          if(field.type==='multiselect'){
+            const selected=Array.isArray(field.value)?field.value:[];
+            choices.innerHTML=`<div class="duty-field-choice-list">${labels.map((label,i)=>`<label><input type="checkbox" data-choice="${i}" ${selected.includes(label)?'checked':''}> ${esc(label)}</label>`).join('')}</div>`;
+            choices.onchange=()=>{field.value=Array.from(choices.querySelectorAll('[data-choice]:checked'),el=>labels[Number(el.dataset.choice)])};
+          }else{
+            choices.innerHTML=`<label>الاختيار <select data-choice-value><option value="">بدون اختيار</option>${labels.map((label,i)=>`<option value="${i}" ${label===field.value?'selected':''}>${esc(label)}</option>`).join('')}</select></label>
+              <label>اللون <select data-choice-color>${COLORS.map(([key,label])=>`<option value="${key}" ${key===(field.color||'slate')?'selected':''}>${label}</option>`).join('')}</select></label>`;
+            choices.querySelector('[data-choice-value]').onchange=e=>{field.value=e.target.value===''?'':labels[Number(e.target.value)]};
+            choices.querySelector('[data-choice-color]').onchange=e=>{field.color=e.target.value};
+          }
+        };
+        options.oninput=e=>{field.options=e.target.value;paint()};
+        paint();
+      }
+      const fileInput=group.querySelector('[data-field-files]');
+      if(!fileInput) return;
+      group.querySelectorAll('[data-remove-file]').forEach(button=>{
+        button.onclick=()=>{field.value=field.value.filter((_,i)=>i!==Number(button.dataset.removeFile));draw()};
+      });
+      fileInput.onchange=async()=>{
+        const type=field.type;
+        const files=Array.from(fileInput.files);
+        if(!files.length) return;
+        const oldFiles=Array.isArray(field.value)?field.value:[];
+        const room=type==='image'?1:4-oldFiles.length;
+        const status=group.querySelector('[data-field-file-status]');
+        if(files.length>room){
+          status.textContent='الحد لهذا الحقل أربع مرفقات، أو صورة واحدة في حقل الصورة.';
+          fileInput.value='';
+          return;
+        }
+        pending++;
+        fileInput.disabled=true;
+        updateButtons();
+        status.textContent='جارٍ تجهيز المرفقات…';
+        try{
+          const prepared=[];
+          for(const file of files){
+            const pdf=type==='files'&&file.type==='application/pdf';
+            if(!pdf&&!['image/jpeg','image/png','image/webp'].includes(file.type)) throw Error('نوع الملف غير مدعوم.');
+            if(file.size>(pdf?500*1024:8*1024*1024)) throw Error(pdf?'حجم PDF يجب ألا يتجاوز ٥٠٠ ك.ب.':'حجم الصورة يجب ألا يتجاوز ٨ م.ب.');
+            const data=pdf?dutyPdfSource(await readAsDataURL(file)):dutyImageSource(await prepareWelcomeImage(file));
+            if(!data) throw Error('تعذّر تجهيز الملف. جرّب ملفًا أصغر.');
+            const name=pdf?file.name.replace(/\.pdf$/i,'').slice(0,96)+'.pdf':file.name.slice(0,100);
+            prepared.push({name,data});
+          }
+          if(list.isConnected&&fields.includes(field)&&field.type===type){
+            field.value=type==='image'?prepared:[...oldFiles,...prepared];
+            draw();
+          }
+        }catch(error){
+          status.textContent=error.message||'تعذّر تجهيز المرفقات.';
+        }finally{
+          pending--;
+          fileInput.value='';
+          fileInput.disabled=false;
+          if(list.isConnected) updateButtons();
+        }
+      };
+    });
+  }
+
+  add.onclick=()=>{
+    if(fields.length>=16) return;
+    fields.push({label:'',type:'text',value:'',options:'',visible:true});
+    draw();
+    list.lastElementChild?.querySelector('[data-field-label]')?.focus();
+  };
+  draw();
+  return ()=>{
+    let mediaSize=0;
+    const clean=[];
+    for(const [index,field] of fields.entries()){
+      const label=String(field.label||'').trim();
+      const group=list.querySelector(`[data-duty-field="${index}"]`);
+      if(!label){group.querySelector('[data-field-label]').focus();throw Error('اكتب اسمًا لكل حقل أضفته.')}
+      const {type}=field;
+      let value=field.value;
+      const options=dutyFieldOptions(field.options);
+      if(type==='number'){
+        const input=group.querySelector('[data-field-value]');
+        if(!input.checkValidity()){input.reportValidity();throw Error('أدخل عددًا صحيح الصيغة.')}
+        value=value==null||value===''?null:Number(value);
+      }else if(type==='select'){
+        value=options.includes(value)?value:'';
+      }else if(type==='multiselect'){
+        value=Array.isArray(value)?value.filter(item=>options.includes(item)):[];
+      }else if(DUTY_MEDIA_TYPES.has(type)){
+        value=Array.isArray(value)?value.filter(file=>dutyImageSource(file?.data)||(type==='files'&&dutyPdfSource(file?.data))):[];
+        mediaSize+=value.reduce((sum,file)=>sum+file.data.length,0);
+      }else if(type!=='link'){
+        value=String(value??'').trim();
+        if(type==='hijri'&&value&&!hijriToGregorian(value)){
+          group.querySelector('[data-field-value]').focus();
+          throw Error('أدخل تاريخًا هجريًا صحيحًا بصيغة سنة/شهر/يوم.');
+        }
+      }
+      const result={label,type,visible:field.visible!==false,value};
+      if(type==='select'||type==='multiselect') result.options=options;
+      if(type==='select'&&COLORS.some(([color])=>color===field.color)) result.color=field.color;
+      clean.push(result);
+    }
+    if(mediaSize>1600000) throw Error('مرفقات الصفحة كبيرة. احذف بعض المرفقات أو استخدم ملفات أصغر.');
+    return clean;
+  };
+}
+
+function editDutyDisplayPage(id){
+  if(!isAdmin()) return;
+  const original=dutyDisplayPages().find(page=>page.id===id);
+  if(id&&!original) return toast('صفحة العرض غير موجودة','err');
+  const page=original||{};
+  modal(original?'تعديل صفحة عرض':'إنشاء صفحة عرض',`
+    <div class="grid2">
+      <div class="fld"><label for="dpTitle">عنوان الصفحة *</label><input id="dpTitle" maxlength="100" value="${esc(page.title||'')}"></div>
+      <div class="fld"><label for="dpLayout">القالب</label><select id="dpLayout">${Object.entries(DUTY_PAGE_LAYOUTS).map(([value,label])=>`<option value="${value}" ${value===page.layout?'selected':''}>${label}</option>`).join('')}</select></div>
+      <label class="ck"><input id="dpEnabled" type="checkbox" ${page.enabled===true?'checked':''}> إظهار الصفحة في شاشة الدوام</label>
+    </div>
+    <section class="duty-page-editor" aria-labelledby="dpFieldsTitle">
+      <h3 id="dpFieldsTitle">حقول العرض</h3>
+      <p class="hint">أضف الحقول التي تحتاجها واختر نوع كل حقل. يمكنك إخفاء أي حقل دون حذفه.</p>
+      <div id="dpFields"></div>
+      <button type="button" class="btn ghost" id="dpAddField">إضافة حقل</button>
+    </section>`,
+    '<button class="btn primary" id="dpSave">حفظ صفحة العرض</button><button type="button" class="btn ghost" id="dpBack">العودة للصفحات</button>','lg');
+
+  const saveButton=$('#dpSave'),backButton=$('#dpBack');
+  const collect=editDutyFields(page,saveButton);
+  backButton.onclick=openDutyDisplayPages;
+  saveButton.onclick=async()=>{
+    if(!isAdmin()||dutySavePending) return;
+    const title=$('#dpTitle').value.trim();
+    if(!title){$('#dpTitle').focus();return toast('أدخل عنوان صفحة العرض','err')}
+    let fields;
+    try{fields=collect()}catch(error){return toast(error.message,'err')}
+    const next={id:id||uid(),title,layout:$('#dpLayout').value,enabled:$('#dpEnabled').checked,fields,updated:nowTs()};
+    const pages=dutyDisplayPages();
+    if(original&&!pages.some(item=>item.id===id&&item.updated===original.updated)){
+      return toast('تغيّرت الصفحة. أعد فتحها قبل الحفظ.','err');
+    }
+    saveButton.disabled=true;
+    backButton.disabled=true;
+    const updated=original?pages.map(item=>item.id===id?next:item):[...pages,next];
+    const ok=await saveDutyChange('dutyDisplayPages',updated,original?'تعديل صفحة عرض':'إنشاء صفحة عرض',title);
+    if(saveButton.isConnected){saveButton.disabled=false;backButton.disabled=false}
+    if(!ok) return toast('تعذّر حفظ صفحة العرض','err');
+    if(isDutyScreenActive()){
+      if(next.enabled) U().dutySlideKey=`custom:${next.id}`;
+      renderDutyScreen();
+    }
+    if(saveButton.isConnected){
+      if(next.enabled) closeModal();
+      else openDutyDisplayPages();
+    }
+    toast('حُفظت صفحة العرض');
+  };
 }
 
 function openDutyItem(id){
@@ -2733,17 +3146,19 @@ function openDutySettings(){
   if(!isAdmin()) return;
   const settings=dutySettings();
   const sources=dutySources();
-  const saved=new Map(settings.sources.filter(entry=>entry&&typeof entry.id==='string').map(entry=>[entry.id,entry.fields]));
+  const saved=new Map(settings.sources.filter(entry=>entry&&typeof entry.id==='string').map(entry=>[entry.id,entry]));
   const order=new Map([...saved.keys()].map((id,index)=>[id,index]));
   sources.sort((a,b)=>(order.get(a.id)??Infinity)-(order.get(b.id)??Infinity));
   const sourceOptions=sources.map(source=>{
-    const fields=dutySelectedFields(source,saved.get(source.id));
+    const selection=saved.get(source.id);
+    const fields=dutySelectedFields(source,selection?.fields);
     const issue=dutySourceIssue(source);
     return `<fieldset class="duty-source-choice" data-source-id="${esc(source.id)}">
       <label class="duty-source-name"><input type="checkbox" data-source-enabled ${fields.length?'checked':''} ${issue&&!fields.length?'disabled':''}> <b>${esc(source.name)}</b></label>
       ${issue?`<p class="hint">${esc(issue)}</p>`:''}
       <div class="duty-source-fields" ${fields.length?'':'hidden'}>
         ${Object.entries(source.fields).map(([key,label])=>`<label><input type="checkbox" data-source-field="${key}" ${fields.includes(key)?'checked':''} ${issue?'disabled':''}> ${esc(label)}</label>`).join('')}
+        <label class="duty-layout-picker">قالب العرض <select data-source-layout ${issue?'disabled':''}>${Object.entries(DUTY_SOURCE_LAYOUTS).map(([key,label])=>`<option value="${key}" ${key===selection?.layout?'selected':''}>${label}</option>`).join('')}</select></label>
       </div>
     </fieldset>`;
   }).join('');
@@ -2755,12 +3170,14 @@ function openDutySettings(){
     </div>
     <section class="duty-source-settings" aria-labelledby="dsSourcesTitle">
       <h3 id="dsSourcesTitle">الصفحات والبيانات المعروضة</h3>
-      <p class="hint">حدّد الصفحة، ثم ضع علامة بجانب البيانات التي تريد عرضها منها.</p>
+      <p class="hint">اختر أي صفحة وحقولها وقالبها. تظهر الصفحة عند تحديد حقل واحد على الأقل.</p>
       <div id="dsSources">${sourceOptions}</div>
     </section>
     <div class="grid2 duty-display-settings">
       <label class="ck"><input id="dsCards" type="checkbox" ${settings.showCards?'checked':''}> إظهار بطاقات المهام والتنبيهات</label>
-      <label class="ck"><input id="dsClock" type="checkbox" ${settings.showClock?'checked':''}> إظهار الساعة والتاريخ</label>
+      <label class="ck"><input id="dsDigest" type="checkbox" ${settings.dailyDigest?'checked':''}> إيجاز العمل اليوم من المعاملات المختارة</label>
+      <label class="ck"><input id="dsClock" type="checkbox" ${settings.showClock?'checked':''}> إظهار الساعة</label>
+      <label class="ck"><input id="dsDate" type="checkbox" ${settings.showDate?'checked':''}> إظهار التاريخ</label>
       <label class="ck"><input id="dsAutoRotate" type="checkbox" ${settings.autoRotate?'checked':''}> تدوير الشرائح في وضع التلفزيون</label>
       <div class="fld"><label for="dsRotation">مدة عرض الشريحة بالثواني</label><input id="dsRotation" type="number" min="8" max="60" step="1" value="${settings.rotationSeconds}"></div>
       <div class="fld full"><label for="dsTicker">نص الشريط السفلي (اختياري)</label><textarea id="dsTicker" rows="2" maxlength="500">${esc(settings.tickerText)}</textarea></div>
@@ -2785,11 +3202,7 @@ function openDutySettings(){
       if(!group.querySelector('[data-source-enabled]').checked) continue;
       const source=sources.find(option=>option.id===group.dataset.sourceId);
       const fields=Array.from(group.querySelectorAll('[data-source-field]:checked'),field=>field.dataset.sourceField);
-      if(!fields.length){
-        group.querySelector('[data-source-field]:not(:disabled)')?.focus();
-        return toast(`اختر البيانات التي تريد عرضها من «${source.name}» أو أزل تحديد الصفحة.`,'err');
-      }
-      selections.push({id:source.id,fields});
+      if(fields.length) selections.push({id:source.id,fields,layout:group.querySelector('[data-source-layout]').value});
     }
 
     const next={
@@ -2798,7 +3211,9 @@ function openDutySettings(){
       subtitle:$('#dsSubtitle').value.trim(),
       sources:selections,
       showCards:$('#dsCards').checked,
+      dailyDigest:$('#dsDigest').checked,
       showClock:$('#dsClock').checked,
+      showDate:$('#dsDate').checked,
       autoRotate:autoRotate.checked,
       rotationSeconds:Math.max(8,Math.min(60,Math.round(Number(rotation.value)||15))),
       tickerText:$('#dsTicker').value.trim()
@@ -2833,6 +3248,8 @@ function stopDutyDisplay(){
   dutyRotateTimer=null;
   dutyClockTimer=null;
   dutyRotationMs=0;
+  dutyClockMs=0;
+  dutyDay='';
   const wasTV=isDutyTV();
   if(wasTV){
     document.body.classList.remove('duty-tv-mode');
@@ -2862,10 +3279,13 @@ function dutyExitTV(){
 
 function updateDutyClock(){
   const clock=$('#dutyClock'),date=$('#dutyDate');
-  if(!clock||!date) return;
   const now=new Date();
-  clock.textContent=dutyTime.format(now);
-  date.textContent=dutyDate.format(now);
+  if(dutyDay&&dutyDateKey(now)!==dutyDay){
+    if(isDutyScreenActive()) renderDutyScreen();
+    return;
+  }
+  if(clock) clock.textContent=dutyTime.format(now);
+  if(date) date.textContent=dutyDate.format(now);
 }
 
 function moveDutySlide(direction,focusId){
@@ -2879,13 +3299,13 @@ function moveDutySlide(direction,focusId){
 }
 
 function syncDutyTimers(settings,slides){
-  if(settings.showClock){
-    updateDutyClock();
-    if(dutyClockTimer===null) dutyClockTimer=setInterval(updateDutyClock,1000);
-  }else{
+  const clockInterval=settings.showClock?1000:30000;
+  if(dutyClockMs!==clockInterval){
     clearInterval(dutyClockTimer);
-    dutyClockTimer=null;
+    dutyClockTimer=setInterval(updateDutyClock,clockInterval);
+    dutyClockMs=clockInterval;
   }
+  updateDutyClock();
 
   const interval=isDutyTV()&&settings.autoRotate&&slides>1?settings.rotationSeconds*1000:0;
   if(dutyRotationMs===interval) return;
@@ -2901,6 +3321,78 @@ function syncDutyTimers(settings,slides){
       if(!document.hidden&&!$('#ov')?.classList.contains('on')) moveDutySlide(1);
     },interval);
   }
+}
+
+function renderDutyMetrics(stats,layout='cards'){
+  if(!stats.length) return '';
+  const compact=layout==='summary'?' duty-summary-compact':'';
+  return `<dl class="duty-summary${compact}">${stats.map(metric=>`<div class="duty-kpi"><dd>${dutyCount.format(metric.value)}</dd><dt>${esc(metric.label)}</dt></div>`).join('')}</dl>`;
+}
+
+function renderDutyFieldValue(field){
+  const {type,value}=field;
+  if(type==='number') return typeof value==='number'&&Number.isFinite(value)?dutyCount.format(value):'';
+  if(type==='date'){
+    const date=dutyDateKey(value);
+    return date?`<time datetime="${esc(date)}">${esc(fmtG(date))}</time>`:'';
+  }
+  if(type==='link') return esc(dutyReferenceTitle(value));
+  if(type==='select'){
+    const color=COLORS.some(([key])=>key===field.color)?field.color:'slate';
+    return value?`<span class="badge b-${color}">${esc(value)}</span>`:'';
+  }
+  if(type==='multiselect'){
+    return Array.isArray(value)&&value.length?`<div class="duty-field-chip-list">${value.map(option=>`<span class="badge b-gold">${esc(option)}</span>`).join('')}</div>`:'';
+  }
+  if(type==='list'){
+    const items=dutyFieldOptions(value);
+    return items.length?`<ul class="duty-field-bullets">${items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`:'';
+  }
+  if(DUTY_MEDIA_TYPES.has(type)){
+    const files=Array.isArray(value)?value:[];
+    const attachments=files.map(file=>{
+      const image=dutyImageSource(file?.data);
+      if(image) return `<figure class="duty-custom-photo"><img src="${esc(image)}" alt="${esc(file.name||field.label)}" decoding="async"></figure>`;
+      const pdf=type==='files'?dutyPdfSource(file?.data):'';
+      if(!pdf) return '';
+      const name=esc(file.name||'مستند.pdf');
+      return canExport()?`<a class="duty-screen-btn duty-file-link" href="${esc(pdf)}" download="${name}">${name}</a>`:`<span>${name}</span>`;
+    }).filter(Boolean);
+    return attachments.length?`<div class="duty-field-media">${attachments.join('')}</div>`:'';
+  }
+  return typeof value==='string'?esc(value):'';
+}
+
+function renderDutyCustomPage(page){
+  const layout=Object.hasOwn(DUTY_PAGE_LAYOUTS,page.layout)?page.layout:'summary';
+  const fields=dutyDisplayFields(page).filter(field=>field?.visible!==false&&DUTY_FIELD_TYPES.has(field?.type));
+  const contents=fields.map(field=>{
+    const value=renderDutyFieldValue(field);
+    if(!value) return '';
+    const wide=DUTY_MEDIA_TYPES.has(field.type)||['longtext','list'].includes(field.type);
+    return `<div class="duty-custom-field${wide?' duty-custom-field-wide':''}" data-type="${field.type}">
+      <dt>${esc(field.label)}</dt><dd>${value}</dd>
+    </div>`;
+  }).join('');
+  return `<section class="duty-custom-slide" data-layout="${layout}">
+    <div class="duty-slide-title"><h3>${esc(page.title)}</h3></div>
+    ${contents?`<dl class="duty-custom-fields">${contents}</dl>`:'<p class="duty-panel-empty">لا توجد حقول معروضة في هذه الصفحة.</p>'}
+  </section>`;
+}
+
+function renderDutySourceRows(slide){
+  if(!slide.columns.length) return '';
+  if(!slide.rows.length) return '<p class="duty-panel-empty">لا توجد بيانات في الحقول المحددة.</p>';
+  if(slide.layout==='summary'){
+    return `<ul class="duty-brief-list">${slide.rows.map(row=>`<li>${row.map((value,index)=>value?`<span><b>${esc(slide.columns[index])}</b> ${esc(value)}</span>`:'').join('')}</li>`).join('')}</ul>`;
+  }
+  if(slide.layout==='cards'){
+    return `<div class="duty-cards">${slide.rows.map(row=>`<dl class="duty-card duty-record-card">${row.map((value,index)=>value?`<div><dt>${esc(slide.columns[index])}</dt><dd>${esc(value)}</dd></div>`:'').join('')}</dl>`).join('')}</div>`;
+  }
+  return `<div class="duty-table-wrap"><table class="duty-table" aria-label="${esc(slide.title)}">
+    <thead><tr>${slide.columns.map(column=>`<th scope="col">${esc(column)}</th>`).join('')}</tr></thead>
+    <tbody>${slide.rows.map(row=>`<tr>${row.map(value=>`<td>${esc(value||'—')}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>`;
 }
 
 function renderDutySlide(slide){
@@ -2920,19 +3412,26 @@ function renderDutySlide(slide){
           ${item.priority==='high'?'<span>أولوية عالية</span>':''}</div>
       </article>`).join('')}</div>`;
   }
+  if(slide.kind==='custom') return renderDutyCustomPage(slide.page);
+  if(slide.kind==='digest'){
+    return `<section class="duty-digest-slide">
+      <div class="duty-slide-title"><h3>إيجاز العمل اليوم</h3></div>
+      ${slide.rows.length?`<div class="duty-cards">${slide.rows.map(row=>`<article class="duty-card">
+        <h4>${esc(row.title)}</h4>${renderDutyMetrics(row.stats,'summary')}
+      </article>`).join('')}</div>`:'<p class="duty-panel-empty">لا توجد مؤشرات معاملات مختارة للإيجاز.</p>'}
+    </section>`;
+  }
   return `<section class="duty-source-slide">
     <div class="duty-slide-title"><h3>${esc(slide.title)}</h3></div>
-    ${slide.stats.length?`<dl class="duty-summary">${slide.stats.map(metric=>`<div class="duty-kpi"><dd>${dutyCount.format(metric.value)}</dd><dt>${esc(metric.label)}</dt></div>`).join('')}</dl>`:''}
-    ${slide.columns.length?(slide.rows.length?`<div class="duty-table-wrap"><table class="duty-table" aria-label="${esc(slide.title)}">
-      <thead><tr>${slide.columns.map(column=>`<th scope="col">${esc(column)}</th>`).join('')}</tr></thead>
-      <tbody>${slide.rows.map(row=>`<tr>${row.map(value=>`<td>${esc(value||'—')}</td>`).join('')}</tr>`).join('')}</tbody>
-    </table></div>`:'<p class="duty-panel-empty">لا توجد بيانات في الحقول المحددة.</p>'):''}
+    ${renderDutyMetrics(slide.stats,slide.layout)}
+    ${renderDutySourceRows(slide)}
   </section>`;
 }
 
 function renderDutyScreen({slideOnly=false}={}){
   if(!isDutyScreenActive()) return;
-  const state=U(),settings=dutySettings(),items=dutyRows(),slides=buildDutySlides(settings,items);
+  dutyDay=dutyDateKey(new Date());
+  const state=U(),settings=dutySettings(),items=dutyRows(),slides=buildDutySlides(settings,items,dutyDay);
   const savedIndex=slides.findIndex(slide=>slide.key===state.dutySlideKey);
   const index=savedIndex>=0?savedIndex:Math.min(Math.max(0,state.dutySlide||0),slides.length-1);
   const slide=slides[index];
@@ -2965,13 +3464,14 @@ function renderDutyScreen({slideOnly=false}={}){
     <div class="duty-toolbar"><div class="duty-toolbar-actions">
       <button class="btn primary" id="dutyTV" type="button">عرض التلفزيون</button>
       ${canEdit?'<button class="btn ghost" id="dutyAdd" type="button">إضافة بطاقة</button>':''}
+      ${isAdmin()?'<button class="btn ghost" id="dutyDisplayPages" type="button">صفحات العرض</button>':''}
       ${isAdmin()?'<button class="btn ghost" id="dutySettings" type="button">إعدادات الشاشة</button>':''}
     </div></div>
     <section class="duty-stage" id="dutyStage">
       <header class="duty-head">
         <div class="duty-brand"><h2>${esc(settings.title)}</h2>${settings.subtitle?`<p>${esc(settings.subtitle)}</p>`:''}</div>
         <div class="duty-head-actions">
-          ${settings.showClock?'<div class="duty-clock"><b id="dutyClock"></b><span id="dutyDate"></span></div>':''}
+          ${settings.showClock||settings.showDate?`<div class="duty-clock">${settings.showClock?'<b id="dutyClock"></b>':''}${settings.showDate?'<span id="dutyDate"></span>':''}</div>`:''}
           ${isDutyTV()?'<button class="duty-screen-btn" id="dutyExit" type="button">إنهاء العرض</button>':''}
         </div>
       </header>
@@ -2988,6 +3488,7 @@ function renderDutyScreen({slideOnly=false}={}){
   $('#dutyTV').onclick=dutyEnterTV;
   if($('#dutyExit')) $('#dutyExit').onclick=dutyExitTV;
   if($('#dutyAdd')) $('#dutyAdd').onclick=()=>openDutyItem();
+  if($('#dutyDisplayPages')) $('#dutyDisplayPages').onclick=openDutyDisplayPages;
   if($('#dutySettings')) $('#dutySettings').onclick=openDutySettings;
   if($('#dutyPrev')) $('#dutyPrev').onclick=()=>moveDutySlide(-1,'#dutyPrev');
   if($('#dutyNext')) $('#dutyNext').onclick=()=>moveDutySlide(1,'#dutyNext');
@@ -3657,8 +4158,11 @@ async function saveRow(rid){
   const oldRows=JSON.parse(JSON.stringify(p.rows)), oldAudit=(DB.audit||[]).slice();
   if(rid){ const r=p.rows.find(x=>x.id===rid);
     if(p.logCol&&V[p.logCol]&&V[p.logCol]!==r.v[p.logCol]){ r.log=r.log||[]; r.log.unshift({at:nowTs(),tx:V[p.logCol],by:ME.name}); }
+    updateAdminClosure(p,r,V);
     r.v=V; r.updated=todayISO(); audit('تعديل سجل',p.name+' · '+rowTitle(p,r));
-  } else { const nr={id:uid(),v:V,log:[],created:todayISO(),updated:todayISO()};
+  } else { const nr={id:uid(),log:[],created:todayISO(),updated:todayISO()};
+    updateAdminClosure(p,nr,V);
+    nr.v=V;
     if(p.logCol&&V[p.logCol]) nr.log.push({at:nowTs(),tx:V[p.logCol],by:ME.name});
     p.rows.unshift(nr); audit('إضافة سجل',p.name+' · '+rowTitle(p,nr)); }
   const btn=$('#bSaveRow'); if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> جارٍ الحفظ…';}
