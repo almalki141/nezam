@@ -1308,12 +1308,12 @@ function screenLogin(lockedUser,note){
       نفس البريد وكلمة المرور يفتحان بياناتك من أجهزتك المختلفة.<br>لا توجد استعادة لمفتاح التشفير إذا نُسيت كلمة المرور.</p>`);
   $('#gate').classList.add('gate-login');
   $('#l_show').onclick=()=>{const input=$('#l_pw'),show=input.type==='password';input.type=show?'text':'password';$('#l_show').setAttribute('aria-pressed',String(show));$('#l_show').setAttribute('aria-label',show?'إخفاء كلمة المرور':'إظهار كلمة المرور')};
-  $('#l_go').onclick=()=>{try{if($('#l_remember').checked)localStorage.setItem('nezam_remember_email',$('#l_mail').value.trim());else localStorage.removeItem('nezam_remember_email')}catch(e){}doLogin()};
+  $('#l_go').onclick=()=>{try{if($('#l_remember').checked)localStorage.setItem('nezam_remember_email',normalizeAccountEmail($('#l_mail').value));else localStorage.removeItem('nezam_remember_email')}catch(e){}doLogin()};
   $('#l_pw').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   setTimeout(()=>{const f=lockedUser?$('#l_pw'):$('#l_mail'); if(f) f.focus();},60);
 }
 async function doLogin(){
-  const mail=$('#l_mail').value.trim().toLowerCase(), pw=$('#l_pw').value;
+  const mail=normalizeAccountEmail($('#l_mail').value), pw=$('#l_pw').value;
   const btn=$('#l_go'); btn.innerHTML='<span class="spin"></span> جارٍ فك التشفير…'; btn.disabled=true;
   let u=null;
   try{
@@ -3282,7 +3282,7 @@ function permGrid(perms){
 }
 function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي');});}
 function newUserPassword(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',bytes=rnd(8);return Array.from(bytes,b=>chars[b%chars.length]).join('')}
-function normalizeNewUserEmail(value){
+function normalizeAccountEmail(value){
   return value.replace(/[\u061c\u200b-\u200f\u202a-\u202e\u2060\u2066-\u2069\ufeff]/g,'')
     .replace(/＠/g,'@').replace(/．/g,'.').trim().toLowerCase();
 }
@@ -3318,7 +3318,7 @@ function openAddUser(){
   };
   emailInput.oninput=()=>showEmailError('');
   $('#uSave').onclick=async()=>{
-    const name=$('#u_name').value.trim(), mail=normalizeNewUserEmail(emailInput.value);
+    const name=$('#u_name').value.trim(), mail=normalizeAccountEmail(emailInput.value);
     emailInput.value=mail;
     if(!name) return toast('الاسم مطلوب','err');
     if(!validNewUserEmail(mail))return showEmailError('أدخل عنوان بريد كاملًا بالصيغة name@example.com.');
@@ -3352,8 +3352,14 @@ function openAddUser(){
       const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\nرابط النظام:\n${location.origin+location.pathname}\n\nالبريد الإلكتروني:\n${mail}\n\nكلمة المرور:\n${pw}\n\nيمكنك الدخول مباشرة بهذه البيانات.\nيُرجى عدم مشاركة بيانات الدخول مع أي شخص.`;
       modal('تم إنشاء الحساب بنجاح',`<div class="gnote"><b>حساب ${esc(name)} جاهز للدخول فورًا</b><br>لا توجد رسالة تأكيد أو رابط تفعيل. انسخ البيانات التالية وأرسلها عبر قناة آمنة.</div>
         <div class="fld"><label>رسالة الدعوة الجاهزة</label><textarea id="inviteMsg" readonly style="min-height:245px;direction:rtl;line-height:1.9">${esc(msg)}</textarea></div>`,
-        `<button class="btn primary" id="copyInvite">نسخ بيانات الدخول</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
+        `<button class="btn primary" id="copyInvite">نسخ بيانات الدخول</button><button class="btn ghost" id="copyInvitePassword">نسخ كلمة المرور فقط</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
       $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText(msg); toast('نُسخت بيانات الدخول كاملة'); };
+      $('#copyInvitePassword').onclick=async()=>{
+        try{
+          await navigator.clipboard.writeText(pw);
+          toast('نُسخت كلمة المرور');
+        }catch(e){toast('تعذّر النسخ. حدّد كلمة المرور من رسالة بيانات الدخول وانسخها.','err');}
+      };
     }catch(e){
       if(rollbackNeeded){
         DB.users=oldDbUsers;VAULT.users=oldVaultUsers;DB.audit=oldAudit;
