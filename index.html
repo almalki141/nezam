@@ -3296,7 +3296,7 @@ function validNewUserEmail(email){
 function openAddUser(){
   if(!isAdmin())return;
   modal('إنشاء حساب مستخدم',`
-    <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد أو تغيير إلزامي لكلمة المرور.</div>
+    <div class="gnote">أنشئ الحساب مباشرة. إذا احتاج المستخدم إلى «الأسواق»، افتح صلاحياته بعد إنشاء الحساب واحفظها لتفعيل الوصول.</div>
     <div class="grid2">
       <div class="fld"><label>الاسم <i>*</i></label><input id="u_name"></div>
       <div class="fld"><label for="u_mail">البريد الإلكتروني <i>*</i></label><input id="u_mail" type="text" inputmode="email" dir="ltr" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="name@example.com" aria-describedby="u_mail_error"><span class="hint" id="u_mail_error" role="status"></span></div>
@@ -3346,7 +3346,6 @@ function openAddUser(){
       audit('إنشاء حساب مباشر',name+' — '+mail);
       if(!(await commitNow()))throw new Error('تعذّر حفظ المستخدم داخل المنظومة');
       rollbackNeeded=false;
-      try{const marketGrant=await fetch(window.SAHM_SERVICE_URL+'/api/access',{method:'POST',headers:{Authorization:'Bearer '+SB_SESSION.access_token,apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:mail,enabled:role==='admin'||['view','edit','full'].includes(perms[MARKET_PAGE_ID])})});if(!marketGrant.ok)toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق من إعدادات المستخدم.','err');}catch{toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق بعد رجوع الاتصال.','err');}
       if(!btn.isConnected)return;
 
       const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\nرابط النظام:\n${location.origin+location.pathname}\n\nالبريد الإلكتروني:\n${mail}\n\nكلمة المرور:\n${pw}\n\nيمكنك الدخول مباشرة بهذه البيانات.\nيُرجى عدم مشاركة بيانات الدخول مع أي شخص.`;
