@@ -753,11 +753,12 @@ html[data-ui-theme="golden"] .savepill .sz{color:#796B55}
 .commander-tools{display:flex;flex-wrap:wrap;gap:8px}.commander-tools button{padding:8px 12px;border:1px solid #d6b978;border-radius:9px;background:transparent;color:#fff9eb;font:inherit;cursor:pointer}
 .commander-body{max-width:1320px;margin:auto;padding:clamp(14px,3vw,34px)}
 .commander-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,225px),1fr));gap:15px}
-.commander-page{min-width:0;padding:clamp(14px,2.5vw,24px);border:1px solid var(--cmd-line);border-radius:15px;background:#fffdf8;box-shadow:0 7px 20px #5344210a;overflow-wrap:anywhere}
+.commander-page{min-width:0;padding:clamp(14px,2.5vw,24px);border:1px solid var(--cmd-line);border-block-start:3px solid #b48c48;border-radius:15px;background:linear-gradient(150deg,#fffdf8 62%,#f3ede0);box-shadow:0 7px 20px #5344210a;overflow-wrap:anywhere}
 .commander-wide{grid-column:1/-1}.commander-page h3{margin:0;color:var(--cmd-green);font-size:clamp(16px,2vw,24px)}.commander-page p,.commander-list p{margin:6px 0 0;white-space:pre-wrap;line-height:1.75}
-.commander-page-title,.commander-count{display:flex;align-items:center;gap:11px}.commander-page-title i{display:grid;place-items:center;color:var(--cmd-gold)}
+.commander-page-title,.commander-count{display:flex;align-items:center;gap:11px}.commander-page-title i{display:grid;place-items:center;flex:none;width:39px;height:39px;border-radius:11px;background:#eee4cf;color:var(--cmd-gold)}
 .commander-count{margin:12px 0;color:#4b6157}.commander-count strong{font-size:clamp(28px,4vw,48px);line-height:1.1;color:var(--cmd-green)}
-.commander-link{display:flex;align-items:center;gap:7px;width:100%;margin-top:12px;padding:9px 0 0;border:0;border-top:1px solid var(--cmd-line);background:none;color:var(--cmd-gold);font:inherit;font-weight:700;cursor:pointer}
+.commander-page .commander-brief{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--cmd-line);font-size:clamp(14px,1.4vw,19px);line-height:1.8}.commander-page .commander-brief-empty{color:#5b695f}
+.commander-brief-field{grid-column:1/-1;display:grid;gap:4px;margin-top:4px}.commander-brief-field[hidden]{display:none}.commander-brief-field textarea{width:100%;min-height:65px;resize:vertical}
 .commander-updates{margin-top:24px}.commander-updates>h3{display:flex;align-items:center;gap:12px;font-size:clamp(18px,2.6vw,27px)}.commander-updates>h3:after{content:'';height:1px;background:var(--cmd-line);flex:1}
 .commander-list{display:grid;gap:8px}.commander-list>div{padding:12px;border:1px solid var(--cmd-line);border-radius:10px;background:#fffdf8;overflow-wrap:anywhere}.commander-list span{display:block;color:#5b695f;font-size:.85em}
 .commander-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.commander-metrics div{padding:10px;border:1px solid var(--cmd-line);border-radius:9px}.commander-metrics dd{margin:4px 0 0;font-size:1.5em;font-weight:700}
@@ -1874,7 +1875,7 @@ const commanderSections={
 };
 const commanderNumber=new Intl.NumberFormat('ar-SA');
 const commanderFieldName=value=>String(value||'').trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا');
-const commanderShortcut=key=>key.startsWith('page:');
+const commanderManualPage=key=>key.startsWith('page:');
 function commanderTransactionStatus(page){
   return page?.cols?.find(col=>col.type==='select'&&commanderFieldName(col.name)==='حالة المعاملة');
 }
@@ -1901,7 +1902,7 @@ function commanderSection(key){
 function commanderPage(key){
   if(key==='guide') return pg(GUIDE_ID);
   if(key==='templates') return pg(EXCEL_LIBRARY_ID);
-  if(commanderShortcut(key)) return key.length>5?pg(key.slice(5)):null;
+  if(commanderManualPage(key)) return key.length>5?pg(key.slice(5)):null;
   if(key.startsWith('transactions:')) return commanderAdministrativePages().find(page=>page.id===key.slice('transactions:'.length));
   if(key==='transactions'){
     const candidates=commanderAdministrativePages();
@@ -1919,7 +1920,7 @@ function commanderPageIssue(key,account){
   if(key==='announcements') return '';
   const page=commanderPage(key);
   if(!page) return 'هذه الصفحة غير موجودة في المنظومة.';
-  if(!commanderShortcut(key)&&page.lockMode&&page.lockMode!=='none') return 'الصفحة مقفلة برقم سري.';
+  if(page.lockMode&&page.lockMode!=='none') return 'الصفحة مقفلة برقم سري.';
   const canRead=account.id===ME?.id?can(page.id,'view'):
     account.role==='admin'||page.id===EXCEL_LIBRARY_ID||['view','edit','full'].includes(account.perms?.[page.id]);
   return canRead?'':'حساب العرض لا يملك صلاحية قراءة هذه الصفحة.';
@@ -1956,12 +1957,14 @@ function commanderDashboard(data,account,preview=false){
     seen.add(identity);
     return true;
   });
-  const content=pages.map(({key,mode})=>{
+  const content=pages.map(({key,mode,brief})=>{
     const section=commanderSection(key), page=commanderPage(key);
-    if(commanderShortcut(key)){
+    const summary=typeof brief==='string'?brief.trim():'';
+    const summaryMarkup=summary?`<p class="commander-brief">${esc(summary)}</p>`:'';
+    if(commanderManualPage(key)){
       return `<article class="commander-page">
         <div class="commander-page-title"><i>${icon('file',24)}</i><h3>${esc(page.name)}</h3></div>
-        ${preview?'<span class="commander-link">اختصار إلى الصفحة</span>':`<button type="button" class="commander-link" data-commander-page="${esc(key)}">فتح الصفحة <span aria-hidden="true">←</span></button>`}
+        ${summaryMarkup||'<p class="commander-brief commander-brief-empty">لم يُضف موجز لهذه الصفحة بعد.</p>'}
       </article>`;
     }
     const name=esc(page?.name||section.title);
@@ -1969,20 +1972,24 @@ function commanderDashboard(data,account,preview=false){
     if(data.layout?.updates!==false&&entries) {
       updates.push(...entries.filter(entry=>/^\d{4}-\d\d-\d\d/.test(entry.updated)).map(entry=>({...entry,section:section.title})));
     }
-    const details=mode!=='full'?'':groups
-      ? `<dl class="commander-metrics">${groups.map(([label,total])=>`<div><dt>${label}</dt><dd>${commanderNumber.format(total)}</dd></div>`).join('')}</dl>`
-      : `<div class="commander-list">${entries.map(entry=>`<div><b>${esc(entry.title)}</b>${entry.text?`<p>${esc(entry.text)}</p>`:''}</div>`).join('')||'<p>لا يوجد محتوى حاليًا.</p>'}</div>`;
+    const visibleGroups=groups?.filter(([,total])=>mode==='full'||total>0);
+    const visibleEntries=mode==='full'?entries:entries?.slice(0,2);
+    const details=visibleGroups?.length
+      ? `<dl class="commander-metrics">${visibleGroups.map(([label,total])=>`<div><dt>${label}</dt><dd>${commanderNumber.format(total)}</dd></div>`).join('')}</dl>`
+      : visibleEntries?.length
+        ? `<div class="commander-list">${visibleEntries.map(entry=>`<div><b>${esc(entry.title)}</b>${mode==='full'&&entry.text?`<p>${esc(entry.text)}</p>`:''}</div>`).join('')}</div>`
+        : '';
     return `<article class="commander-page ${mode==='full'?'commander-wide':''}">
       <div class="commander-page-title"><i>${icon(section.icon,24)}</i><h3>${name}</h3></div>
+      ${summaryMarkup}
       <div class="commander-count"><strong>${commanderNumber.format(count)}</strong><span>${caption}</span></div>
       ${details}
-      ${!preview&&page?`<button type="button" class="commander-link" data-commander-page="${esc(key)}">فتح الصفحة <span aria-hidden="true">←</span></button>`:''}
     </article>`;
   });
   const cards=(data.cards||[]).filter(c=>c.visible!==false);
   const recent=updates.sort((a,b)=>b.updated.localeCompare(a.updated)).slice(0,5);
   return `<div class="commander-surface"><header class="commander-head">
-    <div><small>الصفحات المختارة</small><h2 ${preview?'':'id="commanderDisplayTitle"'}>${esc(data.title)}</h2></div>
+    <div><small>موجز الصفحات المختارة</small><h2 ${preview?'':'id="commanderDisplayTitle"'}>${esc(data.title)}</h2></div>
     ${preview?'':`<div class="commander-tools"><button type="button" id="commanderFullscreen">ملء الشاشة</button><button type="button" id="commanderExit">إنهاء العرض</button></div>`}
     </header><div class="commander-body">
     ${content.length?`<div class="commander-grid">${content.join('')}</div>`:''}
@@ -2009,12 +2016,6 @@ function drawCommanderDisplay(markup){
       else await frame.requestFullscreen();
     }catch{toast('تعذّر تشغيل ملء الشاشة على هذا الجهاز','err')}
   };
-  frame.querySelectorAll('[data-commander-page]').forEach(button=>{
-    button.onclick=()=>{
-      const key=button.dataset.commanderPage;
-      if(commanderAccess(key,ME)) go(commanderPage(key).id);
-    };
-  });
 }
 let commanderRequestVersion=0,commanderOpening=false;
 async function refreshCommanderDisplay(open=false){
@@ -2061,9 +2062,9 @@ async function openCommanderSettings(){
     const id=members.get(String(account?.email||'').toLowerCase());
     return id&&account.active!==false?[{id,name:u.name,email:account.email,user:u}]:[];
   }).sort((a,b)=>String(a.name).localeCompare(String(b.name),'ar'));
-  const savedPages=new Map((settings.layout?.pages||[]).map(({key,mode})=>{
+  const savedPages=new Map((settings.layout?.pages||[]).map(({key,mode,brief})=>{
     const legacyPage=key==='transactions'?commanderPage(key):null;
-    return [legacyPage?`transactions:${legacyPage.id}`:key,mode];
+    return [legacyPage?`transactions:${legacyPage.id}`:key,{mode,brief}];
   }));
   const selectedIds=new Set([...savedPages.keys()].map(key=>commanderPage(key)?.id).filter(Boolean));
   const pageOptions=commanderPageOptions().filter(key=>!selectedIds.has(commanderPage(key)?.id));
@@ -2082,9 +2083,10 @@ async function openCommanderSettings(){
       <div class="commander-option" data-key="${esc(key)}">
         <span class="commander-drag" draggable="true" aria-hidden="true">⠿</span>
         <label><input type="checkbox" data-enabled ${savedPages.has(key)?'checked':''}> ${name}</label>
-        <select data-mode aria-label="طريقة عرض ${name}">${commanderShortcut(key)?'<option value="link">اختصار</option>':`<option value="summary">موجز</option><option value="full" ${savedPages.get(key)==='full'?'selected':''}>عرض تفصيلي</option>`}</select>
+        <select data-mode aria-label="طريقة عرض ${name}">${commanderManualPage(key)?'<option value="brief">موجز إداري</option>':`<option value="summary">موجز</option><option value="full" ${savedPages.get(key)?.mode==='full'?'selected':''}>عرض تفصيلي</option>`}</select>
         <div class="commander-reorder"><button type="button" data-move="up" aria-label="تحريك ${name} للأعلى">↑</button><button type="button" data-move="down" aria-label="تحريك ${name} للأسفل">↓</button></div>
         <small data-unavailable hidden></small>
+        <label class="commander-brief-field" hidden>موجز إداري لصفحة ${name}<textarea data-brief maxlength="400" rows="2" placeholder="اكتب ما تريد أن يظهر للقائد">${esc(savedPages.get(key)?.brief||'')}</textarea></label>
       </div>`;
     }).join('')}</div>
     <label class="commander-switch"><input type="checkbox" id="commanderUpdates" ${settings.layout?.updates===false?'':'checked'}> إظهار آخر التحديثات</label>
@@ -2101,7 +2103,7 @@ async function openCommanderSettings(){
   const currentLayout=()=>({
     updates:$('#commanderUpdates').checked,
     pages:Array.from(pageList.children).filter(item=>item.querySelector('[data-enabled]').checked)
-      .map(item=>({key:item.dataset.key,mode:item.querySelector('[data-mode]').value}))
+      .map(item=>({key:item.dataset.key,mode:item.querySelector('[data-mode]').value,brief:item.querySelector('[data-brief]').value.trim()}))
   });
   const currentAccount=()=>options.find(option=>option.id===$('#commanderViewer').value)?.user;
   function updatePreview(){
@@ -2111,7 +2113,10 @@ async function openCommanderSettings(){
       const unavailable=!!issue;
       const enabled=item.querySelector('[data-enabled]');
       enabled.disabled=unavailable&&!enabled.checked;
-      item.querySelector('[data-mode]').disabled=!enabled.checked||unavailable||commanderShortcut(item.dataset.key);
+      item.querySelector('[data-mode]').disabled=!enabled.checked||unavailable||commanderManualPage(item.dataset.key);
+      const brief=item.querySelector('[data-brief]');
+      brief.closest('label').hidden=!enabled.checked||unavailable;
+      brief.disabled=!enabled.checked||unavailable;
       const hint=item.querySelector('[data-unavailable]');
       hint.textContent=issue;
       hint.hidden=!unavailable;
