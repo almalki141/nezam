@@ -745,15 +745,33 @@ html[data-ui-theme="golden"] .savepill .sz{color:#796B55}
 @media(max-width:900px){.duty-work-summary,.duty-linked-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.duty-data-grid{grid-template-columns:1fr}.duty-excel-list{grid-template-columns:repeat(2,minmax(0,1fr))}.duty-transaction{grid-template-columns:1fr auto}.duty-transaction-action{grid-column:1/-1}.duty-stage{padding-bottom:125px}.duty-foot{right:20px;left:20px}.duty-ticker{bottom:51px}}
 @media(max-width:600px){.duty-work-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.duty-work-summary .duty-kpi:last-child{grid-column:1/-1}.duty-work-summary .duty-kpi{padding:10px}.duty-data-grid{gap:8px}.duty-panel{padding:11px}.duty-excel-list{grid-template-columns:1fr}.duty-transaction{padding:10px;gap:8px}.duty-head{padding-bottom:13px}.duty-brand h2{font-size:24px}.duty-clock{display:none}.duty-ticker-track{animation-duration:22s}.duty-foot{font-size:9px}.duty-foot>span:last-child{display:none}.duty-stage{padding-bottom:112px}}
 .commander-actions{display:flex;flex-wrap:wrap;gap:8px}.commander-actions [hidden]{display:none}
-.commander-display{direction:rtl;position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:clamp(18px,5vw,64px);overflow:auto;box-sizing:border-box;border:0;background:var(--surface);color:var(--ink)}
-.commander-head,.commander-grid{max-width:1320px;margin-inline:auto}.commander-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--line)}
-.commander-head small{color:var(--ink-3)}.commander-head h2{margin:6px 0 0;font-size:clamp(24px,5vw,48px);overflow-wrap:anywhere}.commander-head button{flex-shrink:0}
-.commander-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:16px;margin-top:22px}.commander-grid article{min-width:0;padding:20px;border:1px solid var(--line);border-radius:16px;overflow-wrap:anywhere}.commander-grid h3{margin:0 0 8px;color:var(--ink);font-size:clamp(18px,2.5vw,26px)}.commander-grid article p{margin:0;white-space:pre-wrap;line-height:1.8;font-size:clamp(15px,2vw,22px)}
+.commander-display{direction:rtl;position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;overflow:auto;border:0}
+.commander-frame{min-height:100%;background:#f7f4ed}.commander-frame:fullscreen{width:100%;height:100%;overflow:auto}
+.commander-surface{--cmd-green:#123a2d;--cmd-gold:#8a652b;--cmd-line:#e2d9c6;min-height:100%;background:#f7f4ed;color:#17362b}
+.commander-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:clamp(20px,4vw,54px) max(24px,calc((100% - 1320px)/2));border-bottom:3px solid #bc9953;background:radial-gradient(ellipse at 10% 10%,#2a5846,transparent 58%),#103628;color:#fff9eb}
+.commander-head small{color:#e5cc93}.commander-head h2{margin:4px 0 0;font-size:clamp(29px,5vw,62px);line-height:1.25;overflow-wrap:anywhere}
+.commander-tools{display:flex;flex-wrap:wrap;gap:8px}.commander-tools button{padding:8px 12px;border:1px solid #d6b978;border-radius:9px;background:transparent;color:#fff9eb;font:inherit;cursor:pointer}
+.commander-body{max-width:1320px;margin:auto;padding:clamp(14px,3vw,34px)}
+.commander-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,225px),1fr));gap:15px}
+.commander-page{min-width:0;padding:clamp(14px,2.5vw,24px);border:1px solid var(--cmd-line);border-radius:15px;background:#fffdf8;box-shadow:0 7px 20px #5344210a;overflow-wrap:anywhere}
+.commander-wide{grid-column:1/-1}.commander-page h3{margin:0;color:var(--cmd-green);font-size:clamp(16px,2vw,24px)}.commander-page p,.commander-list p{margin:6px 0 0;white-space:pre-wrap;line-height:1.75}
+.commander-page-title,.commander-count{display:flex;align-items:center;gap:11px}.commander-page-title i{display:grid;place-items:center;color:var(--cmd-gold)}
+.commander-count{margin:12px 0;color:#4b6157}.commander-count strong{font-size:clamp(28px,4vw,48px);line-height:1.1;color:var(--cmd-green)}
+.commander-link{display:flex;align-items:center;gap:7px;width:100%;margin-top:12px;padding:9px 0 0;border:0;border-top:1px solid var(--cmd-line);background:none;color:var(--cmd-gold);font:inherit;font-weight:700;cursor:pointer}
+.commander-updates{margin-top:24px}.commander-updates>h3{display:flex;align-items:center;gap:12px;font-size:clamp(18px,2.6vw,27px)}.commander-updates>h3:after{content:'';height:1px;background:var(--cmd-line);flex:1}
+.commander-list{display:grid;gap:8px}.commander-list>div{padding:12px;border:1px solid var(--cmd-line);border-radius:10px;background:#fffdf8;overflow-wrap:anywhere}.commander-list span{display:block;color:#5b695f;font-size:.85em}
+.commander-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.commander-metrics div{padding:10px;border:1px solid var(--cmd-line);border-radius:9px}.commander-metrics dd{margin:4px 0 0;font-size:1.5em;font-weight:700}
+.commander-empty{margin:0;padding:22px;text-align:center;color:inherit}
+.modal.commander-settings-modal{max-width:1220px}.commander-settings-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:18px;align-items:start}
+.commander-preview{overflow:hidden;border:1px solid var(--line);border-radius:14px}.commander-preview .commander-head{padding:20px 14px}.commander-preview .commander-head h2{font-size:clamp(22px,3vw,34px)}.commander-preview .commander-body{padding:12px}.commander-preview .commander-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,142px),1fr));gap:8px}.commander-preview .commander-page{padding:10px}.commander-preview .commander-page h3{font-size:15px}
+.commander-controls h4{margin:12px 0 6px}.commander-option{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:6px;margin:0 0 6px;padding:8px;border:1px solid var(--line);border-radius:9px}.commander-option small{grid-column:1/-1;color:var(--ink-3)}.commander-option select{max-width:110px}.commander-drag{cursor:grab;color:var(--ink-3)}.commander-reorder{display:flex;gap:3px}.commander-reorder button{font:inherit;line-height:1;padding:5px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);cursor:pointer}.commander-reorder button:disabled{opacity:.35}
+.commander-switch{display:block;margin:14px 0}.commander-controls summary{cursor:pointer;font-weight:700;margin:10px 0}
 .commander-edit-card{min-width:0;margin:0 0 12px;padding:12px;border:1px solid var(--line);border-radius:12px}.commander-card-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+@media(max-width:760px){.commander-settings-layout{grid-template-columns:1fr}.commander-preview{order:2}.commander-head{align-items:flex-start;flex-direction:column}.commander-option{grid-template-columns:auto minmax(0,1fr) auto auto}}
 </style>
 </head>
 <body>
-<dialog id="commanderDisplay" class="commander-display" aria-labelledby="commanderDisplayTitle"></dialog>
+<dialog id="commanderDisplay" class="commander-display" aria-labelledby="commanderDisplayTitle"><div id="commanderFrame" class="commander-frame"></div></dialog>
 
 <!-- ============ بوابة الدخول ============ -->
 <div class="gate" id="gate">
@@ -1831,10 +1849,11 @@ function renderNav(){
 function closeCommanderDisplay(){
   commanderRequestVersion++;
   commanderOpening=false;
-  const view=$('#commanderDisplay');
+  const view=$('#commanderDisplay'),frame=$('#commanderFrame');
+  if(document.fullscreenElement===frame) document.exitFullscreen().catch(()=>{});
   if(view.open) view.close();
-  view.replaceChildren();
-  delete view.dataset.signature;
+  frame.replaceChildren();
+  delete view.commanderMarkup;
 }
 $('#commanderDisplay').addEventListener('cancel',e=>{e.preventDefault();closeCommanderDisplay()});
 
@@ -1847,10 +1866,106 @@ async function commanderRequest(action,params={}){
     return user===ME?.id&&session===SB_SESSION?.user?.id&&wid===WORKSPACE_ID?result:{stale:true};
   }catch(error){ return {error}; }
 }
-function drawCommanderDisplay(view,data){
-  view.innerHTML=`<header class="commander-head"><div><small>العرض الإداري</small><h2 id="commanderDisplayTitle">${esc(data.title)}</h2></div><button type="button" class="btn ghost" id="commanderExit">إنهاء العرض</button></header>
-    <div class="commander-grid">${data.cards.map(c=>`<article><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p></article>`).join('')||'<p class="empty">لا توجد بطاقات معروضة حاليًا.</p>'}</div>`;
+const commanderSections={
+  transactions:{title:'متابعة المعاملات',icon:'clipboard'},
+  guide:{title:'دليل الإجراءات',icon:'file'},
+  templates:{title:'نماذج Excel',icon:'file'},
+  announcements:{title:'إعلانات المنظومة',icon:'star'}
+};
+const commanderNumber=new Intl.NumberFormat('ar-SA');
+function commanderPage(key){
+  if(key==='guide') return pg(GUIDE_ID);
+  if(key==='templates') return pg(EXCEL_LIBRARY_ID);
+  if(key==='transactions') return (DB.pages||[]).find(p=>p.name==='متابعة المعاملات'&&p.cols?.some(c=>c.name==='حالة المعاملة'&&c.type==='select'));
+  return null;
+}
+function commanderAccess(key,account){
+  if(!account||!Object.hasOwn(commanderSections,key)) return false;
+  if(key==='announcements') return true;
+  const page=commanderPage(key);
+  if(!page||(page.lockMode&&page.lockMode!=='none')) return false;
+  if(account.id===ME?.id) return can(page.id,'view');
+  return account.role==='admin'||page.id===EXCEL_LIBRARY_ID||['view','edit','full'].includes(account.perms?.[page.id]);
+}
+function commanderPageContent(key){
+  if(key==='transactions'){
+    const page=commanderPage(key);
+    const status=page.cols.find(c=>c.name==='حالة المعاملة'&&c.type==='select');
+    const groups=new Map([['في مسارها',0],['يتطلب إجراء',0],['منتهية',0],['حالات أخرى',0]]);
+    for(const row of page.rows||[]){
+      const value=row.v?.[status.id];
+      const group=groups.has(value)?value:'حالات أخرى';
+      groups.set(group,groups.get(group)+1);
+    }
+    return {count:page.rows?.length||0,caption:'معاملة إدارية',groups:[...groups]};
+  }
+  const rows=key==='announcements'?DB.homeBanners:commanderPage(key)?.rows;
+  const entries=(Array.isArray(rows)?rows:[]).filter(row=>row&&(row.title||row.name)).map(row=>({
+    title:String(row.title||row.name),
+    text:String(key==='announcements'?row.text||'':row.description||''),
+    updated:String(row.updatedAt||row.updated||row.created||'')
+  }));
+  return {count:entries.length,caption:{announcements:'إعلان',guide:'إجراء',templates:'نموذج'}[key],entries};
+}
+function commanderDashboard(data,account,preview=false){
+  const seen=new Set(), updates=[];
+  const pages=(data.layout?.pages||[]).filter(({key})=>{
+    if(seen.has(key)||!commanderAccess(key,account)) return false;
+    seen.add(key);
+    return true;
+  });
+  const content=pages.map(({key,mode})=>{
+    const section=commanderSections[key], page=commanderPage(key);
+    const {count,caption,entries,groups}=commanderPageContent(key);
+    if(data.layout?.updates!==false&&entries) {
+      updates.push(...entries.filter(entry=>/^\d{4}-\d\d-\d\d/.test(entry.updated)).map(entry=>({...entry,section:section.title})));
+    }
+    const details=mode!=='full'?'':groups
+      ? `<dl class="commander-metrics">${groups.map(([label,total])=>`<div><dt>${label}</dt><dd>${commanderNumber.format(total)}</dd></div>`).join('')}</dl>`
+      : `<div class="commander-list">${entries.map(entry=>`<div><b>${esc(entry.title)}</b>${entry.text?`<p>${esc(entry.text)}</p>`:''}</div>`).join('')||'<p>لا يوجد محتوى حاليًا.</p>'}</div>`;
+    return `<article class="commander-page ${mode==='full'?'commander-wide':''}">
+      <div class="commander-page-title"><i>${icon(section.icon,24)}</i><h3>${section.title}</h3></div>
+      <div class="commander-count"><strong>${commanderNumber.format(count)}</strong><span>${caption}</span></div>
+      ${details}
+      ${!preview&&page?`<button type="button" class="commander-link" data-commander-page="${esc(key)}">فتح الصفحة <span aria-hidden="true">←</span></button>`:''}
+    </article>`;
+  });
+  const cards=(data.cards||[]).filter(c=>c.visible!==false);
+  const recent=updates.sort((a,b)=>b.updated.localeCompare(a.updated)).slice(0,5);
+  return `<div class="commander-surface"><header class="commander-head">
+    <div><small>موجز الصفحات المختارة</small><h2 ${preview?'':'id="commanderDisplayTitle"'}>${esc(data.title)}</h2></div>
+    ${preview?'':`<div class="commander-tools"><button type="button" id="commanderFullscreen">ملء الشاشة</button><button type="button" id="commanderExit">إنهاء العرض</button></div>`}
+    </header><div class="commander-body">
+    ${content.length?`<div class="commander-grid">${content.join('')}</div>`:''}
+    ${!content.length&&!cards.length?'<p class="commander-empty">لا توجد صفحات أو بطاقات متاحة للعرض.</p>':''}
+    ${recent.length?`<section class="commander-updates"><h3>آخر التحديثات</h3><div class="commander-list">${recent.map(entry=>`<div><b>${esc(entry.title)}</b><span>${esc(entry.section)} · ${esc(fmtDateLong(entry.updated.slice(0,10)))}</span></div>`).join('')}</div></section>`:''}
+    ${cards.length?`<section class="commander-updates"><h3>ملاحظات إدارية</h3><div class="commander-grid">${cards.map(card=>`<article class="commander-page"><h3>${esc(card.title)}</h3><p>${esc(card.text)}</p></article>`).join('')}</div></section>`:''}
+    </div></div>`;
+}
+function syncCommanderFullscreen(){
+  const button=$('#commanderFullscreen');
+  if(button) button.textContent=document.fullscreenElement===$('#commanderFrame')?'خروج من ملء الشاشة':'ملء الشاشة';
+}
+document.addEventListener('fullscreenchange',syncCommanderFullscreen);
+function drawCommanderDisplay(markup){
+  const frame=$('#commanderFrame');
+  frame.innerHTML=markup;
   $('#commanderExit').onclick=closeCommanderDisplay;
+  const full=$('#commanderFullscreen');
+  full.hidden=!document.fullscreenEnabled||!frame.requestFullscreen;
+  syncCommanderFullscreen();
+  full.onclick=async()=>{
+    try{
+      if(document.fullscreenElement===frame) await document.exitFullscreen();
+      else await frame.requestFullscreen();
+    }catch{toast('تعذّر تشغيل ملء الشاشة على هذا الجهاز','err')}
+  };
+  frame.querySelectorAll('[data-commander-page]').forEach(button=>{
+    button.onclick=()=>{
+      const key=button.dataset.commanderPage;
+      if(commanderAccess(key,ME)) go(commanderPage(key).id);
+    };
+  });
 }
 let commanderRequestVersion=0,commanderOpening=false;
 async function refreshCommanderDisplay(open=false){
@@ -1870,10 +1985,10 @@ async function refreshCommanderDisplay(open=false){
     return;
   }
   if(open||view.open){
-    const signature=JSON.stringify(data);
-    if(!view.open||view.dataset.signature!==signature){
-      drawCommanderDisplay(view,data);
-      view.dataset.signature=signature;
+    const markup=commanderDashboard(data,ME);
+    if(!view.open||view.commanderMarkup!==markup){
+      drawCommanderDisplay(markup);
+      view.commanderMarkup=markup;
     }
     if(open&&!view.open) view.showModal();
   }
@@ -1895,17 +2010,85 @@ async function openCommanderSettings(){
   const options=(DB.users||[]).flatMap(u=>{
     const account=VAULT.users.find(a=>a.id===u.id);
     const id=members.get(String(account?.email||'').toLowerCase());
-    return id&&account.active!==false?[{id,name:u.name,email:account.email}]:[];
+    return id&&account.active!==false?[{id,name:u.name,email:account.email,user:u}]:[];
   }).sort((a,b)=>String(a.name).localeCompare(String(b.name),'ar'));
+  const savedPages=new Map((settings.layout?.pages||[]).map(page=>[page.key,page.mode]));
+  const pageOrder=[...new Set([...savedPages.keys(),...Object.keys(commanderSections)])].filter(key=>Object.hasOwn(commanderSections,key));
   modal('إعداد شاشة القائد',`
+    <div class="commander-settings-layout"><div id="commanderPreview" class="commander-preview" aria-label="معاينة العرض"></div>
+    <div id="commanderSettingsControls" class="commander-controls">
     <div class="fld"><label for="commanderViewer">المستخدم الذي يستطيع فتح الشاشة</label>
     <select id="commanderViewer"><option value="">بدون مستخدم — إيقاف العرض</option>
     ${options.map(u=>`<option value="${esc(u.id)}"${u.id===settings.viewer_id?' selected':''}>${esc(u.name)} — ${esc(u.email)}</option>`).join('')}</select></div>
     <div class="fld"><label for="commanderTitle">عنوان الشاشة</label><input id="commanderTitle" maxlength="80" value="${esc(settings.title||'شاشة القائد')}"></div>
-    <p class="dim">أضف بطاقات للإعلانات والتذكيرات الإدارية، وحدد ما يظهر منها.</p>
-    <div id="commanderCards"></div><button type="button" class="btn ghost" id="commanderAdd">إضافة بطاقة</button>`,
-    '<button type="button" class="btn primary" id="commanderSave">حفظ إعدادات العرض</button><button type="button" class="btn ghost" onclick="closeModal()">إلغاء</button>');
+    <h4>الصفحات المختارة</h4>
+    <div id="commanderPageOrder">${pageOrder.map(key=>`
+      <div class="commander-option" data-key="${key}">
+        <span class="commander-drag" draggable="true" aria-hidden="true">⠿</span>
+        <label><input type="checkbox" data-enabled ${savedPages.has(key)?'checked':''}> ${commanderSections[key].title}</label>
+        <select data-mode aria-label="طريقة عرض ${commanderSections[key].title}"><option value="summary">موجز</option><option value="full" ${savedPages.get(key)==='full'?'selected':''}>صفحة كاملة</option></select>
+        <div class="commander-reorder"><button type="button" data-move="up" aria-label="تحريك ${commanderSections[key].title} للأعلى">↑</button><button type="button" data-move="down" aria-label="تحريك ${commanderSections[key].title} للأسفل">↓</button></div>
+        <small data-unavailable hidden>هذه الصفحة غير متاحة لحساب العرض.</small>
+      </div>`).join('')}</div>
+    <label class="commander-switch"><input type="checkbox" id="commanderUpdates" ${settings.layout?.updates===false?'':'checked'}> إظهار آخر التحديثات</label>
+    <details><summary>ملاحظات إدارية</summary><div id="commanderCards"></div><button type="button" class="btn ghost" id="commanderAdd">إضافة بطاقة</button></details>
+    </div></div>`,
+    '<button type="button" class="btn primary" id="commanderSave">حفظ إعدادات العرض</button><button type="button" class="btn ghost" onclick="closeModal()">إلغاء</button>','commander-settings-modal');
   const list=$('#commanderCards'),add=$('#commanderAdd');
+  const pageList=$('#commanderPageOrder'), controls=$('#commanderSettingsControls');
+  const currentCards=()=>Array.from(list.children,item=>({
+    title:item.querySelector('[data-title]').value.trim(),
+    text:item.querySelector('[data-text]').value.trim(),
+    visible:item.querySelector('[data-visible]').checked
+  }));
+  const currentLayout=()=>({
+    updates:$('#commanderUpdates').checked,
+    pages:Array.from(pageList.children).filter(item=>item.querySelector('[data-enabled]').checked)
+      .map(item=>({key:item.dataset.key,mode:item.querySelector('[data-mode]').value}))
+  });
+  const currentAccount=()=>options.find(option=>option.id===$('#commanderViewer').value)?.user;
+  function updatePreview(){
+    const account=currentAccount();
+    Array.from(pageList.children).forEach((item,index)=>{
+      const unavailable=!!account&&!commanderAccess(item.dataset.key,account);
+      const enabled=item.querySelector('[data-enabled]');
+      enabled.disabled=unavailable&&!enabled.checked;
+      item.querySelector('[data-mode]').disabled=!enabled.checked||unavailable;
+      item.querySelector('[data-unavailable]').hidden=!unavailable;
+      item.querySelector('[data-move="up"]').disabled=index===0;
+      item.querySelector('[data-move="down"]').disabled=index===pageList.children.length-1;
+    });
+    const data={title:$('#commanderTitle').value.trim()||'شاشة القائد',layout:currentLayout(),cards:currentCards().filter(c=>c.title&&c.text)};
+    $('#commanderPreview').innerHTML=account
+      ? commanderDashboard(data,account,true)
+      : '<p class="commander-empty">اختر حساب العرض لمعاينة الشاشة بحسب صلاحياته.</p>';
+  }
+  controls.addEventListener('input',updatePreview);
+  pageList.addEventListener('dragstart',e=>{
+    const handle=e.target.closest('.commander-drag');
+    if(handle) e.dataTransfer.setData('text/plain',handle.closest('[data-key]').dataset.key);
+  });
+  pageList.addEventListener('dragover',e=>{if(e.target.closest('[data-key]'))e.preventDefault()});
+  pageList.addEventListener('drop',e=>{
+    const target=e.target.closest('[data-key]');
+    const source=Array.from(pageList.children).find(item=>item.dataset.key===e.dataTransfer.getData('text/plain'));
+    if(!target||!source||target===source) return;
+    e.preventDefault();
+    const bounds=target.getBoundingClientRect();
+    pageList.insertBefore(source,e.clientY<bounds.top+bounds.height/2?target:target.nextElementSibling);
+    updatePreview();
+  });
+  pageList.addEventListener('click',e=>{
+    const button=e.target.closest('[data-move]');
+    if(!button) return;
+    const item=button.closest('[data-key]');
+    const neighbor=button.dataset.move==='up'?item.previousElementSibling:item.nextElementSibling;
+    if(!neighbor) return;
+    if(button.dataset.move==='up') pageList.insertBefore(item,neighbor);
+    else pageList.insertBefore(neighbor,item);
+    updatePreview();
+    (button.disabled?item.querySelector('[data-enabled]'):button).focus();
+  });
   const syncAdd=()=>{add.disabled=list.children.length>=8};
   function addCard(card={}){
     if(list.children.length>=8) return;
@@ -1916,19 +2099,20 @@ async function openCommanderSettings(){
       <div class="commander-card-actions"><label><input type="checkbox" data-visible ${card.visible!==false?'checked':''}> تظهر في العرض</label>
       <button type="button" class="btn ghost" data-remove>إزالة البطاقة</button></div>`;
     list.append(item);
-    item.querySelector('[data-remove]').onclick=()=>{item.remove();syncAdd()};
+    item.querySelector('[data-remove]').onclick=()=>{item.remove();syncAdd();updatePreview()};
     syncAdd();
     return item;
   }
   (settings.cards||[]).forEach(addCard);
   add.onclick=()=>addCard()?.querySelector('[data-title]').focus();
+  updatePreview();
   $('#commanderSave').onclick=async e=>{
     if(!isAdmin()) return;
     const btn=e.currentTarget, title=$('#commanderTitle').value.trim(), viewer=$('#commanderViewer').value||null;
-    const cards=Array.from(list.children,item=>({title:item.querySelector('[data-title]').value.trim(),text:item.querySelector('[data-text]').value.trim(),visible:item.querySelector('[data-visible]').checked}));
+    const cards=currentCards(),layout=currentLayout();
     if(!title||cards.some(c=>!c.title||!c.text)) return toast('أكمل عنوان الشاشة وعنوان ومحتوى كل بطاقة','err');
     btn.disabled=true;
-    const result=await commanderRequest('save',{p_viewer:viewer,p_title:title,p_cards:cards});
+    const result=await commanderRequest('save_layout',{p_viewer:viewer,p_title:title,p_cards:cards,p_layout:layout});
     if(result.stale||!btn.isConnected) return;
     btn.disabled=false;
     if(result.error) return toast('تعذّر حفظ إعدادات شاشة القائد','err');
