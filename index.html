@@ -1877,13 +1877,21 @@ const commanderFieldName=value=>String(value||'').trim().replace(/\s+/g,' ').rep
 function commanderTransactionStatus(page){
   return page?.cols?.find(col=>col.type==='select'&&commanderFieldName(col.name)==='حالة المعاملة');
 }
+function commanderAdministrativePages(){
+  return (DB.pages||[]).filter(page=>/^[a-z0-9_-]{1,80}$/i.test(page.id)&&commanderTransactionStatus(page)&&
+    page.cols.some(col=>['عنوان المعاملة','رقم المعاملة'].includes(commanderFieldName(col.name))));
+}
+function commanderSection(key){
+  if(Object.hasOwn(commanderSections,key)) return commanderSections[key];
+  if(key.startsWith('transactions:')&&commanderPage(key)) return commanderSections.transactions;
+  return null;
+}
 function commanderPage(key){
   if(key==='guide') return pg(GUIDE_ID);
   if(key==='templates') return pg(EXCEL_LIBRARY_ID);
+  if(key.startsWith('transactions:')) return commanderAdministrativePages().find(page=>page.id===key.slice('transactions:'.length));
   if(key==='transactions'){
-    const pages=DB.pages||[];
-    const candidates=pages.filter(page=>commanderTransactionStatus(page)&&
-      page.cols.some(col=>['عنوان المعاملة','رقم المعاملة'].includes(commanderFieldName(col.name))));
+    const candidates=commanderAdministrativePages();
     const names=['متابعة المعاملات','مركز متابعة المعاملات','متابعة معاملات'];
     for(const name of names){
       const page=candidates.find(candidate=>commanderFieldName(candidate.name)===name);
@@ -1894,7 +1902,7 @@ function commanderPage(key){
   return null;
 }
 function commanderPageIssue(key,account){
-  if(!account||!Object.hasOwn(commanderSections,key)) return 'اختر حساب العرض أولًا.';
+  if(!account) return 'اختر حساب العرض أولًا.';
   if(key==='announcements') return '';
   const page=commanderPage(key);
   if(!page) return 'تعذّر تحديد صفحة إدارية مطابقة في المنظومة.';
@@ -1907,7 +1915,7 @@ function commanderAccess(key,account){
   return !commanderPageIssue(key,account);
 }
 function commanderPageContent(key){
-  if(key==='transactions'){
+  if(key==='transactions'||key.startsWith('transactions:')){
     const page=commanderPage(key);
     const status=commanderTransactionStatus(page);
     const groups=new Map([['في مسارها',0],['يتطلب إجراء',0],['منتهية',0],['حالات أخرى',0]]);
@@ -1934,7 +1942,7 @@ function commanderDashboard(data,account,preview=false){
     return true;
   });
   const content=pages.map(({key,mode})=>{
-    const section=commanderSections[key], page=commanderPage(key);
+    const section=commanderSection(key), page=commanderPage(key);
     const name=esc(page?.name||section.title);
     const {count,caption,entries,groups}=commanderPageContent(key);
     if(data.layout?.updates!==false&&entries) {
@@ -2032,8 +2040,12 @@ async function openCommanderSettings(){
     const id=members.get(String(account?.email||'').toLowerCase());
     return id&&account.active!==false?[{id,name:u.name,email:account.email,user:u}]:[];
   }).sort((a,b)=>String(a.name).localeCompare(String(b.name),'ar'));
-  const savedPages=new Map((settings.layout?.pages||[]).map(page=>[page.key,page.mode]));
-  const pageOrder=[...new Set([...savedPages.keys(),...Object.keys(commanderSections)])].filter(key=>Object.hasOwn(commanderSections,key));
+  const savedPages=new Map((settings.layout?.pages||[]).map(({key,mode})=>{
+    const legacyPage=key==='transactions'?commanderPage(key):null;
+    return [legacyPage?`transactions:${legacyPage.id}`:key,mode];
+  }));
+  const pageOptions=['guide','templates','announcements',...orderedPages(commanderAdministrativePages()).map(page=>`transactions:${page.id}`)];
+  const pageOrder=[...new Set([...savedPages.keys(),...pageOptions])];
   modal('إعداد شاشة القائد',`
     <div class="commander-settings-layout"><div id="commanderPreview" class="commander-preview" aria-label="معاينة العرض"></div>
     <div id="commanderSettingsControls" class="commander-controls">
@@ -2042,14 +2054,17 @@ async function openCommanderSettings(){
     ${options.map(u=>`<option value="${esc(u.id)}"${u.id===settings.viewer_id?' selected':''}>${esc(u.name)} — ${esc(u.email)}</option>`).join('')}</select></div>
     <div class="fld"><label for="commanderTitle">عنوان الشاشة</label><input id="commanderTitle" maxlength="80" value="${esc(settings.title||'شاشة القائد')}"></div>
     <h4>اختر الصفحات التي تظهر في العرض</h4>
-    <div id="commanderPageOrder">${pageOrder.map(key=>`
-      <div class="commander-option" data-key="${key}">
+    <div id="commanderPageOrder">${pageOrder.map(key=>{
+      const name=esc(commanderPage(key)?.name||commanderSection(key)?.title||'صفحة غير متاحة');
+      return `
+      <div class="commander-option" data-key="${esc(key)}">
         <span class="commander-drag" draggable="true" aria-hidden="true">⠿</span>
-        <label><input type="checkbox" data-enabled ${savedPages.has(key)?'checked':''}> ${esc(commanderPage(key)?.name||commanderSections[key].title)}</label>
-        <select data-mode aria-label="طريقة عرض ${commanderSections[key].title}"><option value="summary">موجز</option><option value="full" ${savedPages.get(key)==='full'?'selected':''}>صفحة كاملة</option></select>
-        <div class="commander-reorder"><button type="button" data-move="up" aria-label="تحريك ${commanderSections[key].title} للأعلى">↑</button><button type="button" data-move="down" aria-label="تحريك ${commanderSections[key].title} للأسفل">↓</button></div>
+        <label><input type="checkbox" data-enabled ${savedPages.has(key)?'checked':''}> ${name}</label>
+        <select data-mode aria-label="طريقة عرض ${name}"><option value="summary">موجز</option><option value="full" ${savedPages.get(key)==='full'?'selected':''}>صفحة كاملة</option></select>
+        <div class="commander-reorder"><button type="button" data-move="up" aria-label="تحريك ${name} للأعلى">↑</button><button type="button" data-move="down" aria-label="تحريك ${name} للأسفل">↓</button></div>
         <small data-unavailable hidden></small>
-      </div>`).join('')}</div>
+      </div>`;
+    }).join('')}</div>
     <label class="commander-switch"><input type="checkbox" id="commanderUpdates" ${settings.layout?.updates===false?'':'checked'}> إظهار آخر التحديثات</label>
     <details><summary>ملاحظات إدارية</summary><div id="commanderCards"></div><button type="button" class="btn ghost" id="commanderAdd">إضافة بطاقة</button></details>
     </div></div>`,
@@ -2135,6 +2150,7 @@ async function openCommanderSettings(){
     const btn=e.currentTarget, title=$('#commanderTitle').value.trim(), viewer=$('#commanderViewer').value||null;
     const cards=currentCards(),layout=currentLayout();
     if(!title||cards.some(c=>!c.title||!c.text)) return toast('أكمل عنوان الشاشة وعنوان ومحتوى كل بطاقة','err');
+    if(layout.pages.length>100) return toast('اختر ١٠٠ صفحة أو أقل','err');
     btn.disabled=true;
     const result=await commanderRequest('save_layout',{p_viewer:viewer,p_title:title,p_cards:cards,p_layout:layout});
     if(result.stale||!btn.isConnected) return;
