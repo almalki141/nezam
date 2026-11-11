@@ -3282,12 +3282,24 @@ function permGrid(perms){
 }
 function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي');});}
 function newUserPassword(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',bytes=rnd(8);return Array.from(bytes,b=>chars[b%chars.length]).join('')}
+function normalizeNewUserEmail(value){
+  return value.replace(/[\u061c\u200b-\u200f\u202a-\u202e\u2060\u2066-\u2069\ufeff]/g,'')
+    .replace(/＠/g,'@').replace(/．/g,'.').trim().toLowerCase();
+}
+function validNewUserEmail(email){
+  const [local,domain,...extra]=email.split('@');
+  if(!domain||extra.length||email.length>254||local.length>64)return false;
+  if(!/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*$/.test(local))return false;
+  const labels=domain.split('.');
+  return labels.length>1&&labels.every(label=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label));
+}
 function openAddUser(){
+  if(!isAdmin())return;
   modal('إنشاء حساب مستخدم',`
     <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد أو تغيير إلزامي لكلمة المرور.</div>
     <div class="grid2">
       <div class="fld"><label>الاسم <i>*</i></label><input id="u_name"></div>
-      <div class="fld"><label>البريد الإلكتروني <i>*</i></label><input id="u_mail" type="email" placeholder="name@example.com"></div>
+      <div class="fld"><label for="u_mail">البريد الإلكتروني <i>*</i></label><input id="u_mail" type="text" inputmode="email" dir="ltr" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="name@example.com" aria-describedby="u_mail_error"><span class="hint" id="u_mail_error" role="status"></span></div>
       <div class="fld"><label>كلمة المرور للمستخدم الجديد</label><div class="promotion-fixed">تُنشأ تلقائيًا عند الحفظ</div>
         <span class="hint">8 أحرف وأرقام مختلفة لكل مستخدم؛ تظهر لك بعد نجاح الإنشاء، ويمكن للمستخدم تغييرها لاحقًا دون إلزام.</span></div>
       <div class="fld"><label>الدور</label><select id="u_role"><option value="staff">موظف</option><option value="admin">مدير (صلاحية كاملة)</option></select></div>
@@ -3298,23 +3310,44 @@ function openAddUser(){
     </div>`,
     `<button class="btn primary" id="uSave">إنشاء الحساب مباشرة</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
   bindPermPresets();
+  const emailInput=$('#u_mail'),emailError=$('#u_mail_error');
+  const showEmailError=message=>{
+    emailError.textContent=message;
+    emailInput.setAttribute('aria-invalid',String(Boolean(message)));
+    if(message&&emailInput.isConnected)emailInput.focus();
+  };
+  emailInput.oninput=()=>showEmailError('');
   $('#uSave').onclick=async()=>{
-    const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw=newUserPassword();
+    const name=$('#u_name').value.trim(), mail=normalizeNewUserEmail(emailInput.value);
+    emailInput.value=mail;
     if(!name) return toast('الاسم مطلوب','err');
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return toast('بريد غير صحيح','err');
-    if(VAULT.users.some(x=>x.email.toLowerCase()===mail)) return toast('هذا البريد مستخدم مسبقاً','err');
+    if(!validNewUserEmail(mail))return showEmailError('أدخل عنوان بريد كاملًا بالصيغة name@example.com.');
+    if(VAULT.users.some(x=>x.email.toLowerCase()===mail))return showEmailError('هذا البريد مرتبط بحساب موجود في المنظومة.');
+    showEmailError('');
+    const pw=newUserPassword();
     const btn=$('#uSave'); btn.innerHTML='<span class="spin"></span> جارٍ الإنشاء…'; btn.disabled=true;
-    const oldDbUsers=[...(DB.users||[])],oldVaultUsers=[...(VAULT.users||[])],oldAudit=[...(DB.audit||[])];let cloudCreated=false;
+    const role=$('#u_role').value,canExport=$('#u_exp').checked,canImport=$('#u_imp').checked;
+    const perms={};
+    document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value);
+    let oldDbUsers,oldVaultUsers,oldAudit,rollbackNeeded=false;
     try{
       const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
-      const id=uid(), perms={};
-      document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value);
-      DB.users=[...oldDbUsers,{id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,mustChangePassword:false,createdAt:nowTs()}];
+      const id=uid();
+      const cloud=await SB.functions.invoke('manage-users',{body:{action:'create',email:mail,password:pw,name,role}});
+      if(cloud.error){
+        const detail=await cloud.error.context?.json?.().catch(()=>null);
+        throw new Error(detail?.error?.message||detail?.message||detail?.error||cloud.error.message);
+      }
+      if(cloud.data?.error)throw new Error(cloud.data.error.message||cloud.data.error);
+      oldDbUsers=DB.users;oldVaultUsers=VAULT.users;oldAudit=[...(DB.audit||[])];
+      rollbackNeeded=true;
+      DB.users=[...oldDbUsers,{id,name,role,perms,canExport,canImport,mustChangePassword:false,createdAt:nowTs()}];
       VAULT.users=[...oldVaultUsers,{id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0,activatedAt:nowTs()}];
-      const cloud=await SB.functions.invoke('manage-users',{body:{action:'create',email:mail,password:pw,name,role:$('#u_role').value}});
-      if(cloud.error) throw cloud.error; if(cloud.data&&cloud.data.error) throw new Error(cloud.data.error);
-      cloudCreated=true;audit('إنشاء حساب مباشر',name+' — '+mail);if(!(await commitNow()))throw new Error('تعذّر حفظ المستخدم داخل المنظومة');
-      try{const marketGrant=await fetch(window.SAHM_SERVICE_URL+'/api/access',{method:'POST',headers:{Authorization:'Bearer '+SB_SESSION.access_token,apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:mail,enabled:$('#u_role').value==='admin'||['view','edit','full'].includes(perms[MARKET_PAGE_ID])})});if(!marketGrant.ok)toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق من إعدادات المستخدم.','err');}catch{toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق بعد رجوع الاتصال.','err');}
+      audit('إنشاء حساب مباشر',name+' — '+mail);
+      if(!(await commitNow()))throw new Error('تعذّر حفظ المستخدم داخل المنظومة');
+      rollbackNeeded=false;
+      try{const marketGrant=await fetch(window.SAHM_SERVICE_URL+'/api/access',{method:'POST',headers:{Authorization:'Bearer '+SB_SESSION.access_token,apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:mail,enabled:role==='admin'||['view','edit','full'].includes(perms[MARKET_PAGE_ID])})});if(!marketGrant.ok)toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق من إعدادات المستخدم.','err');}catch{toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق بعد رجوع الاتصال.','err');}
+      if(!btn.isConnected)return;
 
       const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\nرابط النظام:\n${location.origin+location.pathname}\n\nالبريد الإلكتروني:\n${mail}\n\nكلمة المرور:\n${pw}\n\nيمكنك الدخول مباشرة بهذه البيانات.\nيُرجى عدم مشاركة بيانات الدخول مع أي شخص.`;
       modal('تم إنشاء الحساب بنجاح',`<div class="gnote"><b>حساب ${esc(name)} جاهز للدخول فورًا</b><br>لا توجد رسالة تأكيد أو رابط تفعيل. انسخ البيانات التالية وأرسلها عبر قناة آمنة.</div>
@@ -3322,12 +3355,19 @@ function openAddUser(){
         `<button class="btn primary" id="copyInvite">نسخ بيانات الدخول</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
       $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText(msg); toast('نُسخت بيانات الدخول كاملة'); };
     }catch(e){
-      DB.users=oldDbUsers;VAULT.users=oldVaultUsers;DB.audit=oldAudit;
-      if(cloudCreated){try{const rollback=await SB.functions.invoke('manage-users',{body:{action:'delete',email:mail}});if(rollback.error||(rollback.data&&rollback.data.error))throw new Error(rollback.error?.message||rollback.data.error)}catch(_){toast('تعذّر تحرير البريد تلقائيًا؛ استخدم خيار إصلاح البريد','err')}}
-      await commitNow().catch(()=>false);
+      if(rollbackNeeded){
+        DB.users=oldDbUsers;VAULT.users=oldVaultUsers;DB.audit=oldAudit;
+        try{const rollback=await SB.functions.invoke('manage-users',{body:{action:'delete',email:mail}});if(rollback.error||rollback.data?.error)throw new Error('rollback failed')}catch(_){toast('تعذّر إلغاء الحساب غير المكتمل. راجع مسؤول خدمة الدخول قبل إعادة المحاولة.','err')}
+        await commitNow().catch(()=>false);
+      }
       btn.disabled=false; btn.textContent='إنشاء الحساب';
-      const duplicate=/already registered|already exists|مستخدم مسبق/i.test(String(e.message||''));
-      if(duplicate){modal('إصلاح بريد عالق',`<div class="gnote">البريد <b>${esc(mail)}</b> موجود في خدمة الدخول لكنه غير مضاف إلى منظومتك. استخدم الإصلاح فقط إذا كانت محاولة إضافة هذا البريد قد فشلت سابقًا.</div>`,`<button class="btn danger" id="uRepairEmail">إصلاح البريد وإعادة المحاولة</button><button class="btn ghost" onclick="openAddUser()">إلغاء</button>`,'sm');$('#uRepairEmail').onclick=async()=>{const repair=$('#uRepairEmail');repair.disabled=true;repair.innerHTML='<span class="spin"></span> جارٍ الإصلاح…';try{const del=await SB.functions.invoke('manage-users',{body:{action:'delete',email:mail}});if(del.error||(del.data&&del.data.error))throw new Error(del.error?.message||del.data.error);openAddUser();$('#u_name').value=name;$('#u_mail').value=mail;toast('تم تحرير البريد؛ يمكنك إنشاء الحساب الآن')}catch(x){repair.disabled=false;repair.textContent='إصلاح البريد وإعادة المحاولة';toast('تعذّر إصلاح البريد: '+authMessage(x.message),'err')}}}else toast('تعذّر إنشاء الحساب: '+authMessage(e.message),'err');
+      if(/invalid (?:email|format)|unable to validate email|email_address_invalid/i.test(e.message)){
+        return showEmailError('رفضت خدمة الدخول صيغة البريد. تأكد من كتابة عنوان المستخدم الحقيقي كاملًا، ثم حاول مرة أخرى.');
+      }
+      if(/already registered|already exists|مستخدم مسبق/i.test(e.message)){
+        return showEmailError('هذا البريد مسجل لدى خدمة الدخول. راجع مسؤول الخدمة إذا كان الحساب غير ظاهر في المنظومة.');
+      }
+      toast('تعذّر إنشاء الحساب: '+authMessage(e.message),'err');
     }
   };
 }
