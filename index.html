@@ -3281,14 +3281,15 @@ function permGrid(perms){
     <select data-pp="${p.id}" aria-label="صلاحية صفحة ${esc(p.name||'بدون اسم')}">${LEVELS.map(l=>`<option value="${l}" ${(perms[p.id]||'none')===l?'selected':''}>${LEVEL_AR[l]}</option>`).join('')}</select></div>`;}).join('')}</div>`;
 }
 function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي');});}
+function newUserPassword(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',bytes=rnd(8);return Array.from(bytes,b=>chars[b%chars.length]).join('')}
 function openAddUser(){
   modal('إنشاء حساب مستخدم',`
     <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد أو تغيير إلزامي لكلمة المرور.</div>
     <div class="grid2">
       <div class="fld"><label>الاسم <i>*</i></label><input id="u_name"></div>
       <div class="fld"><label>البريد الإلكتروني <i>*</i></label><input id="u_mail" type="email" placeholder="name@example.com"></div>
-      <div class="fld"><label>كلمة المرور للمستخدم الجديد</label><div class="promotion-fixed" dir="ltr">123456</div>
-        <span class="hint">يدخل بها مباشرة، ويمكنه تغييرها لاحقًا من حسابه دون إلزام.</span></div>
+      <div class="fld"><label>كلمة المرور للمستخدم الجديد</label><div class="promotion-fixed">تُنشأ تلقائيًا عند الحفظ</div>
+        <span class="hint">8 أحرف وأرقام مختلفة لكل مستخدم؛ تظهر لك بعد نجاح الإنشاء، ويمكن للمستخدم تغييرها لاحقًا دون إلزام.</span></div>
       <div class="fld"><label>الدور</label><select id="u_role"><option value="staff">موظف</option><option value="admin">مدير (صلاحية كاملة)</option></select></div>
       <div class="fld full"><label>خيارات</label>
         <label style="font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="u_exp" checked style="width:auto"> السماح بالتصدير والطباعة</label>
@@ -3298,7 +3299,7 @@ function openAddUser(){
     `<button class="btn primary" id="uSave">إنشاء الحساب مباشرة</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
   bindPermPresets();
   $('#uSave').onclick=async()=>{
-    const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw='123456';
+    const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw=newUserPassword();
     if(!name) return toast('الاسم مطلوب','err');
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return toast('بريد غير صحيح','err');
     if(VAULT.users.some(x=>x.email.toLowerCase()===mail)) return toast('هذا البريد مستخدم مسبقاً','err');
