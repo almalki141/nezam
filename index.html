@@ -1336,11 +1336,10 @@ async function doLogin(){
     const kek=await deriveKEK(pw,u.salt,VAULT.iters||ITERS);
     const dek=await unwrapDEK(kek,u);
     const data=await decObj(dek,VAULT.data);
-    const firstActivation=!u.activatedAt; u.fails=0; u.lockUntil=0; u.activatedAt=u.activatedAt||nowTs();
+    u.fails=0; u.lockUntil=0; u.activatedAt=u.activatedAt||nowTs();
     DEK=dek; DB=data; MYREV=VAULT.rev||1;
     ME=(DB.users||[]).find(x=>x.id===u.id);
     if(!ME){ ME={id:u.id,name:u.email,role:'admin',perms:{},canExport:true,canImport:true}; DB.users=DB.users||[]; DB.users.push(ME); }
-    if(firstActivation&&ME.role!=='admin') ME.mustChangePassword=true;
     audit('دخول','تسجيل دخول ناجح');
     enterApp();
     save();
@@ -3284,12 +3283,12 @@ function permGrid(perms){
 function bindPermPresets(){document.querySelectorAll('[data-perm-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-pp]').forEach(s=>s.value=b.dataset.permAll);toast('طُبّقت الصلاحية على جميع الصفحات، بما فيها الأسواق ومتابعة أعمالي');});}
 function openAddUser(){
   modal('إنشاء حساب مستخدم',`
-    <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد؛ سيدخل بالبريد والكلمة المؤقتة ثم يختار كلمة مرور خاصة به.</div>
+    <div class="gnote">أنشئ الحساب مباشرة. لن يحتاج الموظف إلى رابط دعوة أو تأكيد بريد أو تغيير إلزامي لكلمة المرور.</div>
     <div class="grid2">
       <div class="fld"><label>الاسم <i>*</i></label><input id="u_name"></div>
       <div class="fld"><label>البريد الإلكتروني <i>*</i></label><input id="u_mail" type="email" placeholder="name@example.com"></div>
-      <div class="fld"><label>كلمة المرور المبدئية <i>*</i></label><input id="u_pw" type="text" value="${Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)+'-'+Math.random().toString(36).slice(2,6)}">
-        <span class="hint">صالحة للدخول الأول فقط، ثم يفرض النظام تغييرها.</span></div>
+      <div class="fld"><label>كلمة المرور للمستخدم الجديد</label><div class="promotion-fixed" dir="ltr">123456</div>
+        <span class="hint">يدخل بها مباشرة، ويمكنه تغييرها لاحقًا من حسابه دون إلزام.</span></div>
       <div class="fld"><label>الدور</label><select id="u_role"><option value="staff">موظف</option><option value="admin">مدير (صلاحية كاملة)</option></select></div>
       <div class="fld full"><label>خيارات</label>
         <label style="font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="u_exp" checked style="width:auto"> السماح بالتصدير والطباعة</label>
@@ -3299,37 +3298,35 @@ function openAddUser(){
     `<button class="btn primary" id="uSave">إنشاء الحساب مباشرة</button><button class="btn ghost" onclick="openUsers()">رجوع</button>`,'lg');
   bindPermPresets();
   $('#uSave').onclick=async()=>{
-    const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw=$('#u_pw').value;
+    const name=$('#u_name').value.trim(), mail=$('#u_mail').value.trim().toLowerCase(), pw='123456';
     if(!name) return toast('الاسم مطلوب','err');
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) return toast('بريد غير صحيح','err');
-    if(pw.length<8) return toast('كلمة المرور 8 أحرف على الأقل','err');
     if(VAULT.users.some(x=>x.email.toLowerCase()===mail)) return toast('هذا البريد مستخدم مسبقاً','err');
     const btn=$('#uSave'); btn.innerHTML='<span class="spin"></span> جارٍ الإنشاء…'; btn.disabled=true;
-    let createdId=null;
+    const oldDbUsers=[...(DB.users||[])],oldVaultUsers=[...(VAULT.users||[])],oldAudit=[...(DB.audit||[])];let cloudCreated=false;
     try{
       const salt=ab2b64(rnd(16)), kek=await deriveKEK(pw,salt,VAULT.iters||ITERS), wr=await wrapDEK(kek,DEK);
-      const id=uid(), perms={}; createdId=id;
+      const id=uid(), perms={};
       document.querySelectorAll('[data-pp]').forEach(s=>perms[s.dataset.pp]=s.value);
-      DB.users.push({id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,mustChangePassword:true,createdAt:nowTs()});
-      VAULT.users.push({id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0});
+      DB.users=[...oldDbUsers,{id,name,role:$('#u_role').value,perms,canExport:$('#u_exp').checked,canImport:$('#u_imp').checked,mustChangePassword:false,createdAt:nowTs()}];
+      VAULT.users=[...oldVaultUsers,{id,email:mail,salt,...wr,active:true,fails:0,lockUntil:0,activatedAt:nowTs()}];
       const cloud=await SB.functions.invoke('manage-users',{body:{action:'create',email:mail,password:pw,name,role:$('#u_role').value}});
       if(cloud.error) throw cloud.error; if(cloud.data&&cloud.data.error) throw new Error(cloud.data.error);
-      audit('إنشاء حساب مباشر',name+' — '+mail); await persist();
+      cloudCreated=true;audit('إنشاء حساب مباشر',name+' — '+mail);if(!(await commitNow()))throw new Error('تعذّر حفظ المستخدم داخل المنظومة');
       try{const marketGrant=await fetch(window.SAHM_SERVICE_URL+'/api/access',{method:'POST',headers:{Authorization:'Bearer '+SB_SESSION.access_token,apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:mail,enabled:$('#u_role').value==='admin'||['view','edit','full'].includes(perms[MARKET_PAGE_ID])})});if(!marketGrant.ok)toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق من إعدادات المستخدم.','err');}catch{toast('الحساب جاهز؛ أعد حفظ صلاحية الأسواق بعد رجوع الاتصال.','err');}
 
-      const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\nرابط النظام:\n${location.origin+location.pathname}\n\nالبريد الإلكتروني:\n${mail}\n\nكلمة المرور المؤقتة:\n${pw}\n\nبعد أول دخول سيطلب منك النظام إنشاء كلمة مرور خاصة بك.\nيُرجى عدم مشاركة بيانات الدخول مع أي شخص.`;
+      const msg=`مرحبًا ${name}،\nتم إنشاء حسابك في منظومة الشؤون الإدارية.\n\nرابط النظام:\n${location.origin+location.pathname}\n\nالبريد الإلكتروني:\n${mail}\n\nكلمة المرور:\n${pw}\n\nيمكنك الدخول مباشرة بهذه البيانات.\nيُرجى عدم مشاركة بيانات الدخول مع أي شخص.`;
       modal('تم إنشاء الحساب بنجاح',`<div class="gnote"><b>حساب ${esc(name)} جاهز للدخول فورًا</b><br>لا توجد رسالة تأكيد أو رابط تفعيل. انسخ البيانات التالية وأرسلها عبر قناة آمنة.</div>
         <div class="fld"><label>رسالة الدعوة الجاهزة</label><textarea id="inviteMsg" readonly style="min-height:245px;direction:rtl;line-height:1.9">${esc(msg)}</textarea></div>`,
         `<button class="btn primary" id="copyInvite">نسخ بيانات الدخول</button><button class="btn ghost" onclick="openUsers()">العودة للمستخدمين</button>`,'sm');
       $('#copyInvite').onclick=async()=>{ await navigator.clipboard.writeText(msg); toast('نُسخت بيانات الدخول كاملة'); };
     }catch(e){
-      if(createdId){
-        DB.users=DB.users.filter(x=>x.id!==createdId);
-        VAULT.users=VAULT.users.filter(x=>x.id!==createdId);
-        try{ await persist(); }catch(_){}
-      }
+      DB.users=oldDbUsers;VAULT.users=oldVaultUsers;DB.audit=oldAudit;
+      if(cloudCreated){try{const rollback=await SB.functions.invoke('manage-users',{body:{action:'delete',email:mail}});if(rollback.error||(rollback.data&&rollback.data.error))throw new Error(rollback.error?.message||rollback.data.error)}catch(_){toast('تعذّر تحرير البريد تلقائيًا؛ استخدم خيار إصلاح البريد','err')}}
+      await commitNow().catch(()=>false);
       btn.disabled=false; btn.textContent='إنشاء الحساب';
-      toast('تعذّر إنشاء الحساب: '+authMessage(e.message),'err');
+      const duplicate=/already registered|already exists|مستخدم مسبق/i.test(String(e.message||''));
+      if(duplicate){modal('إصلاح بريد عالق',`<div class="gnote">البريد <b>${esc(mail)}</b> موجود في خدمة الدخول لكنه غير مضاف إلى منظومتك. استخدم الإصلاح فقط إذا كانت محاولة إضافة هذا البريد قد فشلت سابقًا.</div>`,`<button class="btn danger" id="uRepairEmail">إصلاح البريد وإعادة المحاولة</button><button class="btn ghost" onclick="openAddUser()">إلغاء</button>`,'sm');$('#uRepairEmail').onclick=async()=>{const repair=$('#uRepairEmail');repair.disabled=true;repair.innerHTML='<span class="spin"></span> جارٍ الإصلاح…';try{const del=await SB.functions.invoke('manage-users',{body:{action:'delete',email:mail}});if(del.error||(del.data&&del.data.error))throw new Error(del.error?.message||del.data.error);openAddUser();$('#u_name').value=name;$('#u_mail').value=mail;toast('تم تحرير البريد؛ يمكنك إنشاء الحساب الآن')}catch(x){repair.disabled=false;repair.textContent='إصلاح البريد وإعادة المحاولة';toast('تعذّر إصلاح البريد: '+authMessage(x.message),'err')}}}else toast('تعذّر إنشاء الحساب: '+authMessage(e.message),'err');
     }
   };
 }
