@@ -2532,7 +2532,15 @@ function renderBusiness(){const rows=businessClients(),u=U(),q=String(u.q||'').t
 
 function vehicleRows(){DB.vehicles=Array.isArray(DB.vehicles)?DB.vehicles:[];return DB.vehicles}
 function vehicleNextDate(v){if(!v?.lastMaintenance)return '';const d=new Date(v.lastMaintenance+'T12:00:00');if(isNaN(d))return '';d.setDate(d.getDate()+Math.max(1,+v.intervalDays||30));return d.toISOString().slice(0,10)}
-function vehicleMaintenanceState(v){const next=vehicleNextDate(v);if(!next)return {key:'missing',label:'لم تُسجّل صيانة',color:'red',days:null,next:''};const d=dutyDaysUntil(next),remind=7;if(d<0)return {key:'overdue',label:`متأخرة ${Math.abs(d)} يوم`,color:'red',days:d,next};if(d===0)return {key:'due',label:'الصيانة اليوم',color:'amber',days:d,next};if(d<=remind)return {key:'due',label:`متبقي ${d} أيام`,color:'amber',days:d,next};return {key:'scheduled',label:`بعد ${d} يوم`,color:'green',days:d,next}}
+function vehicleMaintenanceState(v){
+  const next=vehicleNextDate(v);
+  if(!next) return {key:'missing',label:'لم تُسجّل صيانة',color:'red',days:null,next:''};
+  const days=(Date.parse(next)-Date.parse(todayISO()))/86400000;
+  if(days<0) return {key:'overdue',label:`متأخرة ${Math.abs(days)} يوم`,color:'red',days,next};
+  if(days===0) return {key:'due',label:'الصيانة اليوم',color:'amber',days,next};
+  if(days<=7) return {key:'due',label:`متبقي ${days} أيام`,color:'amber',days,next};
+  return {key:'scheduled',label:`بعد ${days} يوم`,color:'green',days,next};
+}
 const vehicleReadiness=v=>({ready:{label:'جاهزة',color:'green'},limited:{label:'جاهزية محدودة',color:'amber'},out:{label:'غير جاهزة',color:'red'}}[v]||{label:'غير محددة',color:'slate'});
 function openVehicle(id){
   if(!can(VEHICLES_PAGE_ID,'edit'))return toast('لا تملك صلاحية تعديل العربات','err');const rows=vehicleRows(),old=rows.find(x=>x.id===id),v=old?JSON.parse(JSON.stringify(old)):{id:uid(),number:'',type:'',plate:'',department:'',readiness:'ready',lastMaintenance:'',intervalDays:30,remindDays:7,odometer:'',notes:'',history:[]};
